@@ -44,7 +44,7 @@
 <style>
 	main {
 		padding: 20px 28px 40px;
-		min-height: 100vh;
+		min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 	}
 	header {
 		display: flex;

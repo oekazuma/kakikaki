@@ -20,5 +20,9 @@ html, body {
 	-webkit-touch-callout: none;
 	overscroll-behavior: none;
 }
+/* PWA(standalone) ではステータスバーの下までコンテンツが広がるため、安全領域ぶんを body で確保する */
+body {
+	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
 button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .card { background: var(--card); border-radius: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }

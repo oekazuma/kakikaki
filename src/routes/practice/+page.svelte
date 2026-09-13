@@ -185,7 +185,7 @@
 		grid-template-columns: 220px 1fr 110px;
 		grid-template-rows: auto 1fr;
 		gap: 12px 18px;
-		height: 100vh;
+		height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 		padding: 16px 22px;
 	}
 	header {
@@ -348,7 +348,7 @@
 	}
 	.toast {
 		position: fixed;
-		top: 24px;
+		top: calc(24px + env(safe-area-inset-top));
 		left: 50%;
 		transform: translateX(-50%);
 		z-index: 70;
