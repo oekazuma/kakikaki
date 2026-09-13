@@ -2,6 +2,7 @@
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
 	import BackButton from '$lib/components/BackButton.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { SEION, GROUPS, ALPHABET } from '$lib/chars';
 	import { charCleared, charGold } from '$lib/progress.svelte';
 	import { lang, info } from '$lib/lang.svelte';
@@ -15,7 +16,8 @@
 {#snippet cell(c: string)}
 	{#if c}
 		<a class={['card', 'cell', { done: charCleared(c) }]} href="{base}/practice?w=char-{c}">
-			{c}<span class="s">{charGold(c) ? '👑' : charCleared(c) ? '★' : ''}</span>
+			{c}
+			{#if charGold(c)}<span class="s gold"><Icon name="crown" size={16} fill /></span>{:else if charCleared(c)}<span class="s"><Icon name="star" size={16} fill /></span>{/if}
 		</a>
 	{:else}<span class="cell empty"></span>{/if}
 {/snippet}
@@ -115,9 +117,12 @@
 	.s {
 		position: absolute;
 		right: 6px;
-		bottom: 2px;
-		font-size: 14px;
+		bottom: 6px;
 		color: var(--star);
+		display: grid;
+	}
+	.s.gold {
+		color: #e08a00;
 	}
 	.groups {
 		display: flex;

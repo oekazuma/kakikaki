@@ -130,7 +130,7 @@
 			{#each chars as ch, n (n)}
 				<button class={['tab', 'card', { on: n === i }]} onclick={() => select(n)}>
 					<span class="ch">{ch}</span>
-					<span class={['s', { gold: get(ch).test > 0 }]}>{charCleared(ch) ? '★' : '☆'}</span>
+					<span class={['s', { gold: get(ch).test > 0, on: charCleared(ch) }]}><Icon name={get(ch).test > 0 ? 'crown' : 'star'} size={13} fill={charCleared(ch) || get(ch).test > 0} /></span>
 				</button>
 			{/each}
 		</div>
@@ -154,7 +154,7 @@
 			{#key `${lang.v}-${c}-${mode}-${gen}`}
 				<Canvas bind:this={canvas} char={c} {strokes} {mode} onDone={done} onStroke={(k) => (stroke = k + 1)} onDraw={() => (drawn = true)} />
 			{/key}
-			{#if flyStar}<div class="flystar">⭐</div>{/if}
+			{#if flyStar}<div class="flystar"><Icon name="star" size={90} fill /></div>{/if}
 		</div>
 		<p class="hint">{msg || (mode === 'test' && drawn ? 'かけたら みぎの「できた」を おしてね' : cur.hint)}</p>
 	</section>
@@ -220,10 +220,17 @@
 		color: #fff;
 	}
 	.tab .s {
-		font-size: 12px;
+		display: grid;
+		color: #c3cad2;
+	}
+	.tab .s.on {
+		color: var(--star);
 	}
 	.tab .s.gold {
-		color: var(--star);
+		color: #e08a00;
+	}
+	.tab.on .s {
+		color: #fff;
 	}
 	.charstars {
 		padding: 10px;
@@ -330,7 +337,8 @@
 		position: absolute;
 		left: 50%;
 		top: 50%;
-		font-size: 90px;
+		color: var(--star);
+		filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
 		animation: fly 0.9s ease-in forwards;
 		pointer-events: none;
 	}

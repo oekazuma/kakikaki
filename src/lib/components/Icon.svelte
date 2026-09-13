@@ -17,10 +17,20 @@
 		eye: 'M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6zM12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0',
 		help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01'
 	} as const;
-	let { name, size = 24 }: { name: keyof typeof PATHS; size?: number } = $props();
+	let { name, size = 24, fill = false }: { name: keyof typeof PATHS; size?: number; fill?: boolean } = $props();
 </script>
 
-<svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<svg
+	viewBox="0 0 24 24"
+	width={size}
+	height={size}
+	fill={fill ? 'currentColor' : 'none'}
+	stroke="currentColor"
+	stroke-width={fill ? 1.5 : 2}
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	aria-hidden="true"
+>
 	<path d={PATHS[name]} />
 </svg>
 

@@ -3,12 +3,13 @@
 	import { imageUrl } from '$lib/image';
 	import { wordStar, wordCrown } from '$lib/progress.svelte';
 	import { nameOf, subOf } from '$lib/lang.svelte';
+	import Icon from './Icon.svelte';
 	let { word, onclick, size = 180 }: { word: Word; onclick?: () => void; size?: number } = $props();
 	let missing = $state(false);
 </script>
 
 <button class="card" style:width="{size}px" {onclick}>
-	{#if wordCrown(word)}<span class="badge">👑</span>{:else if wordStar(word)}<span class="badge">⭐</span>{/if}
+	{#if wordCrown(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span>{:else if wordStar(word)}<span class="badge"><Icon name="star" size={18} fill /></span>{/if}
 	{#if missing}
 		<div class="initial" style:height="{size * 0.6}px">{word.name[0]}</div>
 	{:else}
@@ -58,10 +59,20 @@
 	}
 	.badge {
 		position: absolute;
-		top: 6px;
+		top: 8px;
 		right: 8px;
-		font-size: 26px;
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background: var(--star);
+		color: #fff;
+		display: grid;
+		place-content: center;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 		animation: pop 0.5s;
+	}
+	.badge.gold {
+		background: #e08a00;
 	}
 	@keyframes pop {
 		50% {
