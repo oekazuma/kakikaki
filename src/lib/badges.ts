@@ -45,7 +45,7 @@ export function computeStats(l: Lang, charCleared: (c: string) => boolean, charG
 
 const CAT_EMOJI: Record<string, string> = {
 	'のりもの': '🚗', 'どうぶつ': '🐾', 'くだもの': '🍎', 'やさい': '🥕', 'たべもの': '🍙',
-	'しぜん': '🌈', 'からだ': '🖐️', 'みのまわり': '🏠', 'あそび': '⚽'
+	'しぜん': '🌈', 'からだ': '🖐️', 'きもち': '😊', 'みのまわり': '🏠', 'あそび': '⚽'
 };
 
 export type Badge = { id: string; emoji: string; name: string; desc: string; need: (s: Stats) => [have: number, need: number] };
