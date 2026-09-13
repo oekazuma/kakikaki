@@ -121,10 +121,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />
-		<div>
-			<div class="with">{nameOf(word)}と いっしょに</div>
-			<h1>{cur.title}</h1>
-		</div>
+		<h1>{cur.title}</h1>
 	</header>
 
 	<aside class="left">
@@ -138,7 +135,6 @@
 			{/each}
 		</div>
 		<div class="charstars card">
-			<div class="lbl">「{c}」の ほし</div>
 			<div class="cols">
 				<div><small>なぞる</small><Stars n={2} k={get(c).trace} /></div>
 				<div><small>じぶんで</small><Stars n={1} k={get(c).free} /></div>
@@ -197,11 +193,6 @@
 		gap: 14px;
 		align-items: center;
 	}
-	.with {
-		color: var(--teal);
-		font-size: 13px;
-		font-weight: bold;
-	}
 	h1 {
 		margin: 0;
 		font-size: 22px;
@@ -237,10 +228,6 @@
 	.charstars {
 		padding: 10px;
 		text-align: center;
-	}
-	.lbl {
-		font-size: 13px;
-		font-weight: bold;
 	}
 	.cols {
 		display: flex;
