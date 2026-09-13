@@ -16,8 +16,15 @@
 		char,
 		mode,
 		onDone,
-		onStroke
-	}: { char: string; mode: Mode; onDone: (r: Result) => void; onStroke?: (i: number) => void } = $props();
+		onStroke,
+		onDraw
+	}: {
+		char: string;
+		mode: Mode;
+		onDone: (r: Result) => void;
+		onStroke?: (i: number) => void;
+		onDraw?: () => void;
+	} = $props();
 
 	const ds = $derived(STROKES[char]);
 	const samples = $derived(ds.map((d) => pathToPoints(d)));
@@ -112,6 +119,7 @@
 		} else {
 			trails.push(trail);
 			trail = [];
+			onDraw?.();
 			clearTimeout(idle);
 			idle = setTimeout(judge, 4000);
 		}

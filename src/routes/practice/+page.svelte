@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { base } from '$app/paths';
+	import { untrack } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import Canvas, { type Result } from '$lib/components/Canvas.svelte';
 	import WordCard from '$lib/components/WordCard.svelte';
@@ -17,8 +18,16 @@
 	const word = $derived(wordById(page.url.searchParams.get('w') ?? '') ?? wordById('patocar')!);
 	const chars = $derived([...word.name]);
 	let i = $state(Number(page.url.searchParams.get('i') ?? 0));
-	let mode = $state<Mode>('trace');
 	const c = $derived(chars[i]);
+
+	// その文字で次にやるべきモード。全部終わっていれば null
+	function nextMode(ch: string): Mode | null {
+		const p = get(ch);
+		return p.trace < 2 ? 'trace' : p.free < 1 ? 'free' : p.test < 1 ? 'test' : null;
+	}
+	let mode = $state<Mode>(untrack(() => nextMode(chars[i])) ?? 'trace');
+	let gen = $state(0); // 同じ文字・モードで書き取り面を作り直すためのカウンタ
+	let drawn = $state(false); // おてほんなしで 1 画以上書いた
 	let canvas = $state<Canvas>();
 	let stroke = $state(0);
 	let msg = $state('');
@@ -42,14 +51,17 @@
 	const MODES: { id: Mode; label: string; hint: string; title: string }[] = [
 		{ id: 'trace', label: '👆 なぞる', hint: 'まるから、みちに そって ゆっくり', title: 'なぞって みよう！' },
 		{ id: 'free', label: '✏️ じぶんで かく', hint: 'いろの みちを ぬろう。なんかいに わけても いいよ', title: 'じぶんで かいてみよう！' },
-		{ id: 'test', label: '🌟 おてほんなし', hint: 'おてほんを みないで かいてみよう。かけたら「できた」', title: 'おてほんなしで かいてみよう！' }
+		{ id: 'test', label: '🌟 おてほんなし', hint: 'おてほんを みないで かいてみよう', title: 'おてほんなしで かいてみよう！' }
 	];
 	const cur = $derived(MODES.find((m) => m.id === mode)!);
 
-	function select(n: number) {
+	function select(n: number, m: Mode = nextMode(chars[n]) ?? 'trace') {
 		i = n;
+		mode = m;
 		stroke = 0;
 		msg = '';
+		drawn = false;
+		gen++;
 	}
 
 	function done(r: Result) {
@@ -90,11 +102,12 @@
 		}
 		setTimeout(() => {
 			busy = false;
-			if (i < chars.length - 1) select(i + 1);
+			const next = nextMode(c);
+			if (next) select(i, next);
+			else if (i < chars.length - 1) select(i + 1);
 			else {
-				stroke = 0;
-				msg = '';
-				canvas?.reset();
+				select(i, 'trace');
+				msg = 'ぜんぶ できた！ すきな もじで もういちど あそべるよ';
 			}
 		}, wait);
 	}
@@ -132,39 +145,25 @@
 	<section class="center">
 		<div class="modes card">
 			{#each MODES as m (m.id)}
-				<button
-					class={{ on: mode === m.id }}
-					onclick={() => {
-						mode = m.id;
-						msg = '';
-						stroke = 0;
-					}}>{m.label}</button
-				>
+				<button class={{ on: mode === m.id }} onclick={() => select(i, m.id)}>{m.label}</button>
 			{/each}
 		</div>
 		<div class="board card">
 			<span class="count">{Math.min(stroke + 1, STROKES[c].length)} / {STROKES[c].length}</span>
-			{#key `${c}-${mode}`}
-				<Canvas bind:this={canvas} char={c} {mode} onDone={done} onStroke={(k) => (stroke = k + 1)} />
+			{#key `${c}-${mode}-${gen}`}
+				<Canvas bind:this={canvas} char={c} {mode} onDone={done} onStroke={(k) => (stroke = k + 1)} onDraw={() => (drawn = true)} />
 			{/key}
 			{#if flyStar}<div class="flystar">⭐</div>{/if}
 		</div>
-		<p class="hint">{msg || cur.hint}</p>
+		<p class="hint">{msg || (mode === 'test' && drawn ? 'かけたら みぎの ✅「できた」を おしてね' : cur.hint)}</p>
 	</section>
 
 	<aside class="right">
 		<button class="rb" onclick={() => say(readingOf(c))}><span class="card ic">🔊</span>きく</button>
 		<button class="rb" onclick={() => canvas?.playDemo()}><span class="card ic">👀</span>みる</button>
-		<button
-			class="rb"
-			onclick={() => {
-				canvas?.reset();
-				stroke = 0;
-				msg = '';
-			}}><span class="card ic">↺</span>やりなおす</button
-		>
+		<button class="rb" onclick={() => select(i, mode)}><span class="card ic">↺</span>やりなおす</button>
 		{#if mode === 'test'}
-			<button class="rb done" onclick={() => canvas?.judge()}><span class="card ic">✅</span>できた</button>
+			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic">✅</span>できた</button>
 		{/if}
 	</aside>
 
@@ -323,6 +322,23 @@
 	}
 	.done .ic {
 		background: var(--teal);
+		width: 64px;
+		height: 64px;
+		font-size: 30px;
+		color: #fff;
+	}
+	.done {
+		font-weight: bold;
+		color: var(--teal);
+	}
+	.done.ready .ic {
+		animation: ready 1s ease-in-out infinite;
+		box-shadow: 0 0 0 6px rgba(19, 120, 111, 0.25);
+	}
+	@keyframes ready {
+		50% {
+			transform: scale(1.12);
+		}
 	}
 	.flystar {
 		position: absolute;
