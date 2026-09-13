@@ -14,6 +14,7 @@
 	import { get, record, charCleared, wordStar, wordCrown, checkBadges, type Mode } from '$lib/progress.svelte';
 	import { lang, info, nameOf, lettersOf, strokesOf, charsOf } from '$lib/lang.svelte';
 	import type { Badge } from '$lib/badges';
+	import type { Word } from '$lib/words';
 	import { say, sfx, readingOf } from '$lib/audio';
 	import { fx } from '$lib/fx';
 	import { stars, praise } from '$lib/score';
@@ -59,13 +60,29 @@
 		});
 	});
 
-	// つぎの単語（同じ並び順で次、末尾なら先頭）。1 文字練習なら次の文字
-	function nextId() {
+	// まだ終わっていない次の単語（同じ並び順で後ろから探し、末尾なら先頭へ）。全部終わっていれば null
+	const wordDone = (w: Word) => lettersOf(w).every((ch) => nextMode(ch) === null);
+	function nextId(): string | null {
 		if (word.id.startsWith('char-')) {
 			const list = charsOf();
-			return `char-${list[(list.indexOf(word.name) + 1) % list.length]}`;
+			const k = list.indexOf(word.name);
+			for (let n = 1; n < list.length; n++) {
+				const ch = list[(k + n) % list.length];
+				if (nextMode(ch) !== null) return `char-${ch}`;
+			}
+			return null;
 		}
-		return WORDS[(WORDS.findIndex((w) => w.id === word.id) + 1) % WORDS.length].id;
+		const k = WORDS.findIndex((w) => w.id === word.id);
+		for (let n = 1; n < WORDS.length; n++) {
+			const w = WORDS[(k + n) % WORDS.length];
+			if (!wordDone(w)) return w.id;
+		}
+		return null;
+	}
+	function goNext() {
+		complete = false;
+		const id = nextId();
+		goto(id ? `${base}/practice?w=${id}` : `${base}/`);
 	}
 	function replay() {
 		complete = false;
@@ -211,7 +228,7 @@
 				{#if wordCrown(word)}<span class="mark gold"><Icon name="crown" size={22} fill /> おうかん</span>{:else}<span class="mark"><Icon name="star" size={22} fill /> ほし ゲット</span>{/if}
 			</div>
 			<div class="btns">
-				<button class="next" onclick={() => goto(`${base}/practice?w=${nextId()}`)}>{word.id.startsWith('char-') ? 'つぎの もじ' : 'つぎの たんご'}</button>
+				<button class="next" onclick={goNext}>{word.id.startsWith('char-') ? 'つぎの もじ' : 'つぎの たんご'}</button>
 				<a class="home" href="{base}/">ホームへ</a>
 				<button class="again" onclick={replay}>もういちど</button>
 			</div>
