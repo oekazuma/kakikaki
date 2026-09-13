@@ -16,6 +16,7 @@
 		font-size: 20px;
 		font-weight: bold;
 		color: #fff;
+		text-decoration: none;
 		background: var(--blue);
 		box-shadow: 0 3px 0 #2f5b8a;
 		flex: none;
