@@ -8,7 +8,7 @@
 
 **Tech Stack:** SvelteKit (Svelte 5 runes, TypeScript), adapter-static, vitest, pnpm, Node 24。追加ランタイム依存なし。
 
-**Spec:** `docs/superpowers/specs/2026-09-13-kakikaki-hiragana-design.md`
+**Spec:** `docs/superpowers/specs/2026-09-13-kakikaki-design.md`
 
 ## Global Constraints
 
@@ -16,7 +16,7 @@
 - 座標系は KanjiVG の 109×109 viewBox。判定・採点・認識はすべてこの単位。
 - UI テキストはすべてひらがな中心の日本語（子ども向け）。保護者向け画面だけ漢字可。
 - 画面は横向き前提。縦向きは案内オーバーレイ。
-- `kit.paths.base` = `process.env.BASE_PATH ?? '/kakikaki-hiragana'`。画像などの静的パスは必ず `base` を前置。
+- `kit.paths.base` = `process.env.BASE_PATH ?? '/kakikaki'`。画像などの静的パスは必ず `base` を前置。
 - Svelte ファイルを書く時は svelte:svelte-code-writer スキル（MCP の autofixer）で検証する。
 - コミットは各タスク末尾。メッセージ末尾に `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`。
 
@@ -34,7 +34,7 @@
 - [ ] **Step 1: scaffold**
 
 ```bash
-cd ~/localRepo/kakikaki-hiragana
+cd ~/localRepo/kakikaki
 pnpm dlx sv@latest create --template minimal --types ts --add vitest="usages:unit" --install pnpm --no-dir-check --no-download-check .
 pnpm add -D @sveltejs/adapter-static
 pnpm remove @sveltejs/adapter-auto
@@ -50,7 +50,7 @@ export default {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({ fallback: undefined }),
-		paths: { base: process.env.BASE_PATH ?? '/kakikaki-hiragana' },
+		paths: { base: process.env.BASE_PATH ?? '/kakikaki' },
 		serviceWorker: { register: true }
 	}
 };
@@ -1517,8 +1517,8 @@ git add -A && git commit -m "feat: 進捗保存・効果音と読み上げ・パ
 {
 	"name": "かきかき ひらがな",
 	"short_name": "かきかき",
-	"start_url": "/kakikaki-hiragana/",
-	"scope": "/kakikaki-hiragana/",
+	"start_url": "/kakikaki/",
+	"scope": "/kakikaki/",
 	"display": "standalone",
 	"orientation": "landscape",
 	"background_color": "#f4f5f0",
@@ -1610,7 +1610,7 @@ iPad 横画面で使うひらがな書き練習 PWA。
 書き順データ: [KanjiVG](https://kanjivg.tagaini.net)（CC BY-SA 3.0）
 ```
 
-- [ ] **Step 6: `pnpm build && pnpm preview` → Browser で `http://localhost:4173/kakikaki-hiragana/` を開き、DevTools 相当（`navigator.serviceWorker.controller`）で SW が有効なことを確認。コミット**
+- [ ] **Step 6: `pnpm build && pnpm preview` → Browser で `http://localhost:4173/kakikaki/` を開き、DevTools 相当（`navigator.serviceWorker.controller`）で SW が有効なことを確認。コミット**
 
 ```bash
 git add -A && git commit -m "feat: PWA マニフェスト・Service Worker・GitHub Pages デプロイ"
@@ -1619,8 +1619,8 @@ git add -A && git commit -m "feat: PWA マニフェスト・Service Worker・Git
 - [ ] **Step 7: GitHub に公開**（ユーザー確認済みの手順）
 
 ```bash
-gh repo create kakikaki-hiragana --public --source . --push
-gh api -X POST repos/{owner}/kakikaki-hiragana/pages -f build_type=workflow
+gh repo create kakikaki --public --source . --push
+gh api -X POST repos/{owner}/kakikaki/pages -f build_type=workflow
 ```
 
-Actions 完了後 `https://<owner>.github.io/kakikaki-hiragana/` を iPad で開く。
+Actions 完了後 `https://<owner>.github.io/kakikaki/` を iPad で開く。

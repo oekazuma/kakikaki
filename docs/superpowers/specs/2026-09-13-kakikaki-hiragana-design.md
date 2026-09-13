@@ -5,7 +5,7 @@ iPad 横画面で使う、子ども向けひらがな書き練習 PWA。配布�
 ## 技術
 
 - SvelteKit (Svelte 5, runes) + `@sveltejs/adapter-static`、TypeScript、vitest。
-- `kit.paths.base` は GitHub Pages のリポジトリ名 `/kakikaki-hiragana`。`BASE_PATH` 環境変数で上書き可（Cloudflare Pages 等に移すとき用）。
+- `kit.paths.base` は GitHub Pages のリポジトリ名 `/kakikaki`。`BASE_PATH` 環境変数で上書き可（Cloudflare Pages 等に移すとき用）。
 - PWA: `static/manifest.webmanifest`（`display: standalone`、`orientation: landscape` は iPadOS では無視される前提）、`src/service-worker.ts`（SvelteKit 組み込み。`build` + `files` を cache-first、バージョンごとに古いキャッシュ削除）。`app.html` に `apple-mobile-web-app-capable`、`apple-touch-icon`、`viewport-fit=cover, user-scalable=no`。
 - 追加ライブラリなし。パーティクル・紙吹雪・認識器は自前。
 - デプロイ: GitHub Actions で `pnpm build` → `actions/deploy-pages`。

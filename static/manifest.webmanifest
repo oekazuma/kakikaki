@@ -1,8 +1,8 @@
 {
 	"name": "かきかき ひらがな",
 	"short_name": "かきかき",
-	"start_url": "/kakikaki-hiragana/",
-	"scope": "/kakikaki-hiragana/",
+	"start_url": "/kakikaki/",
+	"scope": "/kakikaki/",
 	"display": "standalone",
 	"orientation": "landscape",
 	"background_color": "#f4f5f0",

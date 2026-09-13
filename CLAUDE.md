@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 概要
 
-iPad 横画面用の子ども向けひらがな書き練習 PWA。SvelteKit（Svelte 5 runes、TypeScript）+ adapter-static で、`main` への push で GitHub Pages（`/kakikaki-hiragana/`）へ自動デプロイされる。UI 文言は子ども向けのひらがな中心、保護者向け画面（`/about`）だけ漢字可。追加ランタイム依存はゼロで、パーティクル・効果音・手書き認識はすべて自前実装。
+iPad 横画面用の子ども向けひらがな書き練習 PWA。SvelteKit（Svelte 5 runes、TypeScript）+ adapter-static で、`main` への push で GitHub Pages（`/kakikaki/`）へ自動デプロイされる。UI 文言は子ども向けのひらがな中心、保護者向け画面（`/about`）だけ漢字可。追加ランタイム依存はゼロで、パーティクル・効果音・手書き認識はすべて自前実装。
 
 ## コマンド
 
 ```bash
-pnpm dev                      # http://localhost:5173/kakikaki-hiragana/
+pnpm dev                      # http://localhost:5173/kakikaki/
 pnpm test                     # vitest 一括実行（純粋関数のテストのみ、DOM 不要）
 pnpm exec vitest run src/lib/judge.test.ts   # 単一ファイル
 pnpm check                    # svelte-check

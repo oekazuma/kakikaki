@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://oekazuma.github.io/kakikaki-hiragana/">https://oekazuma.github.io/kakikaki-hiragana/</a>
+  <a href="https://oekazuma.github.io/kakikaki/">https://oekazuma.github.io/kakikaki/</a>
 </p>
 
 ---

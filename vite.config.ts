@@ -10,7 +10,7 @@ export default defineConfig({
 				runes: ({ filename }) => (filename.split(/[/\\]/).includes('node_modules') ? undefined : true)
 			},
 			adapter: adapter(),
-			paths: { base: (process.env.BASE_PATH ?? '/kakikaki-hiragana') as `/${string}` },
+			paths: { base: (process.env.BASE_PATH ?? '/kakikaki') as `/${string}` },
 			serviceWorker: { register: true }
 		})
 	],
