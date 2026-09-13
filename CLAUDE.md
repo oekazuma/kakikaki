@@ -16,6 +16,7 @@ pnpm check                    # svelte-check
 pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
 node scripts/fetch-strokes.ts # KanjiVG から src/lib/strokes.ts を再生成
 node scripts/fetch-images.ts  # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
+node scripts/make-icon.ts     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
 `main` に push すると GitHub Actions が GitHub Pages にデプロイする。公開先を変えるときは `BASE_PATH=/ pnpm build` のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
