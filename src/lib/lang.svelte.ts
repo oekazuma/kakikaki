@@ -24,9 +24,12 @@ export const info = () => LANG_INFO[lang.v];
 export const strokesOf = (l: Lang = lang.v) => LANG_INFO[l].strokes;
 export const charsOf = (l: Lang = lang.v) => LANG_INFO[l].chars;
 
-// 表示名。英語は単語そのもの、説明欄には日本語名を出す
+// 表示名。英語は単語そのもの
 export const nameOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.name : w.en);
-export const descOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.desc : w.name === w.en ? undefined : w.name);
+// ひらがな → カタカナ（ー はそのまま）
+export const toKatakana = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
+// 補助行: ひらがな のときは「カタカナ 英語」、えいご のときは「カタカナ」
+export const descOf = (w: Word, l: Lang = lang.v) => (w.name === w.en ? undefined : l === 'ja' ? `${toKatakana(w.name)}  ${w.en}` : toKatakana(w.name));
 
 // 書く対象の文字。スペースやハイフンは飛ばす
 export const lettersOf = (w: Word, l: Lang = lang.v) => [...nameOf(w, l)].filter((c) => c !== ' ' && c !== '-');

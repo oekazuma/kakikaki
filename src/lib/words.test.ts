@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { WORDS, charWord, wordById } from './words';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
-import { lettersOf } from './lang.svelte';
+import { lettersOf, toKatakana } from './lang.svelte';
 
 describe('words', () => {
 	it('全単語の全文字に書き順がある（日本語・英語）', () => {
@@ -19,10 +19,9 @@ describe('words', () => {
 		expect(wordById('bus')?.name).toBe('ばす');
 		expect(wordById('char-ぱ')?.name).toBe('ぱ');
 	});
-	it('全単語に説明と英語名がある', () => {
-		for (const w of WORDS) {
-			expect(w.desc, w.name).toBeTruthy();
-			expect(w.en, w.name).toMatch(/^[a-z ]+$/);
-		}
+	it('全単語に英語名があり、カタカナ変換できる', () => {
+		for (const w of WORDS) expect(w.en, w.name).toMatch(/^[a-z ]+$/);
+		expect(toKatakana('ぱとかー')).toBe('パトカー');
+		expect(toKatakana('きゅうきゅうしゃ')).toBe('キュウキュウシャ');
 	});
 });
