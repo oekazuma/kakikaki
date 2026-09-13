@@ -49,10 +49,15 @@
 		</div>
 	{:else}
 		<div class="en">
-			{#each ALPHABET as row, r (r)}
-				<div class="row">
-					{#each row as c, k (k)}{@render cell(c)}{/each}
-				</div>
+			{#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)]] as [name, rows] (name)}
+				<section class="card group">
+					<h2 class="ltr">{name}</h2>
+					{#each rows as row, r (r)}
+						<div class="row">
+							{#each row as c, k (k)}{@render cell(c)}{/each}
+						</div>
+					{/each}
+				</section>
 			{/each}
 		</div>
 	{/if}
@@ -135,12 +140,18 @@
 	}
 	.en {
 		display: grid;
-		gap: 8px;
+		gap: 16px;
+	}
+	.ltr {
+		text-align: left;
 	}
 	.row {
 		display: grid;
 		grid-template-columns: repeat(13, 1fr);
 		gap: 8px;
+	}
+	.row + .row {
+		margin-top: 8px;
 	}
 	.en .cell {
 		width: auto;
