@@ -108,7 +108,7 @@
 	}
 
 	const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string; hint: string; title: string }[] = [
-		{ id: 'trace', icon: 'trace', label: 'なぞる', hint: 'まるから、みちに そって ゆっくり', title: 'なぞって みよう！' },
+		{ id: 'trace', icon: 'trace', label: 'なぞる', hint: 'の まるから みちに そって ゆっくり', title: 'なぞって みよう！' },
 		{ id: 'free', icon: 'pencil', label: 'じぶんで かく', hint: 'いろの みちを ぬろう。なんかいに わけても いいよ', title: 'じぶんで かいてみよう！' },
 		{ id: 'test', icon: 'star', label: 'おてほんなし', hint: 'おてほんを みないで かいてみよう', title: 'おてほんなしで かいてみよう！' }
 	];
@@ -217,7 +217,17 @@
 			{/key}
 			{#if flyStar}<div class="flystar"><Icon name="star" size={90} fill /></div>{/if}
 		</div>
-		<p class="hint">{msg || (mode === 'test' && drawn ? 'かけたら みぎの「できた」を おしてね' : cur.hint)}</p>
+		<p class="hint">
+			{#if msg}
+				{msg}
+			{:else if mode === 'trace'}
+				<span class="num">{Math.min(stroke + 1, strokes[c].length)}</span>{cur.hint}
+			{:else if mode === 'test' && drawn}
+				かけたら みぎの「できた」を おしてね
+			{:else}
+				{cur.hint}
+			{/if}
+		</p>
 	</section>
 
 	<aside class="right">
@@ -405,12 +415,30 @@
 		border-radius: 12px;
 	}
 	.hint {
-		margin: 0;
-		text-align: center;
-		color: var(--sub);
-		font-size: 15px;
-		min-height: 22px;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		padding: 8px 22px;
+		border-radius: 20px;
+		background: #fff;
+		color: var(--ink);
+		font-size: 18px;
+		min-height: 40px;
 		font-weight: bold;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	}
+	/* 書き取り面の番号つきの丸と同じ見た目 */
+	.num {
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		background: var(--blue);
+		color: #fff;
+		display: grid;
+		place-content: center;
+		font-size: 17px;
 	}
 	.right {
 		display: grid;
