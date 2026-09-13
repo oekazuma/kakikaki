@@ -131,7 +131,7 @@
 			<section class="card">
 				<h2>オフラインでも使えます</h2>
 				<p>一度開けば、文字・イラスト・効果音はすべて iPad の中に保存されるので、インターネットがなくても練習できます。読み上げは iPadOS の音声を使うため、これもオフラインで動きます。</p>
-				<p>新しい版が出たときは、通常は 2 回起動したときに切り替わります。すぐに切り替えたいときは右の「最新版に更新」を押してください（このときだけインターネットが必要です）。</p>
+				<p>新しいバージョンが出たときは、通常は 2 回起動したときに切り替わります。すぐに切り替えたいときは右の「最新版に更新」を押してください（このときだけインターネットが必要です）。</p>
 			</section>
 
 			<section class="card">
@@ -148,7 +148,7 @@
 			<section class="card">
 				<h2>更新</h2>
 				<button class="update" onclick={update} disabled={updating}><Icon name="redo" size={20} /> {updating ? '更新中…' : '最新版に更新'}</button>
-				<small>いまの版: {built}</small>
+				<small>いまのバージョン: {built}</small>
 			</section>
 
 			<section class="card danger-zone">
