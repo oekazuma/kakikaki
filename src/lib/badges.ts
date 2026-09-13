@@ -1,4 +1,4 @@
-import { CHARS, CHARS_EN, GOJUON, ALPHABET } from './chars';
+import { CHARS, CHARS_EN, SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET } from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
 import { LEVEL_NAME } from './quiz';
@@ -17,11 +17,10 @@ export type Stats = {
 
 type Row = { name: string; chars: string[] };
 const ROWS_JA: Row[] = [
-	...GOJUON.slice(0, 9).map((r) => ({ name: r.filter(Boolean).join(''), chars: r.filter(Boolean) })),
-	{ name: 'わをん', chars: ['わ', 'を', 'ん'] },
-	{ name: 'だくおん', chars: GOJUON.slice(11, 15).flat().filter(Boolean) },
-	{ name: 'はんだくおん', chars: GOJUON[15].filter(Boolean) },
-	{ name: 'ちいさいもじ', chars: [...GOJUON.slice(16).flat().filter(Boolean), 'ー'] }
+	...SEION.map((r) => ({ name: r.filter(Boolean).join(''), chars: r.filter(Boolean) })),
+	{ name: 'だくおん', chars: DAKUON.flat().filter(Boolean) },
+	{ name: 'はんだくおん', chars: HANDAKUON.flat().filter(Boolean) },
+	{ name: 'ちいさいもじ', chars: [...KOGAKI.flat().filter(Boolean), ...CHOON.flat().filter(Boolean)] }
 ];
 const ROWS_EN: Row[] = ALPHABET.flatMap((row) => [row.slice(0, 7), row.slice(7)]).map((chars) => ({ name: chars.join(''), chars }));
 export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, en: ROWS_EN };

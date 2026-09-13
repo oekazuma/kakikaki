@@ -1,12 +1,10 @@
 <script lang="ts">
-	import BackButton from '$lib/components/BackButton.svelte';
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
-	import { GOJUON, ALPHABET } from '$lib/chars';
+	import BackButton from '$lib/components/BackButton.svelte';
+	import { SEION, GROUPS, ALPHABET } from '$lib/chars';
 	import { charCleared, charGold } from '$lib/progress.svelte';
 	import { lang, info } from '$lib/lang.svelte';
-	// ひらがなは縦の五十音、英語は横 13 文字の 4 段
-	const cols = $derived(lang.v === 'ja' ? GOJUON : ALPHABET.map((r) => r));
 </script>
 
 <svelte:head>
@@ -14,24 +12,50 @@
 	<meta name="description" content="練習したい文字をえらぶページ。" />
 </svelte:head>
 
+{#snippet cell(c: string)}
+	{#if c}
+		<a class={['card', 'cell', { done: charCleared(c) }]} href="{base}/practice?w=char-{c}">
+			{c}<span class="s">{charGold(c) ? '👑' : charCleared(c) ? '★' : ''}</span>
+		</a>
+	{:else}<span class="cell empty"></span>{/if}
+{/snippet}
+
+{#snippet table(cols: string[][])}
+	<div class="table" style:--n={cols.length}>
+		{#each cols as col, r (r)}
+			<div class="col">
+				{#each col as c, k (k)}{@render cell(c)}{/each}
+			</div>
+		{/each}
+	</div>
+{/snippet}
+
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />
 		<h1>もじから えらぶ</h1>
 	</header>
-	<div class={['grid', lang.v]}>
-		{#each cols as row, r (r)}
-			<div class="col">
-				{#each row as c, k (k)}
-					{#if c}
-						<a class={['card', 'cell', { done: charCleared(c) }]} href="{base}/practice?w=char-{c}">
-							{c}<span class="s">{charGold(c) ? '👑' : charCleared(c) ? '★' : ''}</span>
-						</a>
-					{:else}<span class="cell empty"></span>{/if}
+	{#if lang.v === 'ja'}
+		<div class="ja">
+			{@render table(SEION)}
+			<div class="groups">
+				{#each GROUPS as g (g.name)}
+					<section class="card group">
+						<h2>{g.name}</h2>
+						{@render table(g.cols)}
+					</section>
 				{/each}
 			</div>
-		{/each}
-	</div>
+		</div>
+	{:else}
+		<div class="en">
+			{#each ALPHABET as row, r (r)}
+				<div class="row">
+					{#each row as c, k (k)}{@render cell(c)}{/each}
+				</div>
+			{/each}
+		</div>
+	{/if}
 </main>
 
 <style>
@@ -48,31 +72,27 @@
 		margin: 0;
 		font-size: 22px;
 	}
-	.grid {
+	/* 五十音は右から左（あ行が右端） */
+	.ja {
+		direction: rtl;
 		display: grid;
-		grid-template-columns: repeat(10, 1fr);
+		gap: 18px;
+	}
+	.table {
+		display: grid;
+		grid-template-columns: repeat(var(--n), var(--cell, 96px));
 		gap: 8px;
+		justify-content: start;
 	}
 	.col {
 		display: grid;
 		gap: 8px;
 	}
-	/* 五十音表は右から左（あ行が右端） */
-	.grid.ja {
-		direction: rtl;
-	}
-	.grid.ja .cell {
-		direction: ltr;
-	}
-	.grid.en {
-		grid-template-columns: 1fr;
-	}
-	.grid.en .col {
-		grid-template-columns: repeat(13, 1fr);
-	}
 	.cell {
+		direction: ltr;
 		position: relative;
-		aspect-ratio: 1;
+		width: var(--cell, 96px);
+		height: var(--cell, 96px);
 		display: grid;
 		place-content: center;
 		font-size: 30px;
@@ -93,5 +113,38 @@
 		bottom: 2px;
 		font-size: 14px;
 		color: var(--star);
+	}
+	.groups {
+		display: flex;
+		gap: 16px;
+		align-items: start;
+		--cell: 78px;
+	}
+	.group {
+		padding: 10px 14px 14px;
+	}
+	h2 {
+		direction: ltr;
+		text-align: right;
+		margin: 0 0 8px;
+		font-size: 15px;
+		color: var(--sub);
+	}
+	.group .cell {
+		font-size: 26px;
+	}
+	.en {
+		display: grid;
+		gap: 8px;
+	}
+	.row {
+		display: grid;
+		grid-template-columns: repeat(13, 1fr);
+		gap: 8px;
+	}
+	.en .cell {
+		width: auto;
+		height: auto;
+		aspect-ratio: 1;
 	}
 </style>

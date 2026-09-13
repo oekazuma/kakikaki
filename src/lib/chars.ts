@@ -1,4 +1,5 @@
-export const GOJUON: string[][] = [
+// 五十音表。各配列は縦 1 列（あ段〜お段）。ん は わ・を の列に入れる
+export const SEION: string[][] = [
 	['あ', 'い', 'う', 'え', 'お'],
 	['か', 'き', 'く', 'け', 'こ'],
 	['さ', 'し', 'す', 'せ', 'そ'],
@@ -8,16 +9,27 @@ export const GOJUON: string[][] = [
 	['ま', 'み', 'む', 'め', 'も'],
 	['や', '', 'ゆ', '', 'よ'],
 	['ら', 'り', 'る', 'れ', 'ろ'],
-	['わ', '', '', '', 'を'],
-	['ん', 'ー', '', '', ''],
+	['わ', '', 'を', '', 'ん']
+];
+export const DAKUON: string[][] = [
 	['が', 'ぎ', 'ぐ', 'げ', 'ご'],
 	['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
 	['だ', 'ぢ', 'づ', 'で', 'ど'],
-	['ば', 'び', 'ぶ', 'べ', 'ぼ'],
-	['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ'],
+	['ば', 'び', 'ぶ', 'べ', 'ぼ']
+];
+export const HANDAKUON: string[][] = [['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ']];
+export const KOGAKI: string[][] = [
 	['ぁ', 'ぃ', 'ぅ', 'ぇ', 'ぉ'],
 	['ゃ', 'ゅ', 'ょ', 'っ', '']
 ];
+export const CHOON: string[][] = [['ー']];
+export const GROUPS: { name: string; cols: string[][] }[] = [
+	{ name: 'だくおん', cols: DAKUON },
+	{ name: 'はんだくおん', cols: HANDAKUON },
+	{ name: 'ちいさいもじ', cols: KOGAKI },
+	{ name: 'のばすおと', cols: CHOON }
+];
+export const GOJUON = [...SEION, ...DAKUON, ...HANDAKUON, ...KOGAKI, ...CHOON];
 export const CHARS = GOJUON.flat().filter(Boolean);
 
 const AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
