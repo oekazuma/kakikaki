@@ -42,7 +42,6 @@
 				toast = b;
 				fx.confetti(150);
 				sfx.fanfare();
-				say(`めだる ゲット！ ${b.name}`);
 				setTimeout(() => (toast = null), 2400);
 			}, delay + k * 2600);
 		});
@@ -78,7 +77,6 @@
 		const st = r.mode === 'trace' ? 3 : stars(r.score);
 		msg = r.mode === 'trace' ? 'できた！' : `${'★'.repeat(st)} ${praise(st)}`;
 		sfx.kira();
-		say(readingOf(c));
 		if (!wasC && charCleared(c)) {
 			fx.confetti(120);
 			flyStar = true;
@@ -91,7 +89,6 @@
 				drive = true;
 				fx.confetti(300);
 				sfx.fanfare();
-				say('やったー！');
 			}, 600);
 			setTimeout(() => (drive = false), 2600);
 		}
@@ -123,7 +120,7 @@
 	</header>
 
 	<aside class="left">
-		<WordCard {word} size={190} onclick={() => say(word.name)} />
+		<WordCard {word} size={190} />
 		<div class="tabs">
 			{#each chars as ch, n (n)}
 				<button class={['tab', 'card', { on: n === i }]} onclick={() => select(n)}>
@@ -159,7 +156,14 @@
 	</section>
 
 	<aside class="right">
-		<button class="rb" onclick={() => say(readingOf(c))}><span class="card ic">🔊</span>きく</button>
+		<button class="rb" onclick={() => say(readingOf(c))}>
+			<span class="card ic">
+				<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+					<path d="M4 9v6h4l5 4V5L8 9H4z" fill="var(--blue)" />
+					<path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" />
+				</svg>
+			</span>きく
+		</button>
 		<button class="rb" onclick={() => canvas?.playDemo()}><span class="card ic">👀</span>みる</button>
 		<button class="rb" onclick={() => select(i, mode)}><span class="card ic">↺</span>やりなおす</button>
 		{#if mode === 'test'}
