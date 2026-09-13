@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="static/logo.svg" alt="かきかき" width="520">
+  <img src="static/logo.svg" alt="かきかき ひらがな" width="420">
+  <img src="static/logo-en.svg" alt="かきかき えいご" width="420">
 </p>
 
 <p align="center">
@@ -12,12 +13,6 @@
 </p>
 
 ---
-
-![ホーム画面](docs/images/home.png)
-
-![練習画面](docs/images/practice.png)
-
-![よみクイズ](docs/images/quiz.png)
 
 ## 特徴
 
