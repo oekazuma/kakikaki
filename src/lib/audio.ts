@@ -41,13 +41,13 @@ const SPECIAL: Record<string, string> = {
 };
 export const readingOf = (c: string) => SPECIAL[c] ?? c;
 
-export function say(text: string) {
+export function say(text: string, locale = 'ja-JP') {
 	if (!('speechSynthesis' in window)) return;
 	speechSynthesis.cancel();
 	const u = new SpeechSynthesisUtterance(text);
-	u.lang = 'ja-JP';
+	u.lang = locale;
 	u.rate = 0.9;
-	const v = speechSynthesis.getVoices().find((v) => v.lang.replace('_', '-').startsWith('ja'));
+	const v = speechSynthesis.getVoices().find((v) => v.lang.replace('_', '-').startsWith(locale.slice(0, 2)));
 	if (v) u.voice = v;
 	speechSynthesis.speak(u);
 }

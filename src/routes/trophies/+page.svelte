@@ -4,30 +4,33 @@
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
 	import Bar from '$lib/components/Bar.svelte';
-	import { BADGES, CAT_TOTAL, TOTAL } from '$lib/badges';
+	import { badgesOf, CAT_TOTAL, TOTAL } from '$lib/badges';
 	import { CATEGORIES } from '$lib/words';
 	import { earned, stats } from '$lib/progress.svelte';
+	import { lang, info } from '$lib/lang.svelte';
 
 	const s = $derived(stats());
-	const got = $derived(Object.keys(earned).length);
+	const BADGES = $derived(badgesOf(lang.v));
+	const total = $derived(TOTAL(lang.v));
+	const got = $derived(Object.keys(earned()).length);
 	const tiles = $derived([
-		{ label: 'もじ', icon: 'pencil', have: s.chars, need: TOTAL.chars, color: 'var(--blue)' },
-		{ label: 'きんのほし', icon: 'star', have: s.gold, need: TOTAL.chars, color: 'var(--star)' },
-		{ label: 'たんご', icon: 'book', have: s.words, need: TOTAL.words, color: 'var(--teal)' },
-		{ label: 'おうかん', icon: 'crown', have: s.crowns, need: TOTAL.words, color: '#e08a00' }
+		{ label: 'もじ', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },
+		{ label: 'きんのほし', icon: 'star', have: s.gold, need: total.chars, color: 'var(--star)' },
+		{ label: 'たんご', icon: 'book', have: s.words, need: total.words, color: 'var(--teal)' },
+		{ label: 'おうかん', icon: 'crown', have: s.crowns, need: total.words, color: '#e08a00' }
 	] as const);
 	const pct = (h: number, n: number) => Math.floor((100 * h) / n);
 </script>
 
 <svelte:head>
-	<title>めだる と きろく | かきかき ひらがな</title>
+	<title>めだる と きろく | {info().title}</title>
 	<meta name="description" content="文字・単語・カテゴリごとの進捗率と、あつめたメダルを見るページ。" />
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />
-		<h1><Icon name="trophy" /> めだる と きろく</h1>
+		<h1><Icon name="trophy" /> めだる と きろく <small>（{info().short}）</small></h1>
 		<span class="count">めだる {got} / {BADGES.length}</span>
 	</header>
 
@@ -54,12 +57,12 @@
 	<section class="badges">
 		{#each BADGES as b (b.id)}
 			{@const [have, need] = b.need(s)}
-			{@const ok = !!earned[b.id]}
+			{@const ok = !!earned()[b.id]}
 			<div class={['card', 'badge', { ok }]}>
 				<span class="em">{b.emoji}</span>
 				<b>{b.name}</b>
 				<small>{b.desc}</small>
-				{#if ok}<span class="date">{earned[b.id].replaceAll('-', '/')} ゲット！</span>{:else}<span class="rest">あと {need - have}</span>{/if}
+				{#if ok}<span class="date">{earned()[b.id].replaceAll('-', '/')} ゲット！</span>{:else}<span class="rest">あと {need - have}</span>{/if}
 			</div>
 		{/each}
 	</section>
@@ -86,6 +89,10 @@
 	}
 	h1 :global(svg) {
 		color: #e08a00;
+	}
+	h1 small {
+		font-size: 14px;
+		color: var(--sub);
 	}
 	.count {
 		font-weight: bold;

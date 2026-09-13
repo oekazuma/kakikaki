@@ -18,11 +18,11 @@
 		color: #fff;
 		text-decoration: none;
 		background: var(--blue);
-		box-shadow: 0 3px 0 #2f5b8a;
+		box-shadow: 0 3px 0 var(--dark);
 		flex: none;
 	}
 	.back:active {
 		transform: translateY(2px);
-		box-shadow: 0 1px 0 #2f5b8a;
+		box-shadow: 0 1px 0 var(--dark);
 	}
 </style>

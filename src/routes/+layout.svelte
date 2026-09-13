@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { fx } from '$lib/fx';
 	import Icon from '$lib/components/Icon.svelte';
+	import { lang } from '$lib/lang.svelte';
 	let { children } = $props();
+	$effect(() => {
+		document.documentElement.dataset.lang = lang.v;
+	});
 </script>
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>

@@ -7,6 +7,17 @@
 	--teal: #13786f;
 	--guide: #d9dfe4;
 	--star: #f5b400;
+	--dark: #2f5b8a;
+}
+/* えいご はオレンジ系。切替時は色がにじむように変わる */
+[data-lang='en'] {
+	--blue: #e8734a;
+	--teal: #c95f2e;
+	--dark: #b8502c;
+}
+main,
+main * {
+	transition: background-color 0.4s, color 0.4s, border-color 0.4s;
 }
 * { box-sizing: border-box; }
 html, body {

@@ -19,3 +19,7 @@ export const GOJUON: string[][] = [
 	['ゃ', 'ゅ', 'ょ', 'っ', '']
 ];
 export const CHARS = GOJUON.flat().filter(Boolean);
+
+const AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+export const ALPHABET: string[][] = [[...AZ.slice(0, 13)], [...AZ.slice(13)], [...AZ.toLowerCase().slice(0, 13)], [...AZ.toLowerCase().slice(13)]];
+export const CHARS_EN = ALPHABET.flat();

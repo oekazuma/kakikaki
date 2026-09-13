@@ -10,15 +10,16 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { wordById } from '$lib/words';
 	import { imageUrl } from '$lib/image';
-	import { STROKES } from '$lib/strokes';
 	import { get, record, charCleared, wordStar, checkBadges, type Mode } from '$lib/progress.svelte';
+	import { lang, info, nameOf, lettersOf, strokesOf } from '$lib/lang.svelte';
 	import type { Badge } from '$lib/badges';
 	import { say, sfx, readingOf } from '$lib/audio';
 	import { fx } from '$lib/fx';
 	import { stars, praise } from '$lib/score';
 
 	const word = $derived(wordById(page.url.searchParams.get('w') ?? '') ?? wordById('patocar')!);
-	const chars = $derived([...word.name]);
+	const chars = $derived(lettersOf(word));
+	const strokes = $derived(strokesOf());
 	let i = $state(Number(page.url.searchParams.get('i') ?? 0));
 	const c = $derived(chars[i]);
 
@@ -74,7 +75,7 @@
 		}
 		busy = true;
 		const wasC = charCleared(c),
-			wasW = wordStar(word.name);
+			wasW = wordStar(word);
 		record(c, r.mode);
 		const st = r.mode === 'trace' ? 3 : stars(r.score);
 		msg = r.mode === 'trace' ? 'できた！' : `${'★'.repeat(st)} ${praise(st)}`;
@@ -85,7 +86,7 @@
 			setTimeout(() => (flyStar = false), 900);
 		}
 		let wait = 1200;
-		if (!wasW && wordStar(word.name)) {
+		if (!wasW && wordStar(word)) {
 			wait = 2600;
 			setTimeout(() => {
 				drive = true;
@@ -113,15 +114,15 @@
 </script>
 
 <svelte:head>
-	<title>{word.name} を かく | かきかき ひらがな</title>
-	<meta name="description" content="「{word.name}」の文字を なぞる・じぶんで かく・おてほんなし で練習するページ。" />
+	<title>{nameOf(word)} を かく | {info().title}</title>
+	<meta name="description" content="「{nameOf(word)}」の文字を なぞる・じぶんで かく・おてほんなし で練習するページ。" />
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />
 		<div>
-			<div class="with">{word.name}と いっしょに</div>
+			<div class="with">{nameOf(word)}と いっしょに</div>
 			<h1>{cur.title}</h1>
 		</div>
 	</header>
@@ -153,9 +154,9 @@
 			{/each}
 		</div>
 		<div class="board card">
-			<span class="count">{Math.min(stroke + 1, STROKES[c].length)} / {STROKES[c].length}</span>
-			{#key `${c}-${mode}-${gen}`}
-				<Canvas bind:this={canvas} char={c} {mode} onDone={done} onStroke={(k) => (stroke = k + 1)} onDraw={() => (drawn = true)} />
+			<span class="count">{Math.min(stroke + 1, strokes[c].length)} / {strokes[c].length}</span>
+			{#key `${lang.v}-${c}-${mode}-${gen}`}
+				<Canvas bind:this={canvas} char={c} {strokes} {mode} onDone={done} onStroke={(k) => (stroke = k + 1)} onDraw={() => (drawn = true)} />
 			{/key}
 			{#if flyStar}<div class="flystar">⭐</div>{/if}
 		</div>
@@ -163,7 +164,7 @@
 	</section>
 
 	<aside class="right">
-		<button class="rb" onclick={() => say(readingOf(c))}><span class="card ic"><Icon name="speaker" size={26} /></span>きく</button>
+		<button class="rb" onclick={() => say(lang.v === 'ja' ? readingOf(c) : c, info().speech)}><span class="card ic"><Icon name="speaker" size={26} /></span>きく</button>
 		<button class="rb" onclick={() => select(i, mode)}><span class="card ic"><Icon name="redo" size={26} /></span>やりなおす</button>
 		{#if mode === 'test'}
 			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={32} /></span>できた</button>

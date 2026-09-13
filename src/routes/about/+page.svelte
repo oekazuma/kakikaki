@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { version } from '$app/environment';
 	import { reset, today } from '$lib/progress.svelte';
+	import { info } from '$lib/lang.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import BackButton from '$lib/components/BackButton.svelte';
 
@@ -53,7 +54,7 @@
 	}
 
 	function doReset() {
-		if (confirm('練習記録・星・メダル・練習した日をすべて削除します。この操作は取り消せません。よろしいですか？')) {
+		if (confirm(`「${info().short}」の練習記録・星・メダル・練習した日をすべて削除します。この操作は取り消せません。よろしいですか？`)) {
 			reset();
 			passed = false;
 			alert('削除しました');
@@ -62,7 +63,7 @@
 </script>
 
 <svelte:head>
-	<title>アプリについて | かきかき ひらがな</title>
+	<title>アプリについて | {info().title}</title>
 	<meta name="description" content="使い方、星とメダルのルール、更新方法、練習記録の保存と削除についての保護者向け説明。" />
 </svelte:head>
 
@@ -75,6 +76,7 @@
 	<section class="card">
 		<h2>使い方</h2>
 		<ol>
+			<li>ホーム上部の「あ ひらがな｜A えいご」で練習することばを切り替えます。記録・星・メダルはことばごとに別々に保存されます。</li>
 			<li>ホームで単語を選ぶか、「もじから えらぶ」で文字を選びます。</li>
 			<li>文字ごとに <b>なぞる（2 回）→ じぶんで かく → おてほんなし</b> の順に自動で進み、終わると次の文字に移ります。</li>
 			<li>
@@ -119,7 +121,7 @@
 
 	<section class="card danger-zone">
 		<h2>練習記録の削除（保護者向け）</h2>
-		<p>次の記録をすべて削除して、最初の状態に戻します。<b>削除した記録は元に戻せません。</b></p>
+		<p>いま選んでいる「{info().short}」の次の記録をすべて削除して、最初の状態に戻します。<b>削除した記録は元に戻せません。</b>（もう一方のことばの記録は残ります）</p>
 		<ul>
 			<li>各文字の「なぞる」「じぶんで かく」「おてほんなし」の回数と星</li>
 			<li>単語の星と王冠、獲得したメダルと獲得日</li>

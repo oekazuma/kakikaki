@@ -16,6 +16,7 @@ pnpm check                    # svelte-check
 pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
 node scripts/fetch-strokes.ts # KanjiVG から src/lib/strokes.ts を再生成
 node scripts/fetch-images.ts  # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
+node scripts/make-strokes-en.ts # アルファベット 52 文字の書き順を線分・円弧の DSL から生成（src/lib/strokes-en.ts）
 node scripts/make-icon.ts     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
@@ -27,14 +28,16 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 
 ## アーキテクチャ
 
-座標系はすべて KanjiVG の 109×109 viewBox。`Canvas.svelte` が `getScreenCTM()` でポインタ座標を viewBox 単位に変換し、判定・採点・認識はその単位で行う純粋関数に委ねる。
+ひらがな（`ja`）と英語（`en`）の 2 言語を `lang.svelte.ts` の `lang.v` で切り替える。文字セット・書き順・読み上げ言語・表示名は `LANG_INFO` / `strokesOf` / `nameOf` / `lettersOf` 経由で取り、各画面や `Canvas` は言語を直接知らない。テーマ色は `<html data-lang>` に応じて `app.css` の CSS 変数が変わる。
+
+座標系はすべて KanjiVG の 109×109 viewBox（アルファベットも同じ枠に合わせて自作）。`Canvas.svelte` が `getScreenCTM()` でポインタ座標を viewBox 単位に変換し、判定・採点・認識はその単位で行う純粋関数に委ねる。
 
 - `geometry.ts`: SVG path（M/L/H/V/C/S/Z）を等間隔の点列にする。`getPointAtLength` は使わず自前で平坦化するので、テストと実行時で同じ点列になる。
 - `judge.ts`: なぞる（`advance` が cursor をサンプル列上で進め、-1 で逸脱）/ じぶんでかく（`coverage` が塗れた割合）。しきい値は `JUDGE`。
 - `score.ts`: 軌跡とお手本の距離と向きから 0〜1 → 星 1〜3。
 - `recognize.ts`: 全 81 文字のお手本を N 点に再サンプリング・重心合わせした `TEMPLATES` と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
-- `progress.svelte.ts`: `localStorage` 直結の `$state`（`kk:progress` 文字ごとの回数、`kk:earned` メダル id → 獲得日、`kk:days` 練習した日付）。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
-- `badges.ts`: メダル定義と `computeStats`。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
+- `progress.svelte.ts`: `localStorage` 直結の `$state`。キーは言語ごとに `kk:<lang>:progress`（文字ごとの回数）、`kk:<lang>:earned`（メダル id → 獲得日）、`kk:<lang>:days`（練習した日付）。旧キー `kk:progress` 等は起動時に `ja` へ移行する。関数は現在の言語の記録を対象にし、`wordStar` / `wordCrown` は `Word` を受け取る。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
+- `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
 - `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
 

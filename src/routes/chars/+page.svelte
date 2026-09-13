@@ -2,13 +2,16 @@
 	import BackButton from '$lib/components/BackButton.svelte';
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
-	import { GOJUON } from '$lib/chars';
+	import { GOJUON, ALPHABET } from '$lib/chars';
 	import { charCleared, charGold } from '$lib/progress.svelte';
+	import { lang, info } from '$lib/lang.svelte';
+	// ひらがなは縦の五十音、英語は横 13 文字の 4 段
+	const cols = $derived(lang.v === 'ja' ? GOJUON : ALPHABET.map((r) => r));
 </script>
 
 <svelte:head>
-	<title>もじから えらぶ | かきかき ひらがな</title>
-	<meta name="description" content="ひらがな 81 文字から練習したい文字をえらぶページ。" />
+	<title>もじから えらぶ | {info().title}</title>
+	<meta name="description" content="練習したい文字をえらぶページ。" />
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
@@ -16,8 +19,8 @@
 		<BackButton />
 		<h1>もじから えらぶ</h1>
 	</header>
-	<div class="grid">
-		{#each GOJUON as row, r (r)}
+	<div class={['grid', lang.v]}>
+		{#each cols as row, r (r)}
 			<div class="col">
 				{#each row as c, k (k)}
 					{#if c}
@@ -53,6 +56,12 @@
 	.col {
 		display: grid;
 		gap: 8px;
+	}
+	.grid.en {
+		grid-template-columns: 1fr;
+	}
+	.grid.en .col {
+		grid-template-columns: repeat(13, 1fr);
 	}
 	.cell {
 		position: relative;

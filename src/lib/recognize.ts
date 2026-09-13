@@ -14,10 +14,10 @@ export function normalize(strokes: Pt[][]): Pt[][] {
 	return rs.map((s) => translate(s, 54.5 - c.x, 54.5 - c.y));
 }
 
-export const TEMPLATES: Template[] = Object.entries(STROKES).map(([char, ds]) => ({
-	char,
-	strokes: normalize(ds.map((d) => pathToPoints(d, 1.5)))
-}));
+export const makeTemplates = (strokes: Record<string, string[]>): Template[] =>
+	Object.entries(strokes).map(([char, ds]) => ({ char, strokes: normalize(ds.map((d) => pathToPoints(d, 1.5))) }));
+
+export const TEMPLATES: Template[] = makeTemplates(STROKES);
 
 function distance(a: Pt[][], b: Pt[][]) {
 	const m = Math.min(a.length, b.length);

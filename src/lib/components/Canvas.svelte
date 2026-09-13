@@ -4,29 +4,30 @@
 </script>
 
 <script lang="ts">
-	import { STROKES } from '$lib/strokes';
 	import { pathToPoints, type Pt } from '$lib/geometry';
 	import { canStart, advance, traceDone, coverage, JUDGE } from '$lib/judge';
 	import { strokeScore } from '$lib/score';
-	import { recognize, passes, testScore } from '$lib/recognize';
+	import { recognize, passes, testScore, makeTemplates, type Template } from '$lib/recognize';
 	import { sfx, unlock } from '$lib/audio';
 	import { fx } from '$lib/fx';
 
 	let {
 		char,
+		strokes,
 		mode,
 		onDone,
 		onStroke,
 		onDraw
 	}: {
 		char: string;
+		strokes: Record<string, string[]>;
 		mode: Mode;
 		onDone: (r: Result) => void;
 		onStroke?: (i: number) => void;
 		onDraw?: () => void;
 	} = $props();
 
-	const ds = $derived(STROKES[char]);
+	const ds = $derived(strokes[char]);
 	const samples = $derived(ds.map((d) => pathToPoints(d)));
 
 	let si = $state(0);
@@ -58,7 +59,7 @@
 	export function judge() {
 		clearTimeout(idle);
 		if (trails.length === 0) return;
-		const r = recognize(trails);
+		const r = recognize(trails, templatesFor(strokes));
 		const mine = r.find((x) => x.char === char)!;
 		onDone({ mode: 'test', score: testScore(mine.dist), ok: passes(char, r), top: r[0].char });
 	}
@@ -155,6 +156,12 @@
 			if (mode === 'trace') playDemo();
 			armIdle();
 		}
+	}
+	// 認識テンプレートは文字セットごとに 1 回だけ作る
+	const cache = new Map<Record<string, string[]>, Template[]>();
+	function templatesFor(s: Record<string, string[]>) {
+		if (!cache.has(s)) cache.set(s, makeTemplates(s));
+		return cache.get(s)!;
 	}
 	const poly = (pts: Pt[]) => pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
 </script>
