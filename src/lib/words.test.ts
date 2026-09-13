@@ -15,3 +15,9 @@ describe('words', () => {
 		expect(wordById('char-ぱ')?.name).toBe('ぱ');
 	});
 });
+
+describe('desc', () => {
+	it('全単語に説明がある', () => {
+		for (const w of WORDS) expect(w.desc, w.name).toBeTruthy();
+	});
+});
