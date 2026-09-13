@@ -12,6 +12,11 @@
 	const s = $derived(stats());
 </script>
 
+<svelte:head>
+	<title>かきかき ひらがな</title>
+	<meta name="description" content="iPad で遊ぶ、子ども向けのひらがな書き練習アプリ。すきな単語をえらんで、なぞって、じぶんで書いて、星とメダルをあつめよう。" />
+</svelte:head>
+
 <main in:fly={{ x: -40, duration: 250 }}>
 	<header>
 		<h1><img src="{base}/logo-mark.svg" alt="" /><span class="kaki">かきかき</span> <span class="hira">ひらがな</span></h1>

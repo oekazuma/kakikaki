@@ -61,6 +61,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>アプリについて | かきかき ひらがな</title>
+	<meta name="description" content="使い方、星とメダルのルール、更新方法、練習記録の保存と削除についての保護者向け説明。" />
+</svelte:head>
+
 <main>
 	<header>
 		<BackButton />

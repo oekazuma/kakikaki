@@ -19,6 +19,11 @@
 	const pct = (h: number, n: number) => Math.floor((100 * h) / n);
 </script>
 
+<svelte:head>
+	<title>めだる と きろく | かきかき ひらがな</title>
+	<meta name="description" content="文字・単語・カテゴリごとの進捗率と、あつめたメダルを見るページ。" />
+</svelte:head>
+
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />

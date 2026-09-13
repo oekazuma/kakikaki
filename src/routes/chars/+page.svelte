@@ -6,6 +6,11 @@
 	import { charCleared, charGold } from '$lib/progress.svelte';
 </script>
 
+<svelte:head>
+	<title>もじから えらぶ | かきかき ひらがな</title>
+	<meta name="description" content="ひらがな 81 文字から練習したい文字をえらぶページ。" />
+</svelte:head>
+
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />

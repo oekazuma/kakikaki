@@ -112,6 +112,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{word.name} を かく | かきかき ひらがな</title>
+	<meta name="description" content="「{word.name}」の文字を なぞる・じぶんで かく・おてほんなし で練習するページ。" />
+</svelte:head>
+
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />
