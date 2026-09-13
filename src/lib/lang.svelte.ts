@@ -28,8 +28,9 @@ export const charsOf = (l: Lang = lang.v) => LANG_INFO[l].chars;
 export const nameOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.name : w.en);
 // ひらがな → カタカナ（ー はそのまま）
 export const toKatakana = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
-// 補助行: ひらがな のときは「カタカナ 英語」、えいご のときは「カタカナ」
-export const descOf = (w: Word, l: Lang = lang.v) => (w.name === w.en ? undefined : l === 'ja' ? `${toKatakana(w.name)}  ${w.en}` : toKatakana(w.name));
+// 補助行（常に 2 行）: ひらがな のときは「カタカナ / 英語」、えいご のときは「カタカナ / ひらがな」
+export const subOf = (w: Word, l: Lang = lang.v): string[] =>
+	w.name === w.en ? [] : l === 'ja' ? [toKatakana(w.name), w.en] : [toKatakana(w.name), w.name];
 
 // 書く対象の文字。スペースやハイフンは飛ばす
 export const lettersOf = (w: Word, l: Lang = lang.v) => [...nameOf(w, l)].filter((c) => c !== ' ' && c !== '-');

@@ -2,7 +2,7 @@
 	import type { Word } from '$lib/words';
 	import { imageUrl } from '$lib/image';
 	import { wordStar, wordCrown } from '$lib/progress.svelte';
-	import { nameOf, descOf } from '$lib/lang.svelte';
+	import { nameOf, subOf } from '$lib/lang.svelte';
 	let { word, onclick, size = 180 }: { word: Word; onclick?: () => void; size?: number } = $props();
 	let missing = $state(false);
 </script>
@@ -15,7 +15,7 @@
 		<img src={imageUrl(word)} alt="" style:height="{size * 0.6}px" onerror={() => (missing = true)} />
 	{/if}
 	<div class="name">{nameOf(word)}</div>
-	{#if descOf(word)}<div class="desc">{descOf(word)}</div>{/if}
+	{#each subOf(word) as line, i (i)}<div class="desc">{line}</div>{/each}
 </button>
 
 <style>
@@ -51,6 +51,10 @@
 	.desc {
 		font-size: 12px;
 		color: var(--sub);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.3;
 	}
 	.badge {
 		position: absolute;
