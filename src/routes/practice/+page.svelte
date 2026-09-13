@@ -42,6 +42,12 @@
 	let busy = $state(false);
 	let toast = $state<Badge | null>(null);
 	let complete = $state(false); // 単語の全文字が終わった
+	let speaking = $state(false);
+	async function hear() {
+		speaking = true;
+		await say([lang.v === 'ja' ? readingOf(c) : c, ...(chars.length > 1 ? [nameOf(word)] : [])], info().speech);
+		speaking = false;
+	}
 
 	// 単語が切り替わったら（つぎの たんご など）最初からやり直す
 	$effect(() => {
@@ -186,10 +192,10 @@
 	</section>
 
 	<aside class="right">
-		<button class="rb" onclick={() => say([lang.v === 'ja' ? readingOf(c) : c, ...(chars.length > 1 ? [nameOf(word)] : [])], info().speech)}><span class="card ic"><Icon name="speaker" size={26} /></span>きく</button>
-		<button class="rb" onclick={() => select(i, mode)}><span class="card ic"><Icon name="redo" size={26} /></span>やりなおす</button>
+		<button class={['rb', { speaking }]} onclick={hear}><span class="card ic"><Icon name="speaker" size={32} /></span>きく</button>
+		<button class="rb" onclick={() => select(i, mode)}><span class="card ic"><Icon name="redo" size={32} /></span>やりなおす</button>
 		{#if mode === 'test'}
-			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={32} /></span>できた</button>
+			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={36} /></span>できた</button>
 		{/if}
 	</aside>
 
@@ -352,29 +358,53 @@
 	}
 	.right {
 		display: grid;
-		gap: 14px;
+		gap: 26px;
 		align-content: center;
 		justify-items: center;
 	}
 	.rb {
 		display: grid;
 		justify-items: center;
-		gap: 4px;
-		font-size: 11px;
+		gap: 6px;
+		font-size: 13px;
+		font-weight: bold;
 		color: var(--sub);
 	}
 	.ic {
-		width: 48px;
-		height: 48px;
+		width: 68px;
+		height: 68px;
 		display: grid;
 		place-content: center;
 		color: var(--blue);
+		transition: transform 0.1s, background-color 0.2s, color 0.2s;
+	}
+	/* 押したことが分かるように沈める */
+	.rb:active .ic {
+		transform: scale(0.9);
+		background: #dfe7f0;
+	}
+	/* 読み上げ中は点灯 */
+	.speaking .ic {
+		background: var(--blue);
+		color: #fff;
+		animation: glow 1s ease-in-out infinite;
+	}
+	.speaking {
+		color: var(--blue);
+	}
+	@keyframes glow {
+		50% {
+			box-shadow: 0 0 0 8px rgba(79, 124, 174, 0.25);
+		}
 	}
 	.done .ic {
 		background: var(--teal);
-		width: 64px;
-		height: 64px;
+		width: 76px;
+		height: 76px;
 		color: #fff;
+	}
+	.done:active .ic {
+		background: #0f5f58;
 	}
 	.done {
 		font-weight: bold;

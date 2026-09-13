@@ -41,16 +41,26 @@ const SPECIAL: Record<string, string> = {
 };
 export const readingOf = (c: string) => SPECIAL[c] ?? c;
 
-// 複数渡すと順番に読む（文字 → 単語 など）
-export function say(text: string | string[], locale = 'ja-JP') {
-	if (!('speechSynthesis' in window)) return;
+// 複数渡すと順番に読む（文字 → 単語 など）。読み終わり（または中断）で resolve
+export function say(text: string | string[], locale = 'ja-JP'): Promise<void> {
+	if (!('speechSynthesis' in window)) return Promise.resolve();
 	speechSynthesis.cancel();
 	const v = speechSynthesis.getVoices().find((v) => v.lang.replace('_', '-').startsWith(locale.slice(0, 2)));
-	for (const t of [text].flat()) {
-		const u = new SpeechSynthesisUtterance(t);
-		u.lang = locale;
-		u.rate = 0.9;
-		if (v) u.voice = v;
-		speechSynthesis.speak(u);
-	}
+	const list = [text].flat();
+	return new Promise((done) => {
+		const timer = setTimeout(done, 15000); // 端末側でイベントが来ないときの保険
+		list.forEach((t, k) => {
+			const u = new SpeechSynthesisUtterance(t);
+			u.lang = locale;
+			u.rate = 0.9;
+			if (v) u.voice = v;
+			const finish = () => {
+				clearTimeout(timer);
+				done();
+			};
+			if (k === list.length - 1) u.onend = finish;
+			u.onerror = finish; // cancel による中断も含む
+			speechSynthesis.speak(u);
+		});
+	});
 }

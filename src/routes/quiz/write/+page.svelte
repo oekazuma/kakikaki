@@ -27,6 +27,12 @@
 	let drawn = $state(false);
 	let done = $state(false);
 	let canvas = $state<Canvas>();
+	let speaking = $state(false);
+	async function hear() {
+		speaking = true;
+		await say(nameOf(word), info().speech);
+		speaking = false;
+	}
 	const word = $derived(words[i]);
 	const letters = $derived(word ? lettersOf(word) : []);
 	const c = $derived(letters[k]);
@@ -109,7 +115,7 @@
 		<aside class="left">
 			<div class="card pic">
 				<img src={imageUrl(word)} alt="" />
-				<button class="hear" onclick={() => say(nameOf(word), info().speech)}><Icon name="speaker" size={22} /> きく</button>
+				<button class={['hear', { speaking }]} onclick={hear}><Icon name="speaker" size={22} /> きく</button>
 			</div>
 			<div class="slots">
 				{#each letters as ch, n (n)}
@@ -128,9 +134,9 @@
 		</section>
 
 		<aside class="right">
-			<button class="rb" onclick={() => nextLetter(k)}><span class="card ic"><Icon name="redo" size={26} /></span>やりなおす</button>
+			<button class="rb" onclick={() => nextLetter(k)}><span class="card ic"><Icon name="redo" size={32} /></span>やりなおす</button>
 			{#if mode === 'test'}
-				<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={32} /></span>できた</button>
+				<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={36} /></span>できた</button>
 			{/if}
 		</aside>
 	{/if}
@@ -191,9 +197,17 @@
 		gap: 6px;
 		background: #eef1f4;
 		color: var(--blue);
-		padding: 8px 14px;
+		padding: 10px 16px;
 		border-radius: 14px;
 		font-weight: bold;
+		transition: transform 0.1s, background-color 0.2s, color 0.2s;
+	}
+	.hear:active {
+		transform: scale(0.94);
+	}
+	.hear.speaking {
+		background: var(--blue);
+		color: #fff;
 	}
 	.slots {
 		display: flex;
@@ -237,29 +251,38 @@
 	}
 	.right {
 		display: grid;
-		gap: 14px;
+		gap: 26px;
 		align-content: center;
 		justify-items: center;
 	}
 	.rb {
 		display: grid;
 		justify-items: center;
-		gap: 4px;
-		font-size: 11px;
+		gap: 6px;
+		font-size: 13px;
+		font-weight: bold;
 		color: var(--sub);
 	}
 	.ic {
-		width: 48px;
-		height: 48px;
+		width: 68px;
+		height: 68px;
 		display: grid;
 		place-content: center;
 		color: var(--blue);
+		transition: transform 0.1s, background-color 0.2s;
+	}
+	.rb:active .ic {
+		transform: scale(0.9);
+		background: #dfe7f0;
 	}
 	.done .ic {
 		background: var(--teal);
-		width: 64px;
-		height: 64px;
+		width: 76px;
+		height: 76px;
 		color: #fff;
+	}
+	.done:active .ic {
+		background: #0f5f58;
 	}
 	.done {
 		font-weight: bold;
