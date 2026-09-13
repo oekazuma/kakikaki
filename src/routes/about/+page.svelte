@@ -9,16 +9,31 @@
 	const built = Number.isFinite(Number(version)) ? new Date(Number(version)).toLocaleString('ja-JP') : version;
 	let updating = $state(false);
 
-	// Service Worker とキャッシュを捨てて読み直す。次回起動時ではなく今すぐ新版にするため
+	// 新しい Service Worker を取りに行き、取り込み（HTTP キャッシュを無視した再取得）が終わってから読み直す
 	async function update() {
 		if (!navigator.onLine) {
 			alert('インターネットに接続してから押してください');
 			return;
 		}
 		updating = true;
-		const regs = (await navigator.serviceWorker?.getRegistrations()) ?? [];
-		await Promise.all(regs.map((r) => r.unregister()));
-		await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
+		const reg = await navigator.serviceWorker?.getRegistration();
+		if (reg) {
+			await reg.update();
+			const w = reg.installing ?? reg.waiting;
+			if (w) {
+				await new Promise<void>((done) => {
+					const t = setTimeout(done, 30000);
+					w.addEventListener('statechange', () => {
+						if (w.state === 'activated' || w.state === 'redundant') {
+							clearTimeout(t);
+							done();
+						}
+					});
+				});
+			}
+		} else {
+			await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
+		}
 		location.reload();
 	}
 

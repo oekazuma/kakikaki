@@ -8,11 +8,12 @@ const sw = self as unknown as ServiceWorkerGlobalScope;
 const CACHE = `kk-${version}`;
 const ASSETS = [...build, ...files, ...prerendered];
 
+// 画像などは URL にハッシュが無いので、新しい版を入れるときは HTTP キャッシュを無視して取り直す
 sw.addEventListener('install', (e) => {
 	e.waitUntil(
 		caches
 			.open(CACHE)
-			.then((c) => c.addAll(ASSETS))
+			.then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
 			.then(() => sw.skipWaiting())
 	);
 });
