@@ -182,15 +182,15 @@
 		{#if mode === 'trace' && si < ds.length}
 			<path
 				d={ds[si]}
-				class="ink"
+				class="ink live"
 				pathLength={samples[si].length - 1}
 				stroke-dasharray={samples[si].length - 1}
 				stroke-dashoffset={samples[si].length - 1 - cursor}
 			/>
 		{/if}
 		{#if mode !== 'trace'}
-			{#each trails as t (t)}<polyline points={poly(t)} class="ink" />{/each}
-			{#if tracing}<polyline points={poly(trail)} class="ink" />{/if}
+			{#each trails as t (t)}<polyline points={poly(t)} class="ink live" />{/each}
+			{#if tracing}<polyline points={poly(trail)} class="ink live" />{/if}
 		{/if}
 		{#if demo && si < ds.length}
 			<path d={ds[si]} class="demo" pathLength="1" onanimationend={() => (demo = false)} />
@@ -239,11 +239,15 @@
 		stroke-width: 1.2;
 		stroke-dasharray: 3 2.5;
 	}
+	/* 書き終えた画は細くして潰れを防ぐ。描いている途中の線はお手本と同じ太さ */
 	.ink {
 		stroke: var(--blue);
-		stroke-width: 14;
+		stroke-width: 10;
 		transform-box: fill-box;
 		transform-origin: center;
+	}
+	.ink.live {
+		stroke-width: 14;
 	}
 	.bounce {
 		animation: bounce 0.4s ease-out;
