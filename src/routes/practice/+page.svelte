@@ -8,10 +8,11 @@
 	import Stars from '$lib/components/Stars.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import BackButton from '$lib/components/BackButton.svelte';
-	import { wordById } from '$lib/words';
+	import { WORDS, wordById } from '$lib/words';
+	import { goto } from '$app/navigation';
 	import { imageUrl } from '$lib/image';
-	import { get, record, charCleared, wordStar, checkBadges, type Mode } from '$lib/progress.svelte';
-	import { lang, info, nameOf, lettersOf, strokesOf } from '$lib/lang.svelte';
+	import { get, record, charCleared, wordStar, wordCrown, checkBadges, type Mode } from '$lib/progress.svelte';
+	import { lang, info, nameOf, lettersOf, strokesOf, charsOf } from '$lib/lang.svelte';
 	import type { Badge } from '$lib/badges';
 	import { say, sfx, readingOf } from '$lib/audio';
 	import { fx } from '$lib/fx';
@@ -40,6 +41,30 @@
 	let drive = $state(false);
 	let busy = $state(false);
 	let toast = $state<Badge | null>(null);
+	let complete = $state(false); // 単語の全文字が終わった
+
+	// 単語が切り替わったら（つぎの たんご など）最初からやり直す
+	$effect(() => {
+		void word.id;
+		untrack(() => {
+			const first = chars.findIndex((ch) => nextMode(ch) !== null);
+			complete = first === -1;
+			select(Math.max(0, first));
+		});
+	});
+
+	// つぎの単語（同じ並び順で次、末尾なら先頭）。1 文字練習なら次の文字
+	function nextId() {
+		if (word.id.startsWith('char-')) {
+			const list = charsOf();
+			return `char-${list[(list.indexOf(word.name) + 1) % list.length]}`;
+		}
+		return WORDS[(WORDS.findIndex((w) => w.id === word.id) + 1) % WORDS.length].id;
+	}
+	function replay() {
+		complete = false;
+		select(0, 'trace');
+	}
 
 	function showBadges(list: Badge[], delay: number) {
 		list.forEach((b, k) => {
@@ -108,10 +133,7 @@
 			const next = nextMode(c);
 			if (next) select(i, next);
 			else if (i < chars.length - 1) select(i + 1);
-			else {
-				select(i, 'trace');
-				msg = 'ぜんぶ できた！ すきな もじで もういちど あそべるよ';
-			}
+			else complete = true;
 		}, wait);
 	}
 </script>
@@ -173,6 +195,21 @@
 
 	{#if drive}
 		<img class="drive" src={imageUrl(word)} alt="" onerror={() => (drive = false)} />
+	{/if}
+	{#if complete}
+		<div class="complete card" in:fly={{ y: 40, duration: 350 }}>
+			<img src={imageUrl(word)} alt="" onerror={(e) => ((e.currentTarget as HTMLImageElement).hidden = true)} />
+			<b class="cname">{nameOf(word)}</b>
+			<p>ぜんぶ できた！</p>
+			<div class="marks">
+				{#if wordCrown(word)}<span class="mark gold"><Icon name="crown" size={22} fill /> おうかん</span>{:else}<span class="mark"><Icon name="star" size={22} fill /> ほし ゲット</span>{/if}
+			</div>
+			<div class="btns">
+				<button class="next" onclick={() => goto(`${base}/practice?w=${nextId()}`)}>{word.id.startsWith('char-') ? 'つぎの もじ' : 'つぎの たんご'}</button>
+				<a class="home" href="{base}/">ホームへ</a>
+				<button class="again" onclick={replay}>もういちど</button>
+			</div>
+		</div>
 	{/if}
 	{#if toast}
 		<div class="toast card" transition:fly={{ y: -80, duration: 400 }}>
@@ -374,6 +411,62 @@
 			transform: translate(calc(-50% - 60vw), calc(-50% + 10vh)) scale(0.2);
 			opacity: 0;
 		}
+	}
+	.complete {
+		position: fixed;
+		inset: 0;
+		margin: auto;
+		width: 520px;
+		height: 400px;
+		display: grid;
+		justify-items: center;
+		align-content: center;
+		gap: 8px;
+		z-index: 80;
+		box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+	}
+	.complete img {
+		height: 120px;
+	}
+	.cname {
+		font-size: 26px;
+	}
+	.complete p {
+		margin: 0;
+		font-size: 30px;
+		font-weight: bold;
+		color: var(--blue);
+	}
+	.mark {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: var(--star);
+		font-weight: bold;
+	}
+	.mark.gold {
+		color: #e08a00;
+	}
+	.btns {
+		display: flex;
+		gap: 12px;
+		margin-top: 10px;
+	}
+	.btns > * {
+		padding: 12px 20px;
+		border-radius: 16px;
+		font-weight: bold;
+		font-size: 17px;
+		text-decoration: none;
+	}
+	.next {
+		background: var(--blue);
+		color: #fff;
+	}
+	.home,
+	.again {
+		background: #eef1f4;
+		color: var(--ink);
 	}
 	.toast {
 		position: fixed;
