@@ -18,6 +18,8 @@ node scripts/fetch-strokes.ts # KanjiVG から src/lib/strokes.ts を再生成
 node scripts/fetch-images.ts  # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
 ```
 
+`main` に push すると GitHub Actions が GitHub Pages にデプロイする。公開先を変えるときは `BASE_PATH=/ pnpm build` のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
+
 SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` にある。`base` は `BASE_PATH` 環境変数で上書き可。`+layout.ts` で `ssr = false` + `prerender = true` のため、各ルートは HTML シェルとしてプリレンダーされる。
 
 `scripts/*.ts` は Node 24 の型ストリップで直接実行するため、`src/lib/words.ts` と `chars.ts` は `$app/*` を import してはいけない（`base` が必要な `imageUrl` は `src/lib/image.ts` に分離してある）。
@@ -34,7 +36,9 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
 
-`words.ts` の単語は全文字が `strokes.ts` に存在する必要があり、`words.test.ts` がそれを検証する。
+## 単語を増やす
+
+`src/lib/words.ts` のカテゴリ配列に `['id', 'ひらがな', '絵文字']` を追加し、`node scripts/fetch-images.ts` で Twemoji の SVG を `static/img/<id>.svg` に取得する。自前のイラストを使うときは同じパスに置く（画像が無い単語は頭文字のカードで表示される）。全文字が `strokes.ts` に存在する必要があり、`words.test.ts` がそれを検証する。
 
 ## 実機で調整する前提の値
 

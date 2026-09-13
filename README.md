@@ -36,49 +36,6 @@
 
 更新を公開したあと、iPad 側は 2 回目の起動で新しい版に切り替わる。
 
-## 開発
-
-```bash
-pnpm install
-pnpm dev      # http://localhost:5173/kakikaki-hiragana/
-pnpm test     # 判定・採点・認識・データの単体テスト
-pnpm check    # svelte-check
-pnpm build    # build/ に静的サイトを出力
-```
-
-`main` に push すると GitHub Actions が GitHub Pages にデプロイする。
-
-### 構成
-
-| 場所 | 役割 |
-| --- | --- |
-| `src/lib/words.ts` | 単語リスト（id・ひらがな・カテゴリ・絵文字） |
-| `src/lib/strokes.ts` | 書き順データ（`scripts/fetch-strokes.ts` で KanjiVG から生成） |
-| `src/lib/geometry.ts` | SVG path → 点列、再サンプリング |
-| `src/lib/judge.ts` | なぞる / じぶんでかく の判定。しきい値は `JUDGE` |
-| `src/lib/score.ts` | 線の採点と星 |
-| `src/lib/recognize.ts` | 手書き認識（お手本との形比較）。しきい値は `RECOG` |
-| `src/lib/progress.svelte.ts` | 練習記録（localStorage） |
-| `src/lib/audio.ts` | 効果音（WebAudio）と読み上げ（Web Speech） |
-| `src/lib/fx.ts` | パーティクルと紙吹雪 |
-| `src/lib/components/Canvas.svelte` | 書き取り面 |
-| `src/routes/` | ホーム / 練習 / 文字一覧 / アプリについて |
-
-### 単語を増やす
-
-`src/lib/words.ts` のカテゴリ配列に `['id', 'ひらがな', '絵文字']` を追加して、画像を取得する。
-
-```bash
-node scripts/fetch-images.ts   # Twemoji の SVG を static/img/<id>.svg に保存（既存は上書きしない）
-pnpm test                      # 全文字に書き順データがあることを確認
-```
-
-自前のイラストを使う場合は `static/img/<id>.svg` を置く。画像が無い単語は頭文字のカードで表示される。
-
-### 公開先を変える
-
-`BASE_PATH=/ pnpm build` のように `BASE_PATH` で base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
-
 ## クレジット
 
 - 書き順データ: [KanjiVG](https://kanjivg.tagaini.net)（CC BY-SA 3.0）
