@@ -32,7 +32,8 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `judge.ts`: なぞる（`advance` が cursor をサンプル列上で進め、-1 で逸脱）/ じぶんでかく（`coverage` が塗れた割合）。しきい値は `JUDGE`。
 - `score.ts`: 軌跡とお手本の距離と向きから 0〜1 → 星 1〜3。
 - `recognize.ts`: 全 81 文字のお手本を N 点に再サンプリング・重心合わせした `TEMPLATES` と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
-- `progress.svelte.ts`: `localStorage`（キー `kk:progress`）直結の `$state`。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。
+- `progress.svelte.ts`: `localStorage` 直結の `$state`（`kk:progress` 文字ごとの回数、`kk:earned` メダル id → 獲得日、`kk:days` 練習した日付）。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
+- `badges.ts`: メダル定義と `computeStats`。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
 - `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
 

@@ -5,12 +5,21 @@
 	import WordCard from '$lib/components/WordCard.svelte';
 	import { WORDS, CATEGORIES } from '$lib/words';
 	import { unlock } from '$lib/audio';
+	import Bar from '$lib/components/Bar.svelte';
+	import { BADGES, TOTAL } from '$lib/badges';
+	import { earned, stats } from '$lib/progress.svelte';
+	const s = $derived(stats());
 </script>
 
 <main in:fly={{ x: -40, duration: 250 }}>
 	<header>
 		<h1><img src="{base}/logo-mark.svg" alt="" /><span class="kaki">かきかき</span> <span class="hira">ひらがな</span></h1>
 		<nav>
+			<a class="card prog" href="{base}/trophies">
+				<span>🏆 {Object.keys(earned).length} / {BADGES.length}</span>
+				<span class="pl">もじ {s.chars}/{TOTAL.chars}<Bar have={s.chars} need={TOTAL.chars} /></span>
+				<span class="pl">たんご {s.words}/{TOTAL.words}<Bar have={s.words} need={TOTAL.words} color="var(--teal)" /></span>
+			</a>
 			<a class="card btn" href="{base}/chars">もじから えらぶ</a>
 			<a class="card btn" href="{base}/about" aria-label="アプリについて">？</a>
 		</nav>
@@ -67,6 +76,23 @@
 	nav {
 		display: flex;
 		gap: 10px;
+	}
+	.prog {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 8px 16px;
+		text-decoration: none;
+		font-size: 13px;
+		font-weight: bold;
+		color: var(--ink);
+	}
+	.pl {
+		display: grid;
+		gap: 3px;
+		width: 110px;
+		font-size: 11px;
+		color: var(--sub);
 	}
 	.btn {
 		padding: 12px 18px;

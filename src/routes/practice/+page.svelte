@@ -8,7 +8,8 @@
 	import { wordById } from '$lib/words';
 	import { imageUrl } from '$lib/image';
 	import { STROKES } from '$lib/strokes';
-	import { get, record, charCleared, wordStar, type Mode } from '$lib/progress.svelte';
+	import { get, record, charCleared, wordStar, checkBadges, type Mode } from '$lib/progress.svelte';
+	import type { Badge } from '$lib/badges';
 	import { say, sfx, readingOf } from '$lib/audio';
 	import { fx } from '$lib/fx';
 	import { stars, praise } from '$lib/score';
@@ -24,6 +25,19 @@
 	let flyStar = $state(false);
 	let drive = $state(false);
 	let busy = $state(false);
+	let toast = $state<Badge | null>(null);
+
+	function showBadges(list: Badge[], delay: number) {
+		list.forEach((b, k) => {
+			setTimeout(() => {
+				toast = b;
+				fx.confetti(150);
+				sfx.fanfare();
+				say(`めだる ゲット！ ${b.name}`);
+				setTimeout(() => (toast = null), 2400);
+			}, delay + k * 2600);
+		});
+	}
 
 	const MODES: { id: Mode; label: string; hint: string; title: string }[] = [
 		{ id: 'trace', label: '👆 なぞる', hint: 'まるから、みちに そって ゆっくり', title: 'なぞって みよう！' },
@@ -68,6 +82,11 @@
 				say('やったー！');
 			}, 600);
 			setTimeout(() => (drive = false), 2600);
+		}
+		const fresh = checkBadges();
+		if (fresh.length) {
+			showBadges(fresh, wait);
+			wait += fresh.length * 2600;
 		}
 		setTimeout(() => {
 			busy = false;
@@ -151,6 +170,12 @@
 
 	{#if drive}
 		<img class="drive" src={imageUrl(word)} alt="" onerror={() => (drive = false)} />
+	{/if}
+	{#if toast}
+		<div class="toast card" transition:fly={{ y: -80, duration: 400 }}>
+			<span class="tem">{toast.emoji}</span>
+			<div><small>めだる ゲット！</small><b>{toast.name}</b></div>
+		</div>
 	{/if}
 </main>
 
@@ -320,6 +345,31 @@
 			transform: translate(calc(-50% - 60vw), calc(-50% + 10vh)) scale(0.2);
 			opacity: 0;
 		}
+	}
+	.toast {
+		position: fixed;
+		top: 24px;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 70;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		padding: 14px 26px;
+		background: #fffae6;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+	}
+	.tem {
+		font-size: 44px;
+	}
+	.toast small {
+		display: block;
+		color: #e08a00;
+		font-weight: bold;
+		font-size: 12px;
+	}
+	.toast b {
+		font-size: 22px;
 	}
 	.drive {
 		position: fixed;
