@@ -1,5 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
-  <ellipse cx="105" cy="126" rx="78" ry="6" fill="#000" opacity=".08"/>
   <!-- 枝 -->
   <path d="M8 118 C60 112 140 112 194 118" fill="none" stroke="#8d6e63" stroke-width="9" stroke-linecap="round"/>
   <!-- あし（後ろ） -->
