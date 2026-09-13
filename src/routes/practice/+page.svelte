@@ -7,6 +7,7 @@
 	import WordCard from '$lib/components/WordCard.svelte';
 	import Stars from '$lib/components/Stars.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import BackButton from '$lib/components/BackButton.svelte';
 	import { wordById } from '$lib/words';
 	import { imageUrl } from '$lib/image';
 	import { STROKES } from '$lib/strokes';
@@ -113,7 +114,7 @@
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
-		<a class="card home" href="{base}/" aria-label="ホーム"><Icon name="home" /></a>
+		<BackButton />
 		<div>
 			<div class="with">{word.name}と いっしょに</div>
 			<h1>{cur.title}</h1>
@@ -189,13 +190,6 @@
 		display: flex;
 		gap: 14px;
 		align-items: center;
-	}
-	.home {
-		width: 44px;
-		height: 44px;
-		display: grid;
-		place-content: center;
-		color: var(--blue);
 	}
 	.with {
 		color: var(--teal);

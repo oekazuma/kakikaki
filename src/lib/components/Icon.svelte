@@ -2,6 +2,7 @@
 	// 24×24 の線画アイコン。色は currentColor
 	const PATHS = {
 		home: 'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10',
+		back: 'M19 12H5M11 6l-6 6 6 6',
 		speaker: 'M4 9h4l5-4v14l-5-4H4zM16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12',
 		redo: 'M4 11a8 8 0 1 1 2.3 5.7M4 4v7h7',
 		check: 'M4 12.5l5 5L20 6',

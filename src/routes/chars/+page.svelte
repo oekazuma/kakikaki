@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Icon from '$lib/components/Icon.svelte';
+	import BackButton from '$lib/components/BackButton.svelte';
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
 	import { GOJUON } from '$lib/chars';
@@ -8,7 +8,7 @@
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
-		<a class="card home" href="{base}/" aria-label="ホーム"><Icon name="home" /></a>
+		<BackButton />
 		<h1>もじから えらぶ</h1>
 	</header>
 	<div class="grid">
@@ -35,13 +35,6 @@
 		gap: 14px;
 		align-items: center;
 		margin-bottom: 12px;
-	}
-	.home {
-		width: 44px;
-		height: 44px;
-		display: grid;
-		place-content: center;
-		color: var(--blue);
 	}
 	h1 {
 		margin: 0;
