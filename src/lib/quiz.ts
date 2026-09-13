@@ -3,7 +3,7 @@ import { lettersOf, type Lang } from './lang.svelte';
 
 export type Level = 1 | 2 | 3;
 export type Kind = 'read' | 'write';
-export const LEVEL_NAME: Record<Level, string> = { 1: 'しょきゅう', 2: 'ちゅうきゅう', 3: 'じょうきゅう' };
+export const LEVEL_NAME: Record<Level, string> = { 1: 'かんたん', 2: 'ふつう', 3: 'むずかしい' };
 export const QUESTIONS: Record<Kind, number> = { read: 10, write: 5 };
 
 // 文字数で級を決める。分布が各級 60 語前後になる境目
@@ -26,7 +26,7 @@ export function shuffle<T>(arr: T[], rnd = Math.random): T[] {
 	return a;
 }
 
-// 選択肢: 同じカテゴリ優先。上級はさらに同じ文字数を優先して紛らわしくする
+// 選択肢: 同じカテゴリ優先。むずかしい（Level 3）はさらに同じ文字数を優先して紛らわしくする
 export function pickChoices(answer: Word, pool: Word[], l: Lang, level: Level, rnd = Math.random): Word[] {
 	const others = pool.filter((w) => w.id !== answer.id);
 	const len = lettersOf(answer, l).length;

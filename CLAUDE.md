@@ -39,7 +39,7 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `progress.svelte.ts`: `localStorage` 直結の `$state`。キーは言語ごとに `kk:<lang>:progress`（文字ごとの回数）、`kk:<lang>:earned`（メダル id → 獲得日）、`kk:<lang>:days`（練習した日付）。旧キー `kk:progress` 等は起動時に `ja` へ移行する。関数は現在の言語の記録を対象にし、`wordStar` / `wordCrown` は `Word` を受け取る。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
 - `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
 - `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
-- `quiz.ts`: クイズの出題（純粋関数）。`levelOf` が文字数で 初級/中級/上級 を決め（ja: 〜2 / 3 / 4〜、en: 〜4 / 5〜6 / 7〜）、`makeReadQuiz` は word→picture と picture→word を交互に、選択肢は同カテゴリ（上級は同文字数）優先で 3 つ。正解数は `progress.svelte.ts` の `recordQuiz` で `kk:<lang>:quiz` の `read1` などに積む（初回正答のみ、かきクイズはお手本を使わなかった単語のみ）。`routes/quiz/write` は `Canvas` を test モードで使い、2 回不正解で trace モードに切り替える。
+- `quiz.ts`: クイズの出題（純粋関数）。`levelOf` が文字数で かんたん/ふつう/むずかしい（Level 1〜3）を決め（ja: 〜2 / 3 / 4〜、en: 〜4 / 5〜6 / 7〜）、`makeReadQuiz` は word→picture と picture→word を交互に、選択肢は同カテゴリ（Level 3 は同文字数）優先で 3 つ。正解数は `progress.svelte.ts` の `recordQuiz` で `kk:<lang>:quiz` の `read1` などに積む（初回正答のみ、かきクイズはお手本を使わなかった単語のみ）。`routes/quiz/write` は `Canvas` を test モードで使い、2 回不正解で trace モードに切り替える。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
 
 ## 単語を増やす

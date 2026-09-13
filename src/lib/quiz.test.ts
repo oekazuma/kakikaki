@@ -29,7 +29,7 @@ describe('quiz', () => {
 		}
 		expect(qs.map((q) => q.kind)).toEqual(['word', 'picture', 'word', 'picture', 'word', 'picture', 'word', 'picture', 'word', 'picture']);
 	});
-	it('上級の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
+	it('むずかしい の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
 		const answer = wordById('shinkansen')!; // しんかんせん 6 文字
 		const ch = pickChoices(answer, wordsOf('ja', 3), 'ja', 3, seeded(3)).filter((c) => c.id !== answer.id);
 		for (const c of ch) expect(c.category).toBe('のりもの');

@@ -11,12 +11,16 @@
 		{ id: 'read', icon: 'eye', name: 'よみクイズ', desc: 'もじを よんで えを えらぼう' },
 		{ id: 'write', icon: 'pencil', name: 'かきクイズ', desc: 'えを みて もじを かこう' }
 	];
-	const LEVELS: Level[] = [1, 2, 3];
+	const LEVELS: { lv: Level; hint: string }[] = [
+		{ lv: 1, hint: 'みじかい ことば' },
+		{ lv: 2, hint: 'ふつうの ことば' },
+		{ lv: 3, hint: 'ながい ことば' }
+	];
 </script>
 
 <svelte:head>
 	<title>クイズ | {info().title}</title>
-	<meta name="description" content="よみクイズ・かきクイズを 初級・中級・上級 から選ぶページ。" />
+	<meta name="description" content="よみクイズ・かきクイズを かんたん・ふつう・むずかしい から選ぶページ。" />
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
@@ -24,38 +28,42 @@
 		<BackButton />
 		<h1><Icon name="bulb" /> クイズ <small>（{info().short}）</small></h1>
 	</header>
-	{#each KINDS as k (k.id)}
-		<section class="card">
-			<div class="kh">
-				<span class="ki"><Icon name={k.icon} size={30} /></span>
-				<div>
-					<h2>{k.name}</h2>
-					<p>{k.desc}（{QUESTIONS[k.id]} もん）</p>
+	<div class="kinds">
+		{#each KINDS as k (k.id)}
+			<section class="card">
+				<div class="kh">
+					<span class="ki"><Icon name={k.icon} size={34} /></span>
+					<div>
+						<h2>{k.name}</h2>
+						<p>{k.desc}（{QUESTIONS[k.id]} もん）</p>
+					</div>
 				</div>
-			</div>
-			<div class="levels">
-				{#each LEVELS as lv (lv)}
-					{@const n = quiz()[`${k.id}${lv}`] ?? 0}
-					<a class={['lv', `l${lv}`]} href="{base}/quiz/{k.id}?level={lv}">
-						<b>{LEVEL_NAME[lv]}</b>
-						<small>{'★'.repeat(lv)}</small>
-						<span class="n">せいかい {n}</span>
-					</a>
-				{/each}
-			</div>
-		</section>
-	{/each}
+				<div class="levels">
+					{#each LEVELS as { lv, hint } (lv)}
+						<a class={['lv', `l${lv}`]} href="{base}/quiz/{k.id}?level={lv}">
+							<span class="stars">{'★'.repeat(lv)}</span>
+							<span class="name">{LEVEL_NAME[lv]}<small>{hint}</small></span>
+							<span class="n">せいかい<b>{quiz()[`${k.id}${lv}`] ?? 0}</b></span>
+						</a>
+					{/each}
+				</div>
+			</section>
+		{/each}
+	</div>
 </main>
 
 <style>
 	main {
-		padding: 16px 22px 40px;
+		display: grid;
+		grid-template-rows: auto 1fr;
+		gap: 14px;
+		height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+		padding: 16px 22px 20px;
 	}
 	header {
 		display: flex;
 		gap: 14px;
 		align-items: center;
-		margin-bottom: 14px;
 	}
 	h1 {
 		margin: 0;
@@ -71,13 +79,18 @@
 		font-size: 14px;
 		color: var(--sub);
 	}
-	section {
-		padding: 18px 22px;
-		margin-bottom: 16px;
+	.kinds {
 		display: grid;
-		grid-template-columns: 300px 1fr;
-		align-items: center;
+		grid-template-columns: 1fr 1fr;
 		gap: 20px;
+		min-height: 0;
+	}
+	section {
+		display: grid;
+		grid-template-rows: auto 1fr;
+		gap: 14px;
+		padding: 20px 22px;
+		min-height: 0;
 	}
 	.kh {
 		display: flex;
@@ -85,59 +98,78 @@
 		gap: 14px;
 	}
 	.ki {
-		width: 56px;
-		height: 56px;
-		border-radius: 18px;
+		width: 64px;
+		height: 64px;
+		border-radius: 20px;
 		background: var(--blue);
 		color: #fff;
 		display: grid;
 		place-content: center;
+		flex: none;
 	}
 	h2 {
 		margin: 0;
-		font-size: 22px;
+		font-size: 28px;
 	}
 	p {
 		margin: 2px 0 0;
 		color: var(--sub);
-		font-size: 13px;
+		font-size: 14px;
 	}
 	.levels {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-rows: repeat(3, 1fr);
 		gap: 12px;
+		min-height: 0;
 	}
 	.lv {
 		display: grid;
-		justify-items: center;
-		gap: 4px;
-		padding: 16px 10px;
-		border-radius: 18px;
+		grid-template-columns: 90px 1fr auto;
+		align-items: center;
+		gap: 14px;
+		padding: 0 24px;
+		border-radius: 22px;
 		text-decoration: none;
 		color: #fff;
-		font-size: 20px;
 		transition: transform 0.15s;
 	}
 	.lv:active {
-		transform: scale(0.96);
+		transform: scale(0.97);
 	}
 	.l1 {
-		background: #43a047;
+		background: #4caf50;
 	}
 	.l2 {
-		background: var(--blue);
+		background: #3f87d6;
 	}
 	.l3 {
-		background: #8e24aa;
+		background: #ef6c30;
 	}
-	.lv small {
+	.stars {
+		font-size: 26px;
 		color: var(--star);
-		font-size: 16px;
+		letter-spacing: 2px;
+	}
+	.name {
+		font-size: 30px;
+		font-weight: bold;
+		display: grid;
+	}
+	.name small {
+		font-size: 13px;
+		font-weight: normal;
+		opacity: 0.9;
 	}
 	.n {
+		display: grid;
+		justify-items: center;
 		font-size: 12px;
-		background: rgba(255, 255, 255, 0.25);
-		padding: 2px 10px;
-		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.22);
+		padding: 6px 14px;
+		border-radius: 14px;
+		min-width: 80px;
+	}
+	.n b {
+		font-size: 22px;
 	}
 </style>
