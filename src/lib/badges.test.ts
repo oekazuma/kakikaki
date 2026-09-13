@@ -27,7 +27,8 @@ describe('badges', () => {
 	});
 	it('全部クリアで全メダル', () => {
 		for (const l of ['ja', 'en'] as const) {
-			const ids = earnedBadges(l, computeStats(l, () => true, () => true, 30)).map((b) => b.id);
+			const quiz = { read1: 10, read2: 10, read3: 10, write1: 10, write2: 10, write3: 10 };
+			const ids = earnedBadges(l, computeStats(l, () => true, () => true, 30, quiz)).map((b) => b.id);
 			expect(ids.length).toBe(badgesOf(l).length);
 		}
 	});

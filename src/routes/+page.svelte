@@ -42,6 +42,7 @@
 				<span class="pl">もじ {s.chars}/{total.chars}<Bar have={s.chars} need={total.chars} /></span>
 				<span class="pl">たんご {s.words}/{total.words}<Bar have={s.words} need={total.words} color="var(--teal)" /></span>
 			</a>
+			<a class="card btn quiz" href="{base}/quiz"><Icon name="eye" size={20} /> クイズ</a>
 			<a class="card btn" href="{base}/chars">もじから えらぶ</a>
 			<a class="card btn" href="{base}/about" aria-label="アプリについて"><Icon name="help" size={22} /></a>
 		</nav>
@@ -170,6 +171,11 @@
 		align-items: center;
 		gap: 6px;
 		color: #e08a00;
+	}
+	.btn.quiz {
+		background: var(--blue);
+		color: #fff;
+		gap: 6px;
 	}
 	.btn {
 		display: flex;

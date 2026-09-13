@@ -1,6 +1,7 @@
 import { CHARS, CHARS_EN, GOJUON, ALPHABET } from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
+import { LEVEL_NAME } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
 export type Stats = {
@@ -11,6 +12,7 @@ export type Stats = {
 	rows: Record<string, number>; // 行グループ名 → クリア数
 	cats: Record<string, number>; // カテゴリ → 星のついた単語数
 	days: number; // 練習した日数
+	quiz: Record<string, number>; // read1 など → 正解数
 };
 
 type Row = { name: string; chars: string[] };
@@ -27,7 +29,7 @@ export const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, en: CHARS_EN };
 export const CAT_TOTAL = Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c).length]));
 export const TOTAL = (l: Lang) => ({ chars: ALL_CHARS[l].length, words: WORDS.length });
 
-export function computeStats(l: Lang, charCleared: (c: string) => boolean, charGold: (c: string) => boolean, dayCount: number): Stats {
+export function computeStats(l: Lang, charCleared: (c: string) => boolean, charGold: (c: string) => boolean, dayCount: number, quiz: Record<string, number> = {}): Stats {
 	const wordStar = (w: Word) => lettersOf(w, l).every(charCleared);
 	const wordCrown = (w: Word) => lettersOf(w, l).every(charGold);
 	return {
@@ -37,7 +39,8 @@ export function computeStats(l: Lang, charCleared: (c: string) => boolean, charG
 		crowns: WORDS.filter(wordCrown).length,
 		rows: Object.fromEntries(ROWS[l].map((r) => [r.name, r.chars.filter(charCleared).length])),
 		cats: Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c && wordStar(w)).length])),
-		days: dayCount
+		days: dayCount,
+		quiz
 	};
 }
 
@@ -73,6 +76,19 @@ export function badgesOf(l: Lang): Badge[] {
 		...CATEGORIES.map((c) => count(`cat-${c}`, CAT_EMOJI[c] ?? '🏅', `${c} はかせ`, `${c}の たんごに ぜんぶ ほし`, (s) => [s.cats[c], CAT_TOTAL[c]])),
 		count('crowns-10', '👸', 'おうかん 10', '10この たんごに おうかん', (s) => [s.crowns, 10]),
 		count('crowns-all', '🏰', 'おうかん マスター', 'ぜんぶの たんごに おうかん', (s) => [s.crowns, T.words]),
+		...(['read', 'write'] as const).flatMap((k) => {
+			const kn = k === 'read' ? 'よみクイズ' : 'かきクイズ';
+			const em = k === 'read' ? '👀' : '✍️';
+			return [
+				...([1, 2, 3] as const).map((lv) =>
+					count(`${k}-${lv}`, em, `${kn} ${LEVEL_NAME[lv]}`, `${kn}の ${LEVEL_NAME[lv]}で 10もん せいかい`, (s) => [Math.min(10, s.quiz[`${k}${lv}`] ?? 0), 10])
+				),
+				count(`${k}-all`, k === 'read' ? '🧠' : '🖋️', `${kn} マスター`, `${kn}の ぜんぶの きゅうで 10もん せいかい`, (s) => [
+					[1, 2, 3].filter((lv) => (s.quiz[`${k}${lv}`] ?? 0) >= 10).length,
+					3
+				])
+			];
+		}),
 		count('days-3', '📅', '3にち れんしゅう', '3にち れんしゅうした', (s) => [s.days, 3]),
 		count('days-7', '🗓️', '7にち れんしゅう', '7にち れんしゅうした', (s) => [s.days, 7]),
 		count('days-30', '🎂', '30にち れんしゅう', '30にち れんしゅうした', (s) => [s.days, 30])

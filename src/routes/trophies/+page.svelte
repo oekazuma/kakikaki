@@ -6,7 +6,8 @@
 	import Bar from '$lib/components/Bar.svelte';
 	import { badgesOf, CAT_TOTAL, TOTAL } from '$lib/badges';
 	import { CATEGORIES } from '$lib/words';
-	import { earned, stats } from '$lib/progress.svelte';
+	import { earned, stats, quiz } from '$lib/progress.svelte';
+	import { LEVEL_NAME } from '$lib/quiz';
 	import { lang, info } from '$lib/lang.svelte';
 
 	const s = $derived(stats());
@@ -50,6 +51,17 @@
 				<span class="cn">{c}</span>
 				<Bar have={s.cats[c]} need={CAT_TOTAL[c]} color="var(--teal)" />
 				<small>{s.cats[c]} / {CAT_TOTAL[c]}</small>
+			</div>
+		{/each}
+	</section>
+
+	<section class="card quiz">
+		{#each [['read', 'よみクイズ'], ['write', 'かきクイズ']] as [k, name] (k)}
+			<div class="qrow">
+				<b>{name}</b>
+				{#each [1, 2, 3] as lv (lv)}
+					<span class="qc"><small>{LEVEL_NAME[lv as 1 | 2 | 3]}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> もん</span>
+				{/each}
 			</div>
 		{/each}
 	</section>
@@ -146,6 +158,33 @@
 	}
 	.cat small {
 		text-align: right;
+	}
+	.quiz {
+		padding: 12px 16px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px 30px;
+		margin-bottom: 16px;
+	}
+	.qrow {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		font-size: 14px;
+	}
+	.qrow > b {
+		width: 90px;
+	}
+	.qc {
+		display: flex;
+		align-items: baseline;
+		gap: 4px;
+		font-size: 12px;
+		color: var(--sub);
+	}
+	.qc b {
+		font-size: 18px;
+		color: var(--ink);
 	}
 	.badges {
 		display: grid;
