@@ -22,7 +22,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
 		<BackButton />
-		<h1>クイズ <small>（{info().short}）</small></h1>
+		<h1><Icon name="bulb" /> クイズ <small>（{info().short}）</small></h1>
 	</header>
 	{#each KINDS as k (k.id)}
 		<section class="card">
@@ -60,6 +60,12 @@
 	h1 {
 		margin: 0;
 		font-size: 22px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	h1 :global(svg) {
+		color: #e08a00;
 	}
 	h1 small {
 		font-size: 14px;

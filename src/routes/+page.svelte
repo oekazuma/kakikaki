@@ -42,7 +42,7 @@
 				<span class="pl">もじ {s.chars}/{total.chars}<Bar have={s.chars} need={total.chars} /></span>
 				<span class="pl">たんご {s.words}/{total.words}<Bar have={s.words} need={total.words} color="var(--teal)" /></span>
 			</a>
-			<a class="card btn quiz" href="{base}/quiz"><Icon name="eye" size={20} /> クイズ</a>
+			<a class="card btn quiz" href="{base}/quiz"><Icon name="bulb" size={22} /> クイズ</a>
 			<a class="card btn" href="{base}/chars">もじから えらぶ</a>
 			<a class="card btn" href="{base}/about" aria-label="アプリについて"><Icon name="help" size={22} /></a>
 		</nav>
@@ -89,7 +89,7 @@
 	.toggle button {
 		position: relative;
 		z-index: 1;
-		width: 104px;
+		width: 96px;
 		height: 48px;
 		border-radius: 26px;
 		font-size: 22px;
@@ -111,14 +111,14 @@
 		position: absolute;
 		top: 4px;
 		left: 4px;
-		width: 104px;
+		width: 96px;
 		height: 48px;
 		border-radius: 26px;
 		background: var(--blue);
 		transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), background-color 0.4s;
 	}
 	.knob.en {
-		transform: translateX(104px);
+		transform: translateX(96px);
 	}
 	h1 {
 		font-size: 26px;
@@ -190,5 +190,11 @@
 		flex-wrap: wrap;
 		gap: 10px;
 		padding: 6px 0 10px;
+	}
+	/* 幅 1024 の iPad でも 1 行に収める。進捗バーは実績画面にもあるので省略 */
+	@media (max-width: 1240px) {
+		.pl {
+			display: none;
+		}
 	}
 </style>
