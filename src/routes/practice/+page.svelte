@@ -164,7 +164,7 @@
 	</section>
 
 	<aside class="right">
-		<button class="rb" onclick={() => say(lang.v === 'ja' ? readingOf(c) : c, info().speech)}><span class="card ic"><Icon name="speaker" size={26} /></span>きく</button>
+		<button class="rb" onclick={() => say([lang.v === 'ja' ? readingOf(c) : c, ...(chars.length > 1 ? [nameOf(word)] : [])], info().speech)}><span class="card ic"><Icon name="speaker" size={26} /></span>きく</button>
 		<button class="rb" onclick={() => select(i, mode)}><span class="card ic"><Icon name="redo" size={26} /></span>やりなおす</button>
 		{#if mode === 'test'}
 			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={32} /></span>できた</button>
