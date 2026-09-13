@@ -57,6 +57,13 @@
 		display: grid;
 		gap: 8px;
 	}
+	/* 五十音表は右から左（あ行が右端） */
+	.grid.ja {
+		direction: rtl;
+	}
+	.grid.ja .cell {
+		direction: ltr;
+	}
 	.grid.en {
 		grid-template-columns: 1fr;
 	}
