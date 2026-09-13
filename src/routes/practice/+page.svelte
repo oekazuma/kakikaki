@@ -174,7 +174,7 @@
 
 	<aside class="left">
 		<WordCard {word} size={240} />
-		<div class="tabs">
+		<div class={['tabs', { compact: chars.length > 6 }]}>
 			{#each chars as ch, n (n)}
 				{@const lock = !unlocked(n)}
 				<button class={['tab', 'card', { on: n === i, lock, done: charCleared(ch) }]} disabled={lock} onclick={() => select(n)}>
@@ -261,26 +261,39 @@
 		margin: 0;
 		font-size: 22px;
 	}
+	/* 左カラムは高さを超えても画面全体を伸ばさず、内部でスクロールする */
 	.left {
 		display: grid;
 		gap: 20px;
 		align-content: start;
+		min-height: 0;
+		overflow-y: auto;
+		padding: 2px;
 	}
 	.tabs {
 		display: flex;
 		gap: 10px;
 		flex-wrap: wrap;
-		padding: 0 2px;
+		--tab: 62px;
+		--tabh: 68px;
+		--tabf: 30px;
+	}
+	/* 7 文字以上は小さめにして 4 列で収める */
+	.tabs.compact {
+		gap: 7px;
+		--tab: 52px;
+		--tabh: 58px;
+		--tabf: 24px;
 	}
 	.tab {
-		width: 62px;
-		height: 68px;
+		width: var(--tab);
+		height: var(--tabh);
 		display: grid;
 		grid-template-rows: 1fr 16px;
 		justify-items: center;
 		align-items: center;
 		padding: 6px 0 4px;
-		font-size: 30px;
+		font-size: var(--tabf);
 		font-weight: bold;
 		border: 3px solid transparent;
 	}
