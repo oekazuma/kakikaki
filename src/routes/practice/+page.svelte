@@ -43,6 +43,13 @@
 	let busy = $state(false);
 	let toast = $state<Badge | null>(null);
 	let complete = $state(false); // 単語の全文字が終わった
+	let shaking = $state(-1); // 鍵つきタブを押したとき横に揺らす
+	function tapTab(n: number) {
+		if (unlocked(n)) return select(n);
+		shaking = -1;
+		requestAnimationFrame(() => (shaking = n));
+		sfx.buu();
+	}
 	let speaking = $state(false);
 	async function hear() {
 		speaking = true;
@@ -177,7 +184,12 @@
 		<div class={['tabs', { compact: chars.length > 6 }]}>
 			{#each chars as ch, n (n)}
 				{@const lock = !unlocked(n)}
-				<button class={['tab', 'card', { on: n === i, lock, done: charCleared(ch) }]} disabled={lock} onclick={() => select(n)}>
+				<button
+					class={['tab', 'card', { on: n === i, lock, done: charCleared(ch), shake: shaking === n }]}
+					aria-disabled={lock}
+					onclick={() => tapTab(n)}
+					onanimationend={() => (shaking = -1)}
+				>
 					<span class="ch">{ch}</span>
 					<span class={['s', { gold: get(ch).test > 0 }]}>
 						{#if lock}<Icon name="lock" size={14} />{:else if get(ch).test > 0}<Icon name="crown" size={14} fill />{:else if charCleared(ch)}<Icon name="star" size={14} fill />{/if}
@@ -322,6 +334,19 @@
 	}
 	.tab.lock .s {
 		color: #b0b7bf;
+	}
+	.tab.shake {
+		animation: tabshake 0.4s;
+	}
+	@keyframes tabshake {
+		20%,
+		60% {
+			transform: translateX(-7px);
+		}
+		40%,
+		80% {
+			transform: translateX(7px);
+		}
 	}
 	.charstars {
 		padding: 12px 18px;
