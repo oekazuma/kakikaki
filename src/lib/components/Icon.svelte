@@ -1,0 +1,30 @@
+<script lang="ts">
+	// 24×24 の線画アイコン。色は currentColor
+	const PATHS = {
+		home: 'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10',
+		speaker: 'M4 9h4l5-4v14l-5-4H4zM16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12',
+		redo: 'M4 11a8 8 0 1 1 2.3 5.7M4 4v7h7',
+		check: 'M4 12.5l5 5L20 6',
+		trophy: 'M8 4h8v6a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 3M16 6h3a3 3 0 0 1-3 3M12 14v4M8 20h8',
+		rotate: 'M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4',
+		trace: 'M6 18a1.5 1.5 0 1 0 .01 0M18 6a1.5 1.5 0 1 0 .01 0M7.5 16.5C13 15 11 9 16.5 7.5',
+		pencil: 'M4 20l4-1L19 8l-3-3L5 16zM14 7l3 3',
+		star: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
+		crown: 'M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5zM5 19h14',
+		book: 'M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-6a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h7z',
+		help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01'
+	} as const;
+	let { name, size = 24 }: { name: keyof typeof PATHS; size?: number } = $props();
+</script>
+
+<svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+	<path d={PATHS[name]} />
+</svg>
+
+<style>
+	svg {
+		display: inline-block;
+		vertical-align: middle;
+		flex: none;
+	}
+</style>

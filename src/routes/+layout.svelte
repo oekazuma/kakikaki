@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { fx } from '$lib/fx';
+	import Icon from '$lib/components/Icon.svelte';
 	let { children } = $props();
 </script>
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
 {@render children()}
 <div class="portrait card">
-	<div class="icon">🔄</div>
+	<div class="icon"><Icon name="rotate" size={80} /></div>
 	<p>iPad を よこに してね</p>
 </div>
 
@@ -31,7 +32,7 @@
 		background: var(--bg);
 	}
 	.icon {
-		font-size: 80px;
+		color: var(--blue);
 	}
 	@media (orientation: portrait) {
 		.portrait {

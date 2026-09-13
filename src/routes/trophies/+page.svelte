@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte';
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
 	import Bar from '$lib/components/Bar.svelte';
@@ -9,25 +10,25 @@
 	const s = $derived(stats());
 	const got = $derived(Object.keys(earned).length);
 	const tiles = $derived([
-		{ label: 'もじ', emoji: '✏️', have: s.chars, need: TOTAL.chars, color: 'var(--blue)' },
-		{ label: 'きんのほし', emoji: '⭐', have: s.gold, need: TOTAL.chars, color: 'var(--star)' },
-		{ label: 'たんご', emoji: '🎈', have: s.words, need: TOTAL.words, color: 'var(--teal)' },
-		{ label: 'おうかん', emoji: '👑', have: s.crowns, need: TOTAL.words, color: '#e08a00' }
-	]);
+		{ label: 'もじ', icon: 'pencil', have: s.chars, need: TOTAL.chars, color: 'var(--blue)' },
+		{ label: 'きんのほし', icon: 'star', have: s.gold, need: TOTAL.chars, color: 'var(--star)' },
+		{ label: 'たんご', icon: 'book', have: s.words, need: TOTAL.words, color: 'var(--teal)' },
+		{ label: 'おうかん', icon: 'crown', have: s.crowns, need: TOTAL.words, color: '#e08a00' }
+	] as const);
 	const pct = (h: number, n: number) => Math.floor((100 * h) / n);
 </script>
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
-		<a class="card home" href="{base}/" aria-label="ホーム">🏠</a>
-		<h1>🏆 めだる と きろく</h1>
+		<a class="card home" href="{base}/" aria-label="ホーム"><Icon name="home" /></a>
+		<h1><Icon name="trophy" /> めだる と きろく</h1>
 		<span class="count">めだる {got} / {BADGES.length}</span>
 	</header>
 
 	<section class="tiles">
 		{#each tiles as t (t.label)}
 			<div class="card tile">
-				<div class="tl"><span>{t.emoji} {t.label}</span><b>{pct(t.have, t.need)}%</b></div>
+				<div class="tl"><span class="lb" style:color={t.color}><Icon name={t.icon} size={20} /> {t.label}</span><b>{pct(t.have, t.need)}%</b></div>
 				<Bar have={t.have} need={t.need} color={t.color} />
 				<small>{t.have} / {t.need}</small>
 			</div>
@@ -73,13 +74,19 @@
 		height: 44px;
 		display: grid;
 		place-content: center;
-		text-decoration: none;
-		font-size: 22px;
+		color: var(--blue);
 	}
 	h1 {
 		margin: 0;
 		font-size: 22px;
 		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: var(--ink);
+	}
+	h1 :global(svg) {
+		color: #e08a00;
 	}
 	.count {
 		font-weight: bold;
@@ -106,6 +113,11 @@
 	}
 	.tl b {
 		color: var(--sub);
+	}
+	.lb {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 	}
 	small {
 		color: var(--sub);

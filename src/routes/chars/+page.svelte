@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte';
 	import { base } from '$app/paths';
 	import { fly } from 'svelte/transition';
 	import { GOJUON } from '$lib/chars';
@@ -7,7 +8,7 @@
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
-		<a class="card home" href="{base}/" aria-label="ホーム">🏠</a>
+		<a class="card home" href="{base}/" aria-label="ホーム"><Icon name="home" /></a>
 		<h1>もじから えらぶ</h1>
 	</header>
 	<div class="grid">
@@ -40,8 +41,7 @@
 		height: 44px;
 		display: grid;
 		place-content: center;
-		text-decoration: none;
-		font-size: 22px;
+		color: var(--blue);
 	}
 	h1 {
 		margin: 0;

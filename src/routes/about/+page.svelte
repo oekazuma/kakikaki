@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Icon from '$lib/components/Icon.svelte';
 	import { base } from '$app/paths';
 	import { reset } from '$lib/progress.svelte';
 	const a = Math.floor(Math.random() * 8) + 2,
@@ -15,7 +16,7 @@
 
 <main>
 	<header>
-		<a class="card home" href="{base}/" aria-label="ホーム">🏠</a>
+		<a class="card home" href="{base}/" aria-label="ホーム"><Icon name="home" /></a>
 		<h1>アプリについて</h1>
 	</header>
 	<section class="card">
@@ -53,8 +54,7 @@
 		height: 44px;
 		display: grid;
 		place-content: center;
-		text-decoration: none;
-		font-size: 22px;
+		color: var(--blue);
 	}
 	h1 {
 		margin: 0;

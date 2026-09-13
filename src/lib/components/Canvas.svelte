@@ -51,7 +51,7 @@
 		demo = false;
 		armIdle();
 	}
-	export function playDemo() {
+	function playDemo() {
 		demo = false;
 		requestAnimationFrame(() => (demo = true));
 	}
@@ -63,8 +63,9 @@
 		onDone({ mode: 'test', score: testScore(mine.dist), ok: passes(char, r), top: r[0].char });
 	}
 
-	// 文字・モードの切替は親が {#key} で再マウントする
+	// 文字・モードの切替は親が {#key} で再マウントする。なぞるは最初に書く軌跡を見せる
 	$effect(() => {
+		if (mode === 'trace') playDemo();
 		armIdle();
 		return () => clearTimeout(idle);
 	});
@@ -150,7 +151,10 @@
 		if (si >= ds.length) {
 			const s = scores.reduce((a, b) => a + b, 0) / scores.length;
 			setTimeout(() => onDone({ mode, score: s, ok: true, top: char }), 400);
-		} else armIdle();
+		} else {
+			if (mode === 'trace') playDemo();
+			armIdle();
+		}
 	}
 	const poly = (pts: Pt[]) => pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
 </script>

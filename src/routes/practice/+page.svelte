@@ -6,6 +6,7 @@
 	import Canvas, { type Result } from '$lib/components/Canvas.svelte';
 	import WordCard from '$lib/components/WordCard.svelte';
 	import Stars from '$lib/components/Stars.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { wordById } from '$lib/words';
 	import { imageUrl } from '$lib/image';
 	import { STROKES } from '$lib/strokes';
@@ -47,10 +48,10 @@
 		});
 	}
 
-	const MODES: { id: Mode; label: string; hint: string; title: string }[] = [
-		{ id: 'trace', label: '👆 なぞる', hint: 'まるから、みちに そって ゆっくり', title: 'なぞって みよう！' },
-		{ id: 'free', label: '✏️ じぶんで かく', hint: 'いろの みちを ぬろう。なんかいに わけても いいよ', title: 'じぶんで かいてみよう！' },
-		{ id: 'test', label: '🌟 おてほんなし', hint: 'おてほんを みないで かいてみよう', title: 'おてほんなしで かいてみよう！' }
+	const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string; hint: string; title: string }[] = [
+		{ id: 'trace', icon: 'trace', label: 'なぞる', hint: 'まるから、みちに そって ゆっくり', title: 'なぞって みよう！' },
+		{ id: 'free', icon: 'pencil', label: 'じぶんで かく', hint: 'いろの みちを ぬろう。なんかいに わけても いいよ', title: 'じぶんで かいてみよう！' },
+		{ id: 'test', icon: 'star', label: 'おてほんなし', hint: 'おてほんを みないで かいてみよう', title: 'おてほんなしで かいてみよう！' }
 	];
 	const cur = $derived(MODES.find((m) => m.id === mode)!);
 
@@ -112,7 +113,7 @@
 
 <main in:fly={{ x: 40, duration: 250 }}>
 	<header>
-		<a class="card home" href="{base}/" aria-label="ホーム">🏠</a>
+		<a class="card home" href="{base}/" aria-label="ホーム"><Icon name="home" /></a>
 		<div>
 			<div class="with">{word.name}と いっしょに</div>
 			<h1>{cur.title}</h1>
@@ -142,7 +143,7 @@
 	<section class="center">
 		<div class="modes card">
 			{#each MODES as m (m.id)}
-				<button class={{ on: mode === m.id }} onclick={() => select(i, m.id)}>{m.label}</button>
+				<button class={{ on: mode === m.id }} onclick={() => select(i, m.id)}><Icon name={m.icon} size={20} /> {m.label}</button>
 			{/each}
 		</div>
 		<div class="board card">
@@ -152,22 +153,14 @@
 			{/key}
 			{#if flyStar}<div class="flystar">⭐</div>{/if}
 		</div>
-		<p class="hint">{msg || (mode === 'test' && drawn ? 'かけたら みぎの ✅「できた」を おしてね' : cur.hint)}</p>
+		<p class="hint">{msg || (mode === 'test' && drawn ? 'かけたら みぎの「できた」を おしてね' : cur.hint)}</p>
 	</section>
 
 	<aside class="right">
-		<button class="rb" onclick={() => say(readingOf(c))}>
-			<span class="card ic">
-				<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-					<path d="M4 9v6h4l5 4V5L8 9H4z" fill="var(--blue)" />
-					<path d="M16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" />
-				</svg>
-			</span>きく
-		</button>
-		<button class="rb" onclick={() => canvas?.playDemo()}><span class="card ic">👀</span>みる</button>
-		<button class="rb" onclick={() => select(i, mode)}><span class="card ic">↺</span>やりなおす</button>
+		<button class="rb" onclick={() => say(readingOf(c))}><span class="card ic"><Icon name="speaker" size={26} /></span>きく</button>
+		<button class="rb" onclick={() => select(i, mode)}><span class="card ic"><Icon name="redo" size={26} /></span>やりなおす</button>
 		{#if mode === 'test'}
-			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic">✅</span>できた</button>
+			<button class={['rb', 'done', { ready: drawn }]} onclick={() => canvas?.judge()}><span class="card ic"><Icon name="check" size={32} /></span>できた</button>
 		{/if}
 	</aside>
 
@@ -202,8 +195,7 @@
 		height: 44px;
 		display: grid;
 		place-content: center;
-		text-decoration: none;
-		font-size: 22px;
+		color: var(--blue);
 	}
 	.with {
 		color: var(--teal);
@@ -276,6 +268,10 @@
 		border-radius: 16px;
 		font-weight: bold;
 		color: var(--sub);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
 	}
 	.modes .on {
 		background: var(--teal);
@@ -322,13 +318,12 @@
 		height: 48px;
 		display: grid;
 		place-content: center;
-		font-size: 22px;
+		color: var(--blue);
 	}
 	.done .ic {
 		background: var(--teal);
 		width: 64px;
 		height: 64px;
-		font-size: 30px;
 		color: #fff;
 	}
 	.done {

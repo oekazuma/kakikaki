@@ -6,6 +6,7 @@
 	import { WORDS, CATEGORIES } from '$lib/words';
 	import { unlock } from '$lib/audio';
 	import Bar from '$lib/components/Bar.svelte';
+	import Icon from '$lib/components/Icon.svelte';
 	import { BADGES, TOTAL } from '$lib/badges';
 	import { earned, stats } from '$lib/progress.svelte';
 	const s = $derived(stats());
@@ -16,12 +17,12 @@
 		<h1><img src="{base}/logo-mark.svg" alt="" /><span class="kaki">かきかき</span> <span class="hira">ひらがな</span></h1>
 		<nav>
 			<a class="card prog" href="{base}/trophies">
-				<span>🏆 {Object.keys(earned).length} / {BADGES.length}</span>
+				<span class="tr"><Icon name="trophy" size={22} /> {Object.keys(earned).length} / {BADGES.length}</span>
 				<span class="pl">もじ {s.chars}/{TOTAL.chars}<Bar have={s.chars} need={TOTAL.chars} /></span>
 				<span class="pl">たんご {s.words}/{TOTAL.words}<Bar have={s.words} need={TOTAL.words} color="var(--teal)" /></span>
 			</a>
 			<a class="card btn" href="{base}/chars">もじから えらぶ</a>
-			<a class="card btn" href="{base}/about" aria-label="アプリについて">？</a>
+			<a class="card btn" href="{base}/about" aria-label="アプリについて"><Icon name="help" size={22} /></a>
 		</nav>
 	</header>
 	{#each CATEGORIES as cat (cat)}
@@ -94,7 +95,15 @@
 		font-size: 11px;
 		color: var(--sub);
 	}
+	.tr {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		color: #e08a00;
+	}
 	.btn {
+		display: flex;
+		align-items: center;
 		padding: 12px 18px;
 		font-weight: bold;
 		text-decoration: none;
