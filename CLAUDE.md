@@ -1,0 +1,45 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## 概要
+
+iPad 横画面用の子ども向けひらがな書き練習 PWA。SvelteKit（Svelte 5 runes、TypeScript）+ adapter-static で、`main` への push で GitHub Pages（`/kakikaki-hiragana/`）へ自動デプロイされる。UI 文言は子ども向けのひらがな中心、保護者向け画面（`/about`）だけ漢字可。追加ランタイム依存はゼロで、パーティクル・効果音・手書き認識はすべて自前実装。
+
+## コマンド
+
+```bash
+pnpm dev                      # http://localhost:5173/kakikaki-hiragana/
+pnpm test                     # vitest 一括実行（純粋関数のテストのみ、DOM 不要）
+pnpm exec vitest run src/lib/judge.test.ts   # 単一ファイル
+pnpm check                    # svelte-check
+pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
+node scripts/fetch-strokes.ts # KanjiVG から src/lib/strokes.ts を再生成
+node scripts/fetch-images.ts  # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
+```
+
+SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` にある。`base` は `BASE_PATH` 環境変数で上書き可。`+layout.ts` で `ssr = false` + `prerender = true` のため、各ルートは HTML シェルとしてプリレンダーされる。
+
+`scripts/*.ts` は Node 24 の型ストリップで直接実行するため、`src/lib/words.ts` と `chars.ts` は `$app/*` を import してはいけない（`base` が必要な `imageUrl` は `src/lib/image.ts` に分離してある）。
+
+## アーキテクチャ
+
+座標系はすべて KanjiVG の 109×109 viewBox。`Canvas.svelte` が `getScreenCTM()` でポインタ座標を viewBox 単位に変換し、判定・採点・認識はその単位で行う純粋関数に委ねる。
+
+- `geometry.ts`: SVG path（M/L/H/V/C/S/Z）を等間隔の点列にする。`getPointAtLength` は使わず自前で平坦化するので、テストと実行時で同じ点列になる。
+- `judge.ts`: なぞる（`advance` が cursor をサンプル列上で進め、-1 で逸脱）/ じぶんでかく（`coverage` が塗れた割合）。しきい値は `JUDGE`。
+- `score.ts`: 軌跡とお手本の距離と向きから 0〜1 → 星 1〜3。
+- `recognize.ts`: 全 81 文字のお手本を N 点に再サンプリング・重心合わせした `TEMPLATES` と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
+- `progress.svelte.ts`: `localStorage`（キー `kk:progress`）直結の `$state`。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。
+- `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
+- `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
+
+`words.ts` の単語は全文字が `strokes.ts` に存在する必要があり、`words.test.ts` がそれを検証する。
+
+## 実機で調整する前提の値
+
+判定の手触りは iPad 実機で決めるものとして、`JUDGE`（特に先読み `K`）、`RECOG`、`Canvas.svelte` の おてほんなし自動判定（4 秒）を定数にまとめてある。
+
+## UI 確認
+
+ブラウザペインは幅が狭く横画面レイアウトを確認できないため、1180×820 のスクリーンショットや Pointer 操作のテストは Playwright を一時ディレクトリに入れて行う（dev サーバーは初回コンパイルが遅いので、練習画面は `style[data-vite-dev-id*="practice"]` の出現を待ってから撮る）。

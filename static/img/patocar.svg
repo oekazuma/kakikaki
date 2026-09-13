@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
+  <ellipse cx="100" cy="122" rx="85" ry="6" fill="#000" opacity=".08"/>
+  <rect x="90" y="18" width="34" height="10" rx="4" fill="#e53935"/>
+  <rect x="98" y="12" width="18" height="8" rx="3" fill="#ff8a80"/>
+  <path d="M48 62 L70 34 H150 L168 62 Z" fill="#fff"/>
+  <path d="M73 40 H112 V62 H60 Z" fill="#bfe3f7"/>
+  <path d="M118 40 H146 L160 62 H118 Z" fill="#bfe3f7"/>
+  <rect x="18" y="60" width="164" height="50" rx="12" fill="#fff"/>
+  <path d="M18 84 H182 V98 A12 12 0 0 1 170 110 H30 A12 12 0 0 1 18 98 Z" fill="#222"/>
+  <rect x="18" y="66" width="16" height="10" rx="3" fill="#ffd54f"/>
+  <rect x="166" y="66" width="16" height="10" rx="3" fill="#ff5252"/>
+  <text x="100" y="80" font-size="11" text-anchor="middle" fill="#222" font-family="sans-serif" font-weight="bold">POLICE</text>
+  <circle cx="52" cy="110" r="17" fill="#333"/><circle cx="52" cy="110" r="7" fill="#aaa"/>
+  <circle cx="148" cy="110" r="17" fill="#333"/><circle cx="148" cy="110" r="7" fill="#aaa"/>
+</svg>
