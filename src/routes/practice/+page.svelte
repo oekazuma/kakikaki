@@ -50,13 +50,13 @@
 		speaking = false;
 	}
 
-	// 単語が切り替わったら（つぎの たんご など）最初からやり直す
+	// 単語が切り替わったら（つぎの たんご など）まだ終わっていない最初の文字から。
+	// 完了モーダルは初めて終えた瞬間だけ出すので、済んだ単語を開き直しても出さない
 	$effect(() => {
 		void word.id;
 		untrack(() => {
-			const first = chars.findIndex((ch) => nextMode(ch) !== null);
-			complete = first === -1;
-			select(Math.max(0, first));
+			complete = false;
+			select(Math.max(0, chars.findIndex((ch) => nextMode(ch) !== null)));
 		});
 	});
 
