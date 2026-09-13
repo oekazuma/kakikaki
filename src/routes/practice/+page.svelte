@@ -20,14 +20,16 @@
 	const word = $derived(wordById(page.url.searchParams.get('w') ?? '') ?? wordById('patocar')!);
 	const chars = $derived(lettersOf(word));
 	const strokes = $derived(strokesOf());
-	let i = $state(Number(page.url.searchParams.get('i') ?? 0));
-	const c = $derived(chars[i]);
-
 	// その文字で次にやるべきモード。全部終わっていれば null
 	function nextMode(ch: string): Mode | null {
 		const p = get(ch);
 		return p.trace < 2 ? 'trace' : p.free < 1 ? 'free' : p.test < 1 ? 'test' : null;
 	}
+	// 左から順に解放: 前の文字がクリア済みなら選べる
+	const unlocked = (n: number) => n === 0 || charCleared(chars[n - 1]);
+	// 最初はまだ終わっていない最初の文字から
+	let i = $state(untrack(() => Math.max(0, chars.findIndex((ch) => nextMode(ch) !== null))));
+	const c = $derived(chars[i]);
 	let mode = $state<Mode>(untrack(() => nextMode(chars[i])) ?? 'trace');
 	let gen = $state(0); // 同じ文字・モードで書き取り面を作り直すためのカウンタ
 	let drawn = $state(false); // おてほんなしで 1 画以上書いた
@@ -58,6 +60,7 @@
 	const cur = $derived(MODES.find((m) => m.id === mode)!);
 
 	function select(n: number, m: Mode = nextMode(chars[n]) ?? 'trace') {
+		if (!unlocked(n)) return;
 		i = n;
 		mode = m;
 		stroke = 0;
@@ -128,18 +131,19 @@
 		<WordCard {word} size={190} />
 		<div class="tabs">
 			{#each chars as ch, n (n)}
-				<button class={['tab', 'card', { on: n === i }]} onclick={() => select(n)}>
+				{@const lock = !unlocked(n)}
+				<button class={['tab', 'card', { on: n === i, lock, done: charCleared(ch) }]} disabled={lock} onclick={() => select(n)}>
 					<span class="ch">{ch}</span>
-					<span class={['s', { gold: get(ch).test > 0, on: charCleared(ch) }]}><Icon name={get(ch).test > 0 ? 'crown' : 'star'} size={13} fill={charCleared(ch) || get(ch).test > 0} /></span>
+					<span class={['s', { gold: get(ch).test > 0 }]}>
+						{#if lock}<Icon name="lock" size={14} />{:else if get(ch).test > 0}<Icon name="crown" size={14} fill />{:else if charCleared(ch)}<Icon name="star" size={14} fill />{/if}
+					</span>
 				</button>
 			{/each}
 		</div>
 		<div class="charstars card">
-			<div class="cols">
-				<div><small>なぞる</small><Stars n={2} k={get(c).trace} /></div>
-				<div><small>じぶんで</small><Stars n={1} k={get(c).free} /></div>
-				<div><small>おてほんなし</small><Stars n={1} k={get(c).test} /></div>
-			</div>
+			<div class="row"><span>なぞる</span><Stars n={2} k={get(c).trace} size={20} /></div>
+			<div class="row"><span>じぶんで かく</span><Stars n={1} k={get(c).free} size={20} /></div>
+			<div class="row gold"><span>おてほんなし</span><Stars n={1} k={get(c).test} size={20} /></div>
 		</div>
 	</aside>
 
@@ -204,26 +208,36 @@
 	}
 	.tabs {
 		display: flex;
-		gap: 6px;
+		gap: 8px;
 		flex-wrap: wrap;
 	}
 	.tab {
-		width: 46px;
-		padding: 6px 0;
+		width: 62px;
+		height: 68px;
 		display: grid;
+		grid-template-rows: 1fr 16px;
 		justify-items: center;
-		font-size: 20px;
+		align-items: center;
+		padding: 6px 0 4px;
+		font-size: 30px;
 		font-weight: bold;
+		border: 3px solid transparent;
+	}
+	.tab.done {
+		background: #fff8dc;
 	}
 	.tab.on {
 		background: var(--blue);
 		color: #fff;
+		border-color: var(--dark);
+	}
+	.tab.lock {
+		background: #e9ecef;
+		color: #b0b7bf;
+		box-shadow: none;
 	}
 	.tab .s {
 		display: grid;
-		color: #c3cad2;
-	}
-	.tab .s.on {
 		color: var(--star);
 	}
 	.tab .s.gold {
@@ -232,19 +246,24 @@
 	.tab.on .s {
 		color: #fff;
 	}
+	.tab.lock .s {
+		color: #b0b7bf;
+	}
 	.charstars {
-		padding: 10px;
-		text-align: center;
+		padding: 8px 14px;
+		display: grid;
+		gap: 2px;
 	}
-	.cols {
+	.row {
 		display: flex;
-		justify-content: space-around;
-		margin-top: 4px;
-	}
-	.cols small {
-		display: block;
-		font-size: 10px;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 14px;
+		font-weight: bold;
 		color: var(--sub);
+	}
+	.row.gold :global(.on) {
+		color: #e08a00;
 	}
 	.center {
 		display: grid;
