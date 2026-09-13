@@ -11,13 +11,16 @@ const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
 export const lang = $state<{ v: Lang }>({ v: store()?.getItem(KEY) === 'en' ? 'en' : 'ja' });
 
 export function setLang(v: Lang) {
-	lang.v = v;
-	store()?.setItem(KEY, v);
+  lang.v = v;
+  store()?.setItem(KEY, v);
 }
 
-export const LANG_INFO: Record<Lang, { title: string; short: string; speech: string; strokes: Record<string, string[]>; chars: string[] }> = {
-	ja: { title: 'かきかき ひらがな', short: 'ひらがな', speech: 'ja-JP', strokes: STROKES, chars: CHARS },
-	en: { title: 'かきかき えいご', short: 'えいご', speech: 'en-US', strokes: STROKES_EN, chars: CHARS_EN }
+export const LANG_INFO: Record<
+  Lang,
+  { title: string; short: string; speech: string; strokes: Record<string, string[]>; chars: string[] }
+> = {
+  ja: { title: 'かきかき ひらがな', short: 'ひらがな', speech: 'ja-JP', strokes: STROKES, chars: CHARS },
+  en: { title: 'かきかき えいご', short: 'えいご', speech: 'en-US', strokes: STROKES_EN, chars: CHARS_EN }
 };
 
 export const info = () => LANG_INFO[lang.v];
@@ -30,7 +33,7 @@ export const nameOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.name : w.en
 export const toKatakana = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
 // 補助行（常に 2 行）: ひらがな のときは「カタカナ / 英語」、えいご のときは「カタカナ / ひらがな」
 export const subOf = (w: Word, l: Lang = lang.v): string[] =>
-	w.name === w.en ? [] : l === 'ja' ? [toKatakana(w.name), w.en] : [toKatakana(w.name), w.name];
+  w.name === w.en ? [] : l === 'ja' ? [toKatakana(w.name), w.en] : [toKatakana(w.name), w.name];
 
 // 書く対象の文字。スペースやハイフンは飛ばす
 export const lettersOf = (w: Word, l: Lang = lang.v) => [...nameOf(w, l)].filter((c) => c !== ' ' && c !== '-');

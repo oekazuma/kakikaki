@@ -1,39 +1,56 @@
 :root {
-	--bg: #f4f5f0;
-	--card: #fff;
-	--ink: #1f2933;
-	--sub: #6b7280;
-	--blue: #4f7cae;
-	--teal: #13786f;
-	--guide: #d9dfe4;
-	--star: #f5b400;
-	--dark: #2f5b8a;
+  --bg: #f4f5f0;
+  --card: #fff;
+  --ink: #1f2933;
+  --sub: #6b7280;
+  --blue: #4f7cae;
+  --teal: #13786f;
+  --guide: #d9dfe4;
+  --star: #f5b400;
+  --dark: #2f5b8a;
 }
 /* えいご はオレンジ系。切替時は色がにじむように変わる */
 [data-lang='en'] {
-	--blue: #e8734a;
-	--teal: #c95f2e;
-	--dark: #b8502c;
+  --blue: #e8734a;
+  --teal: #c95f2e;
+  --dark: #b8502c;
 }
 main,
 main * {
-	transition: background-color 0.4s, color 0.4s, border-color 0.4s;
+  transition:
+    background-color 0.4s,
+    color 0.4s,
+    border-color 0.4s;
 }
-* { box-sizing: border-box; }
-html, body {
-	margin: 0;
-	height: 100%;
-	background: var(--bg);
-	color: var(--ink);
-	font-family: "Hiragino Maru Gothic ProN", "Rounded Mplus 1c", "Hiragino Sans", sans-serif;
-	-webkit-user-select: none;
-	user-select: none;
-	-webkit-touch-callout: none;
-	overscroll-behavior: none;
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Hiragino Sans', sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
 }
 /* PWA(standalone) ではステータスバーの下までコンテンツが広がるため、安全領域ぶんを body で確保する */
 body {
-	padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
-button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.card { background: var(--card); border-radius: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
+button {
+  font: inherit;
+  color: inherit;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}

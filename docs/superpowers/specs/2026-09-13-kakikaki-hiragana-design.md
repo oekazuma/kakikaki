@@ -24,7 +24,7 @@ iPad 横画面で使う、子ども向けひらがな書き練習 PWA。配布�
 ### 単語 `src/lib/words.ts`
 
 ```ts
-type Word = { id: string; name: string; category: string; image?: string; desc?: string }
+type Word = { id: string; name: string; category: string; image?: string; desc?: string };
 ```
 
 - のりもの: patocar ぱとかー / fire-truck しょうぼうしゃ / ambulance きゅうきゅうしゃ / garbage-truck ごみしゅうしゅうしゃ / bus ばす / train でんしゃ / shinkansen しんかんせん / airplane ひこうき
@@ -44,8 +44,8 @@ type Word = { id: string; name: string; category: string; image?: string; desc?:
 `localStorage` キー `kk:progress`。
 
 ```ts
-type CharProgress = { trace: number; free: number; test: number } // trace 0-2, free 0-1, test 0-1
-type Progress = Record<string, CharProgress>
+type CharProgress = { trace: number; free: number; test: number }; // trace 0-2, free 0-1, test 0-1
+type Progress = Record<string, CharProgress>;
 ```
 
 - 文字クリア: `trace >= 2 && free >= 1`。

@@ -10,13 +10,13 @@ const ds = STROKES[glyph] ?? GLYPHS[glyph];
 if (!ds) throw new Error(`no strokes for ${glyph}`);
 const paths = ds.map((d) => `<path d="${d}"/>`).join('\n      ');
 const star = (cx: number, cy: number, r: number, fill: string, extra = '') => {
-	const p: string[] = [];
-	for (let i = 0; i < 10; i++) {
-		const rr = i % 2 ? r * 0.45 : r,
-			t = -Math.PI / 2 + (i * Math.PI) / 5;
-		p.push(`${(cx + rr * Math.cos(t)).toFixed(1)},${(cy + rr * Math.sin(t)).toFixed(1)}`);
-	}
-	return `<polygon points="${p.join(' ')}" fill="${fill}"${extra}/>`;
+  const p: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const rr = i % 2 ? r * 0.45 : r,
+      t = -Math.PI / 2 + (i * Math.PI) / 5;
+    p.push(`${(cx + rr * Math.cos(t)).toFixed(1)},${(cy + rr * Math.sin(t)).toFixed(1)}`);
+  }
+  return `<polygon points="${p.join(' ')}" fill="${fill}"${extra}/>`;
 };
 const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" fill="${main}"/>
@@ -34,5 +34,10 @@ const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
 </svg>
 `;
 writeFileSync('static/icon.svg', icon);
-writeFileSync('static/logo-mark.svg', icon.replace('<rect width="512" height="512" fill=', '<rect width="512" height="512" rx="112" fill='));
-console.log('static/icon.svg, static/logo-mark.svg を書き出した。PNG 化: qlmanage -t -s 512 -o static static/icon.svg && mv static/icon.svg.png static/icon-512.png && sips -z 180 180 static/icon-512.png --out static/icon-180.png');
+writeFileSync(
+  'static/logo-mark.svg',
+  icon.replace('<rect width="512" height="512" fill=', '<rect width="512" height="512" rx="112" fill=')
+);
+console.log(
+  'static/icon.svg, static/logo-mark.svg を書き出した。PNG 化: qlmanage -t -s 512 -o static static/icon.svg && mv static/icon.svg.png static/icon-512.png && sips -z 180 180 static/icon-512.png --out static/icon-180.png'
+);

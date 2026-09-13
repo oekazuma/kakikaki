@@ -10,17 +10,21 @@ iPad 横画面用の子ども向けひらがな書き練習 PWA。SvelteKit（Sv
 
 ```bash
 pnpm dev                      # http://localhost:5173/kakikaki/
-pnpm test                     # vitest 一括実行（純粋関数のテストのみ、DOM 不要）
+pnpm test:run                 # vitest 一括実行（unit プロジェクト、happy-dom）。pnpm test で watch
 pnpm exec vitest run src/lib/judge.test.ts   # 単一ファイル
+pnpm lint                     # prettier --check と eslint（CI と同じ）
+pnpm format                   # prettier --write
 pnpm check                    # svelte-check
 pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
-node scripts/fetch-strokes.ts # KanjiVG から src/lib/strokes.ts を再生成
-node scripts/fetch-images.ts  # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
-node scripts/make-strokes-en.ts # アルファベット 52 文字の書き順を線分・円弧の DSL から生成（src/lib/strokes-en.ts）
-node scripts/make-icon.ts     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
+pnpm strokes                  # KanjiVG から src/lib/strokes.ts を再生成
+pnpm strokes:en               # アルファベット 52 文字の書き順を線分・円弧の DSL から生成（src/lib/strokes-en.ts）
+pnpm images                   # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
+pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
-`main` に push すると GitHub Actions が GitHub Pages にデプロイする。公開先を変えるときは `BASE_PATH=/ pnpm build` のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
+依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は lint / check / test / build を並列に回す。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
+
+`main` に push すると GitHub Actions が GitHub Pages にデプロイする（`BASE_PATH=/<リポジトリ名>` を渡す）。公開先を変えるときは `BASE_PATH=/ pnpm build` のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
 
 SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` にある。`base` は `BASE_PATH` 環境変数で上書き可。`+layout.ts` で `ssr = false` + `prerender = true` のため、各ルートは HTML シェルとしてプリレンダーされる。
 

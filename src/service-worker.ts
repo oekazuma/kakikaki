@@ -10,39 +10,39 @@ const ASSETS = [...build, ...files, ...prerendered];
 
 // 画像などは URL にハッシュが無いので、新しい版を入れるときは HTTP キャッシュを無視して取り直す
 sw.addEventListener('install', (e) => {
-	e.waitUntil(
-		caches
-			.open(CACHE)
-			.then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
-			.then(() => sw.skipWaiting())
-	);
+  e.waitUntil(
+    caches
+      .open(CACHE)
+      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => sw.skipWaiting())
+  );
 });
 
 sw.addEventListener('activate', (e) => {
-	e.waitUntil(
-		caches
-			.keys()
-			.then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
-			.then(() => sw.clients.claim())
-	);
+  e.waitUntil(
+    caches
+      .keys()
+      .then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => sw.clients.claim())
+  );
 });
 
 // cache-first。?w=... 付きの練習画面もクエリ無視で prerendered の shell に当てる
 sw.addEventListener('fetch', (e) => {
-	if (e.request.method !== 'GET') return;
-	e.respondWith(
-		caches.match(e.request, { ignoreSearch: true }).then(
-			(hit) =>
-				hit ??
-				fetch(e.request)
-					.then((res) => {
-						if (res.ok && new URL(e.request.url).origin === location.origin) {
-							const copy = res.clone();
-							void caches.open(CACHE).then((c) => c.put(e.request, copy));
-						}
-						return res;
-					})
-					.catch(async () => (e.request.mode === 'navigate' && (await caches.match(`${base}/`))) || Response.error())
-		)
-	);
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request, { ignoreSearch: true }).then(
+      (hit) =>
+        hit ??
+        fetch(e.request)
+          .then((res) => {
+            if (res.ok && new URL(e.request.url).origin === location.origin) {
+              const copy = res.clone();
+              void caches.open(CACHE).then((c) => c.put(e.request, copy));
+            }
+            return res;
+          })
+          .catch(async () => (e.request.mode === 'navigate' && (await caches.match(`${base}/`))) || Response.error())
+    )
+  );
 });

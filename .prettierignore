@@ -1,0 +1,9 @@
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# 生成物
+src/lib/strokes.ts
+src/lib/strokes-en.ts
+static/img/
