@@ -173,7 +173,7 @@
 	</header>
 
 	<aside class="left">
-		<WordCard {word} size={190} />
+		<WordCard {word} size={240} />
 		<div class="tabs">
 			{#each chars as ch, n (n)}
 				{@const lock = !unlocked(n)}
@@ -245,9 +245,9 @@
 <style>
 	main {
 		display: grid;
-		grid-template-columns: 220px 1fr 110px;
+		grid-template-columns: 240px 1fr 120px;
 		grid-template-rows: auto 1fr;
-		gap: 12px 18px;
+		gap: 14px 22px;
 		height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 		padding: 16px 22px;
 	}
@@ -263,13 +263,14 @@
 	}
 	.left {
 		display: grid;
-		gap: 10px;
+		gap: 20px;
 		align-content: start;
 	}
 	.tabs {
 		display: flex;
-		gap: 8px;
+		gap: 10px;
 		flex-wrap: wrap;
+		padding: 0 2px;
 	}
 	.tab {
 		width: 62px;
@@ -310,15 +311,15 @@
 		color: #b0b7bf;
 	}
 	.charstars {
-		padding: 8px 14px;
+		padding: 12px 18px;
 		display: grid;
-		gap: 2px;
+		gap: 8px;
 	}
 	.row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-size: 14px;
+		font-size: 15px;
 		font-weight: bold;
 		color: var(--sub);
 	}
