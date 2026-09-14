@@ -25,21 +25,16 @@
   const word = $derived(resolveWord(page.url.searchParams.get('w'), lang.v));
   const strokes = $derived(strokesOf());
   // 単語が切り替わったときだけセッションを作り直す。コンストラクタが読む進捗ストアには反応させない
+  const effects = { buu: sfx.buu, kira: sfx.kira, fanfare: sfx.fanfare, confetti: (n: number) => fx.confetti(n) };
   const s = $derived.by(() => {
     void word.id;
-    return untrack(
-      () =>
-        new PracticeSession(word, {
-          buu: sfx.buu,
-          kira: sfx.kira,
-          fanfare: sfx.fanfare,
-          confetti: (n) => fx.confetti(n)
-        })
-    );
+    return untrack(() => new PracticeSession(word, effects));
   });
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const total = $derived(strokes[s.c].length);
+  // みる: なぞる・じぶんでかく では書き順を再生、おてほんなし では字を 2 秒だけ見せる
+  const show = () => (s.mode === 'test' ? s.peekSample() : canvas?.playDemo());
 
   // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
   async function hear() {
@@ -76,8 +71,11 @@
   <section class="center">
     <ModeBar mode={s.mode} onselect={(m) => s.select(s.i, m)} />
     <div class="board card">
-      <span class="count">{Math.min(s.stroke + 1, total)} / {total}</span>
-      {#if s.mode === 'test'}<Sample char={s.c} strokes={total} />{/if}
+      {#if s.mode === 'test'}
+        <Sample char={s.c} strokes={total} show={s.peek} />
+      {:else}
+        <span class="count">{Math.min(s.stroke + 1, total)} / {total}</span>
+      {/if}
       {#key `${lang.v}-${s.c}-${s.mode}-${s.gen}`}
         <Canvas
           bind:this={canvas}
@@ -96,9 +94,7 @@
 
   <div class="right">
     <ActionButton icon="speaker" label="きく" active={speaking} onclick={hear} />
-    {#if s.mode !== 'test'}
-      <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
-    {/if}
+    <ActionButton icon="eye" label="みる" active={s.peek} onclick={show} />
     <ActionButton icon="redo" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
     {#if s.mode === 'test'}
       <ActionButton icon="check" label="できた" done ready={s.drawn} onclick={() => canvas?.judge()} />
