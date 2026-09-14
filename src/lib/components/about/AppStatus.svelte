@@ -2,6 +2,7 @@
   import { version } from '$app/environment';
   import Icon from '../Icon.svelte';
   import { updateApp, type PwaStatus } from '$lib/pwa';
+  import { update as upd } from '$lib/update.svelte';
   let { status }: { status: PwaStatus } = $props();
 
   // kit.version.name の既定はビルド時刻（ミリ秒）
@@ -29,7 +30,8 @@
 
 <section class="card">
   <h2>更新</h2>
-  <button class="update" onclick={update} disabled={updating}
+  {#if upd.ready}<p class="new">あたらしい バージョンが あります</p>{/if}
+  <button class={['update', { ready: upd.ready }]} onclick={update} disabled={updating}
     ><Icon name="redo" size={20} /> {updating ? '更新中…' : '最新版に更新'}</button
   >
   <small>いまのバージョン: {built}</small>
@@ -57,6 +59,21 @@
     border-radius: 14px;
     font-weight: bold;
     font-size: 16px;
+  }
+  .new {
+    margin: 0 0 8px;
+    color: #c62828;
+    font-weight: bold;
+    text-align: center;
+  }
+  .update.ready {
+    background: #e53935;
+    animation: nudge 1.6s ease-in-out infinite;
+  }
+  @keyframes nudge {
+    50% {
+      transform: scale(1.03);
+    }
   }
   .update:disabled {
     opacity: 0.6;
