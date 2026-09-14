@@ -80,7 +80,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 - `scripts/**` と `src/service-worker.ts` はどの型検査にも入っていない（`.svelte-kit/tsconfig.json` の include/exclude）。S〜M。
 - `words.ts` / `chars.ts` の `$app/*` 禁止を `no-restricted-imports` で機械化する。S。
 - `@types/node ^26` に対しランタイムは Node 24。`^24` に揃える。S。
-- 公開リポジトリに LICENSE が無い（`src/lib/strokes*.ts` は CC BY-SA 3.0 由来）。保守者の判断。
+- 公開リポジトリに LICENSE が無い: **対応済み（2026-09-14、計画外）**。コードは MIT、同梱データは元のライセンスを `LICENSE` に明記。
 - `docs/superpowers/**` は初日の設計/計画で、カテゴリ・ゲート・ルートが現状と違い、命令形で書かれている。先頭に「2026-09-13 時点の初期計画。現行仕様は CLAUDE.md」の 1 行を足すか `docs/archive/` へ。計画内のスペックへのパス（`…-kakikaki-design.md`）は存在しないファイルを指す。S。
 - `.node-version`、`.vscode/settings.json`（prettier を既定フォーマッタに）、`eslint.config.js` の `ignores: ['src/lib/strokes.ts', 'src/lib/strokes-*.ts']`（`strokes.test.ts` を巻き込まない）。S。
 - `pnpm-workspace.yaml` の `allowBuilds: esbuild` は vite 8（rolldown）では死んだ設定。S。
@@ -91,6 +91,12 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 上の 5 件（英語の大文字、保護者向けの表、文字ごとの質、連続日数とカレンダー、かきクイズの新形式）は 013〜017 に計画化した。
 記録の書き出し・そ・ぽ の単語・「みる」ボタンは 012 で実装済み。
 
+## 計画外で対応したもの（2026-09-14）
+
+- おてほんなし の見本カードを左上に移し、字は「みる」を押したときだけ 2 秒見せる（右上は右手で隠れる。「おてほんなし」と表示の食い違いを解消）。
+- カレンダーの印を固定サイズの丸・テーマ色に、「つづけて n にち」を星アイコンのピルに。
+- 「みんなの進み具合」の説明文を削除。
+
 ## Findings considered and rejected
 
 - コンポーネント import の書き方が 3 種類（`./` `../` `$lib/`）: 見た目だけ。lint 規則を入れないなら一度直しても戻る。
@@ -100,8 +106,8 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 - TypeScript 7 へ: typescript-eslint（<6.1）/ svelte-check / kit の peer が未対応。待つ。
 - CLAUDE.md の「2026-09 に緩めた」「2026-09 に試して撤去」の日付: 非自明な WHY（実機で駄目だった）を運ぶ文なので残す。書き換えるなら現在形の制約文に。
 - `はな`（花・鼻）`あめ`（雨・飴）の同名語がよみクイズの選択肢で衝突する可能性: 選択肢は同カテゴリ優先で、各級の同カテゴリ語が 2 つ以上あるため現在のデータでは衝突しない。データ依存で壊れやすいので、単語を増やしたら `quiz.test.ts` に「同名語が同じ問題に出ない」assertion を足すこと。
-- `Content-Security-Policy` の `<meta>`（`kit.csp`、GitHub Pages はヘッダ不可）: 供給網経由の混入に対する唯一の防御になるが、`mode: 'hash'` とインライン style の確認をブラウザで要し、iPad で壊れると戻しにくい。P3・任意。やるなら preview ビルドでコンソール違反 0 を確認してから。
-- `AvatarPicker` の長押し削除モードから抜ける操作が無い（別の候補をタップするしかない）: UX の意図確認が先。
+- `Content-Security-Policy` の `<meta>`: **対応済み（2026-09-14、計画外）**。`vite.config.ts` の `csp`（hash、`connect-src 'self'`、`img-src` に data:/blob:、`style-src` に unsafe-inline）。全ページと写真の切り抜きで違反 0 を preview で確認。
+- `AvatarPicker` の長押し削除モードから抜ける操作が無い: **対応済み（2026-09-14、計画外）**。同じ写真をもう一度タップ、または用意した絵を選ぶと抜ける。
 - `Board.getScreenCTM()!` が null になり得る: 再現手順が無い。観察されたら扱う。
 - `fx.ts` / `nav.ts` / `image.ts` / `pwa.ts` のテスト: モックを試すだけになる。書かない。
 - `progress.svelte.ts` / `practice.svelte.ts` / `badges.ts` の分割: 149〜200 行で凝集している。分けない。
