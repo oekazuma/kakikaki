@@ -21,6 +21,11 @@
 | 010 | 重複判定式・`char-`・メダルの段・`today()`・意味色・切り抜き座標の整理 | P3 | M | 008 | DONE |
 | 011 | scripts の型検査・`$app/*` 禁止の機械化・Node 版・エディタ設定・古い設計文書・CI | P3 | S-M | — | DONE |
 | 012 | 「みる」ボタン、そ・ぽ の単語、記録のバックアップ（書き出し・読み込み） | P3 | M | 003 | DONE |
+| 013 | えいご の単語は先頭を大文字で見せ、大文字 26 字を単語とクイズから届くように | P1 | S | — | TODO |
+| 014 | 「アプリについて」に全員 × 3 ことば の進み具合の表 | P1 | S | — | TODO |
+| 015 | 文字ごとの星と不合格回数を残し、「にがてな もじ」を保護者の表に | P2 | M | 014 | TODO |
+| 016 | 連続日数（ことばをまたぐ）とカレンダー、連続日数のメダル | P2 | S-M | — | TODO |
+| 017 | かきクイズに「きいて かく」形式 | P3 | S-M | — | TODO |
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (理由 1 行)
 
 ## Dependency notes
@@ -81,13 +86,10 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 - `pnpm-workspace.yaml` の `allowBuilds: esbuild` は vite 8（rolldown）では死んだ設定。S。
 - vitest 5 は peer が揃っており上げられる唯一のメジャー。TypeScript 7 は typescript-eslint / svelte-check / kit の peer が未対応で待ち。
 
-## 方向性（機能。保守者が選ぶもの。計画化していない）
+## 方向性（機能）
 
-- **英語の大文字 26 字が単語からもクイズからも到達不能**: 210 語の `en` 名はすべて小文字。`CHARS_EN` は 52 字で、行メダル 4 つと `chars-all` / `gold-all` は `/chars` のマス目を 26 回こなさないと取れない（`words.ts`、`chars.ts:40-46`、`badges.ts:25-28,96,99`）。`nameOf` で先頭を大文字にする 1 行案は既存の小文字の記録（`kk:<pid>:en:progress` の `d`）を無効にするので、別モードか「大文字モード」の設計スパイクが先。
-- **記録のエクスポート（ファイル、同期ではない）**: `summaryOf(pid, l)` が任意の人×ことばを読める。`kk:` 接頭辞の走査で全記録を JSON にでき、保護者ゲートの先に「きろくを ほぞん」を置ける。端末リセットで全消失する唯一の対策。エクスポートだけなら S。
-- **文字ごとの質を捨てている**: `stars(r.score)` は表示後に捨て、`test` の不合格回数も数えない（`practice.svelte.ts:145-156`、`CharProgress` は `{trace,free,test}` のみ）。`star?` / `miss?` を足せば「にがてな もじ」や保護者向けの表が作れる。M。
-- **`days` の日付を使っていない**: `days().length` しか読まず、連続日数もカレンダーも無い（`progress.svelte.ts:31,111`、`badges.ts:140-142` は累計）。ことばごとに分かれているので、連続日数はことばをまたいで union するかを決める。S〜M。
-- 小さな候補: そ・ぽ を含む単語が 0（そら・そり・たんぽぽ など。`scripts/fetch-images.ts` で 4 行）。じぶんでかく に「みる」（書き順の再生）ボタンが無く、6 秒待つしかない（`Canvas.svelte:39-52` の `playDemo` を export して `ActionButton` 1 つ）。かきクイズは 1 形式のみ（よみは 5 形式）。
+上の 5 件（英語の大文字、保護者向けの表、文字ごとの質、連続日数とカレンダー、かきクイズの新形式）は 013〜017 に計画化した。
+記録の書き出し・そ・ぽ の単語・「みる」ボタンは 012 で実装済み。
 
 ## Findings considered and rejected
 

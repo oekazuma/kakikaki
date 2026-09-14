@@ -2,7 +2,7 @@ import { CHARS, ALPHABET, CHARS_EN, CHARS_KANA, toKatakana } from './chars';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
-import type { Word } from './words';
+import { isCharWord, type Word } from './words';
 import { getRaw, setRaw } from './storage';
 
 export type Lang = 'ja' | 'kana' | 'en';
@@ -31,17 +31,20 @@ export const info = (l: Lang = lang.v) => LANG_INFO[l];
 export const strokesOf = (l: Lang = lang.v) => LANG_INFO[l].strokes;
 export const charsOf = (l: Lang = lang.v) => LANG_INFO[l].chars;
 
-// 表示名。カタカナはひらがな名から変換、英語は単語そのもの
-export const nameOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.name : l === 'kana' ? toKatakana(w.name) : w.en);
+// 英語名は Dog のように先頭だけ大文字で見せる（大文字が単語の 1 文字目として練習に入る。1 文字練習はそのまま）
+export const enName = (w: Word) => (isCharWord(w) ? w.en : w.en.charAt(0).toUpperCase() + w.en.slice(1));
+// 表示名。カタカナはひらがな名から変換、英語は先頭だけ大文字
+export const nameOf = (w: Word, l: Lang = lang.v) =>
+  l === 'ja' ? w.name : l === 'kana' ? toKatakana(w.name) : enName(w);
 export { toKatakana };
 // 補助行（常に 2 行）: 表示していない残り 2 つの表記
 export const subOf = (w: Word, l: Lang = lang.v): string[] =>
   w.name === w.en
     ? []
     : l === 'ja'
-      ? [toKatakana(w.name), w.en]
+      ? [toKatakana(w.name), enName(w)]
       : l === 'kana'
-        ? [w.name, w.en]
+        ? [w.name, enName(w)]
         : [toKatakana(w.name), w.name];
 
 // 書く対象の文字。スペースやハイフンは飛ばす

@@ -3,7 +3,7 @@ import { WORDS, charWord, wordById } from './words';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
-import { lettersOf, toKatakana } from './lang.svelte';
+import { lettersOf, nameOf, toKatakana } from './lang.svelte';
 
 describe('words', () => {
   it('全単語の全文字に書き順がある（日本語・英語）', () => {
@@ -22,8 +22,15 @@ describe('words', () => {
     expect(wordById('char-ぱ')?.name).toBe('ぱ');
   });
   it('全単語に英語名があり、カタカナ変換できる', () => {
-    for (const w of WORDS) expect(w.en, w.name).toMatch(/^[a-z ]+$/);
+    for (const w of WORDS) expect(w.en, w.name).toMatch(/^[a-z -]+$/);
     expect(toKatakana('ぱとかー')).toBe('パトカー');
     expect(toKatakana('きゅうきゅうしゃ')).toBe('キュウキュウシャ');
+  });
+  it('英語名は先頭だけ大文字で見せ、全単語の頭文字で A〜Z がそろう。1 文字練習はそのまま', () => {
+    expect(nameOf(wordById('dog')!, 'en')).toBe('Dog');
+    expect(nameOf(wordById('patocar')!, 'en')).toBe('Police car');
+    expect(nameOf(charWord('d'), 'en')).toBe('d');
+    const initials = new Set(WORDS.map((w) => nameOf(w, 'en')[0]));
+    for (const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') expect(initials, c).toContain(c);
   });
 });

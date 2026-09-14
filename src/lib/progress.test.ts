@@ -51,7 +51,7 @@ describe('progress', () => {
     record('あ', 'trace');
     setLang('en');
     expect(get('あ').trace).toBe(0);
-    for (const c of 'bus') {
+    for (const c of 'Bus') {
       record(c, 'trace');
       record(c, 'trace');
       record(c, 'free');

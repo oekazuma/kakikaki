@@ -134,7 +134,8 @@ export const WORDS: Word[] = [
     ['mouth', 'くち', '👄', 'mouth'],
     ['hand', 'て', '✋', 'hand'],
     ['foot', 'あし', '🦶', 'foot'],
-    ['tooth', 'は', '🦷', 'tooth']
+    ['tooth', 'は', '🦷', 'tooth'],
+    ['x-ray', 'れんとげん', '🩻', 'x-ray']
   ]),
   ...W('きもち', [
     ['happy', 'うれしい', '😊', 'happy'],
@@ -201,7 +202,8 @@ export const WORDS: Word[] = [
     ['pool', 'ぷーる', '🏊', 'pool'],
     ['ferris-wheel', 'かんらんしゃ', '🎡', 'ferris wheel'],
     ['yoyo', 'よーよー', '🪀', 'yoyo'],
-    ['violin', 'ばいおりん', '🎻', 'violin']
+    ['violin', 'ばいおりん', '🎻', 'violin'],
+    ['quiz', 'くいず', '❓', 'quiz']
   ]),
   ...W('やさい', [
     ['carrot', 'にんじん', '🥕', 'carrot'],
