@@ -86,4 +86,18 @@ describe('profiles', () => {
     m.record('あ', 'trace');
     expect(localStorage.getItem('kk:p3:ja:progress')).toContain('"trace":1');
   });
+
+  it('人を消すと ふうせん ぽん の自己ベストも消え、同じ id の新しい人に引き継がれない', async () => {
+    const m = await fresh();
+    const b = await import('./balloon.svelte');
+    const p2 = m.addProfile('はな')!;
+    b.saveScore(p2.id, 120, '2026-09-14');
+    b.saveScore('p1', 50, '2026-09-14');
+    m.deleteProfile(p2.id);
+    expect(b.loadBests()[p2.id]).toBeUndefined();
+    expect(b.loadBests().p1.score).toBe(50);
+    const p2b = m.addProfile('たろう')!;
+    expect(p2b.id).toBe(p2.id); // id は再利用される
+    expect(b.ranking(m.profiles.list).map((r) => r.id)).toEqual(['p1']);
+  });
 });

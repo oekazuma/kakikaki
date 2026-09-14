@@ -1,6 +1,7 @@
 import { computeStats, earnedBadges, type Badge } from './badges';
 import { lang, lettersOf, setLang, type Lang } from './lang.svelte';
-import { profiles, byId, setCurrent, removeProfile, updateProfile } from './profiles.svelte';
+import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
+import { removeBest } from './balloon.svelte';
 import type { Word } from './words';
 import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 
@@ -15,8 +16,7 @@ type Data = {
 };
 
 const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
-const keyOf = (pid: string, l: Lang, name: string) => `kk:${pid}:${l}:${name}`;
-const key = (l: Lang, name: string) => keyOf(profiles.cur, l, name);
+const key = (l: Lang, name: keyof Data) => keyOf(profiles.cur, l, name);
 
 const isDays = (v: unknown) => Array.isArray(v) && v.every((d) => typeof d === 'string');
 const load = (l: Lang): Data => ({
@@ -41,7 +41,9 @@ export function switchProfile(id: string) {
 }
 export function deleteProfile(id: string) {
   const wasCur = profiles.cur === id;
-  if (removeProfile(id) && wasCur) switchProfile(profiles.cur);
+  if (!removeProfile(id)) return;
+  removeBest(id);
+  if (wasCur) switchProfile(profiles.cur);
 }
 // 言語の切り替えを使っている人に覚えさせる（次にその人を選んだとき同じ言語で開く）
 export const rememberLang = (l: Lang) => updateProfile(profiles.cur, { lang: l });
@@ -96,7 +98,7 @@ export const wordCrown = (w: Word) => lettersOf(w).every(charGold);
 // 任意の人・ことばの記録を消す。使用中の人なら画面の状態も空にする
 export function resetRecords(pid: string, langs: Lang[]) {
   for (const l of langs) {
-    for (const name of ['progress', 'earned', 'days', 'quiz'] as const) removeKey(keyOf(pid, l, name));
+    for (const name of DATA_NAMES) removeKey(keyOf(pid, l, name));
     if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
   }
 }

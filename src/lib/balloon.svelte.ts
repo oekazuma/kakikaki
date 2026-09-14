@@ -94,6 +94,13 @@ export function saveScore(pid: string, score: number, date: string): boolean {
   saveJSON(KEY, all);
   return true;
 }
+// 人を消したとき、その人の自己ベストも消す（id は再利用されるので、残すと次の人が引き継いでしまう）
+export function removeBest(pid: string) {
+  const all = loadBests();
+  if (!(pid in all)) return;
+  delete all[pid];
+  saveJSON(KEY, all);
+}
 export function ranking(list: Profile[]): (Profile & Best)[] {
   const all = loadBests();
   return list
