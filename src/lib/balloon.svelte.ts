@@ -6,9 +6,10 @@ export type Balloon = { id: number; x: number; y: number; size: number; color: s
 export const COLORS = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#ec407a', '#26c6da'];
 export const MISS_MAX = 3;
 export const points = (combo: number) => 10 + Math.min(10, combo - 1) * 5; // 10, 15, … 60
-// コンボ 5 ごとにレベルが上がり、風船が速く・小さく・多くなる（見逃してコンボが切れると戻る）
+// コンボ 5 ごとにレベルが上がり、風船が少しずつ速く・小さく・多くなる（見逃してコンボが切れると戻る）。
+// 1 段階あたり 速さ +8% / 大きさ -4px / 間隔 -6%、最大 5 段階。急に難しくなりすぎない程度
 export const LEVEL_STEP = 5;
-export const levelOf = (combo: number) => Math.min(6, Math.floor(combo / LEVEL_STEP));
+export const levelOf = (combo: number) => Math.min(5, Math.floor(combo / LEVEL_STEP));
 
 export class BalloonGame {
   balloons = $state<Balloon[]>([]);
@@ -43,19 +44,19 @@ export class BalloonGame {
     for (let i = 0; i < gone.length && !this.over; i++) this.miss();
     while (!this.over && this.time >= this.nextSpawn) {
       this.spawn();
-      // だんだん速く・多く（間隔 0.9 → 0.4 秒、速さ 0.22 → 0.6 画面/秒）
-      this.nextSpawn += Math.max(0.3, (0.9 - this.time * 0.012) * (1 - this.level * 0.1));
+      // だんだん速く・多く（間隔 0.9 → 0.45 秒、速さ 0.22 → 0.5 画面/秒）
+      this.nextSpawn += Math.max(0.45, (0.9 - this.time * 0.008) * (1 - this.level * 0.06));
     }
   }
   private spawn() {
-    const size = Math.max(56, 84 - this.level * 6) + Math.floor(this.rnd() * 44);
+    const size = Math.max(64, 84 - this.level * 4) + Math.floor(this.rnd() * 44);
     this.balloons.push({
       id: this.nextId++,
       x: 0.08 + this.rnd() * 0.84,
       y: 1.1,
       size,
       color: COLORS[Math.floor(this.rnd() * COLORS.length)],
-      vy: (Math.min(0.6, 0.22 + this.time * 0.007) + this.rnd() * 0.08) * (1 + this.level * 0.15)
+      vy: (Math.min(0.5, 0.22 + this.time * 0.005) + this.rnd() * 0.08) * (1 + this.level * 0.08)
     });
   }
   // 割れたら得点、見つからなければ 0
