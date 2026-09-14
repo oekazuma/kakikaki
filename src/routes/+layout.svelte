@@ -114,7 +114,7 @@
     animation: blink 4.5s ease-in-out infinite;
   }
   .ok {
-    animation: blink 4.5s ease-in-out infinite reverse;
+    animation: show-ok 4.5s ease-in-out infinite;
   }
   @keyframes turn {
     0%,
@@ -140,6 +140,19 @@
     }
     100% {
       opacity: 1;
+    }
+  }
+  @keyframes show-ok {
+    0%,
+    25% {
+      opacity: 0;
+    }
+    55%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
   small {
