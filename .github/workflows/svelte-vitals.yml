@@ -6,7 +6,6 @@ name: svelte-vitals
 on:
   pull_request:
     paths-ignore:
-      - '.vscode/**'
       - '**/*.md'
 
 concurrency:
