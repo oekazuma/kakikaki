@@ -13,7 +13,12 @@
     t: Tracer;
     mode: Mode;
     ui: { demo: boolean; bounce: number; shake: boolean };
-    on: { down: (p: Pt) => boolean; move: (p: Pt) => void; up: () => void; demoend: () => void };
+    on: {
+      down: (p: Pt, id: number) => boolean;
+      move: (p: Pt, id: number) => void;
+      up: (id: number) => void;
+      demoend: () => void;
+    };
   } = $props();
   const ds = $derived(t.strokes[t.char]);
   let svg: SVGSVGElement;
@@ -32,10 +37,10 @@
     viewBox="0 0 109 109"
     role="img"
     aria-label="かきとりめん"
-    onpointerdown={(e) => on.down(toView(e)) && svg.setPointerCapture(e.pointerId)}
-    onpointermove={(e) => on.move(toView(e))}
-    onpointerup={on.up}
-    onpointercancel={on.up}
+    onpointerdown={(e) => on.down(toView(e), e.pointerId) && svg.setPointerCapture(e.pointerId)}
+    onpointermove={(e) => on.move(toView(e), e.pointerId)}
+    onpointerup={(e) => on.up(e.pointerId)}
+    onpointercancel={(e) => on.up(e.pointerId)}
   >
     <line x1="54.5" y1="2" x2="54.5" y2="107" class="grid" />
     <line x1="2" y1="54.5" x2="107" y2="54.5" class="grid" />

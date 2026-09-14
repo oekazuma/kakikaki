@@ -45,6 +45,19 @@ describe('Tracer なぞる', () => {
     expect(t.up()).toBe('fail');
     expect(t.si).toBe(0);
   });
+  it('2 本目の指は無視され、1 本目の画は続く', () => {
+    const t = new Tracer('あ', STROKES, 'trace');
+    const pts = strokePts('あ', 0);
+    expect(t.down(pts[0], 1)).toBe(true);
+    for (const p of pts.slice(0, 5)) t.move(p, 1);
+    const cursor = t.cursor;
+    expect(t.down({ x: 100, y: 100 }, 2)).toBe(false); // 手のひら
+    expect(t.move({ x: 100, y: 100 }, 2)).toBe('idle'); // 線から遠くても fail にならない
+    expect(t.up(2)).toBe('idle');
+    expect([t.tracing, t.cursor]).toEqual([true, cursor]);
+    for (const p of pts.slice(5)) t.move(p, 1);
+    expect(t.up(1)).toBe('stroke');
+  });
 });
 
 describe('Tracer じぶんでかく', () => {
@@ -66,6 +79,16 @@ describe('Tracer じぶんでかく', () => {
       ])
     ).toBe('pending');
     expect(t.si).toBe(0);
+  });
+  it('じぶんでかく でも 2 本目の指は軌跡を捨てない', () => {
+    const t = new Tracer('ー', STROKES, 'free');
+    const pts = strokePts('ー', 0);
+    t.down(pts[0], 7);
+    for (const p of pts.slice(0, 3)) t.move(p, 7);
+    expect(t.down({ x: 50, y: 90 }, 8)).toBe(false);
+    expect(t.trail.length).toBe(4);
+    expect(t.up(8)).toBe('idle');
+    expect(t.tracing).toBe(true);
   });
 });
 

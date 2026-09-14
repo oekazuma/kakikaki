@@ -51,18 +51,18 @@
     if (mode !== 'test') idle = setTimeout(playDemo, 6000);
   }
 
-  function down(p: Pt) {
+  function down(p: Pt, id: number) {
     unlock();
     demo = false;
     clearTimeout(idle);
-    return t.down(p);
+    return t.down(p, id);
   }
-  function move(p: Pt) {
-    if (t.move(p) === 'fail') failed();
+  function move(p: Pt, id: number) {
+    if (t.move(p, id) === 'fail') failed();
   }
-  function up() {
+  function up(id: number) {
     const i = t.si;
-    const ev = t.up();
+    const ev = t.up(id);
     if (ev === 'fail') failed();
     else if (ev === 'stroke' || ev === 'done') completed(i, ev === 'done');
     else if (ev === 'drawn') {
