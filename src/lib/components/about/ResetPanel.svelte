@@ -3,23 +3,21 @@
   import { info } from '$lib/lang.svelte';
   import { Gate, MAX_FAILS } from '$lib/gate.svelte';
   import { current } from '$lib/profiles.svelte';
+  import ResetConfirm from './ResetConfirm.svelte';
+  import Shredder from './Shredder.svelte';
 
   const gate = new Gate();
   let ans = $state('');
+  // ゲート通過 → 最終確認（confirm）→ シュレッダー演出（shred）→ 完了表示（done）
+  let step = $state<'idle' | 'confirm' | 'shred' | 'done'>('idle');
   function submit(e: SubmitEvent) {
     e.preventDefault();
     if (!gate.submit(ans)) ans = '';
   }
   function doReset() {
-    if (
-      confirm(
-        `「${current().name}」の「${info().short}」の練習記録・星・メダル・練習した日をすべて削除します。この操作は取り消せません。よろしいですか？`
-      )
-    ) {
-      reset();
-      gate.passed = false;
-      alert('削除しました');
-    }
+    reset();
+    gate.passed = false;
+    step = 'shred';
   }
 </script>
 
@@ -37,8 +35,12 @@
     <li>メダルと獲得日、練習した日</li>
     <li>クイズの正解数</li>
   </ul>
-  {#if gate.passed}
-    <button class="danger" onclick={doReset}>「{current().name}」の「{info().short}」の記録を削除する</button>
+  {#if step === 'done'}
+    <p class="finished">「{current().name}」の「{info().short}」の記録を削除しました。</p>
+  {:else if gate.passed}
+    <button class="danger" onclick={() => (step = 'confirm')}
+      >「{current().name}」の「{info().short}」の記録を削除する</button
+    >
   {:else if gate.locked}
     <p class="lock">本日は {MAX_FAILS} 回間違えたため、削除は明日まで行えません。</p>
   {:else}
@@ -53,6 +55,11 @@
     </form>
   {/if}
 </section>
+{#if step === 'confirm'}
+  <ResetConfirm onconfirm={doReset} oncancel={() => (step = 'idle')} />
+{:else if step === 'shred'}
+  <Shredder name={current().name} lang={info().short} onend={() => (step = 'done')} />
+{/if}
 
 <style>
   .danger-zone {
@@ -80,6 +87,10 @@
     color: #fff;
     padding: 8px 16px;
     border-radius: 10px;
+    font-weight: bold;
+  }
+  .finished {
+    color: #2e7d32;
     font-weight: bold;
   }
   .warn,
