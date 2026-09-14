@@ -15,7 +15,8 @@ type Data = {
 
 const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
 const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
-const key = (l: Lang, name: string) => `kk:${profiles.cur}:${l}:${name}`;
+const keyOf = (pid: string, l: Lang, name: string) => `kk:${pid}:${l}:${name}`;
+const key = (l: Lang, name: string) => keyOf(profiles.cur, l, name);
 
 function loadJSON<T>(k: string, fallback: T): T {
   try {
@@ -105,6 +106,37 @@ export function reset() {
 }
 
 export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz());
+
+// 削除の最終確認用: 任意の人・ことばの記録の件数（保存値を直接読む）
+export type Summary = {
+  chars: number;
+  gold: number;
+  words: number;
+  crowns: number;
+  medals: number;
+  days: number;
+  quiz: number;
+};
+export function summaryOf(pid: string, l: Lang): Summary {
+  const progress = loadJSON<Record<string, CharProgress>>(keyOf(pid, l, 'progress'), {});
+  const g = (c: string) => progress[c] ?? { trace: 0, free: 0, test: 0 };
+  const st = computeStats(
+    l,
+    (c) => g(c).trace >= 2 && g(c).free >= 1,
+    (c) => g(c).test >= 1,
+    loadJSON<string[]>(keyOf(pid, l, 'days'), []).length,
+    loadJSON<Record<string, number>>(keyOf(pid, l, 'quiz'), {})
+  );
+  return {
+    chars: st.chars,
+    gold: st.gold,
+    words: st.words,
+    crowns: st.crowns,
+    medals: Object.keys(loadJSON<Record<string, string>>(keyOf(pid, l, 'earned'), {})).length,
+    days: st.days,
+    quiz: Object.values(st.quiz).reduce((a, b) => a + b, 0)
+  };
+}
 
 // 新しく条件を満たしたメダルを獲得済みにして返す
 export function checkBadges(): Badge[] {

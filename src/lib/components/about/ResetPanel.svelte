@@ -3,8 +3,9 @@
   import { info } from '$lib/lang.svelte';
   import { Gate, MAX_FAILS } from '$lib/gate.svelte';
   import { current } from '$lib/profiles.svelte';
-  import ResetConfirm from './ResetConfirm.svelte';
-  import Shredder from './Shredder.svelte';
+  import DeleteConfirm from '../DeleteConfirm.svelte';
+  import Shredder from '../Shredder.svelte';
+  import { lang } from '$lib/lang.svelte';
 
   const gate = new Gate();
   let ans = $state('');
@@ -56,7 +57,7 @@
   {/if}
 </section>
 {#if step === 'confirm'}
-  <ResetConfirm onconfirm={doReset} oncancel={() => (step = 'idle')} />
+  <DeleteConfirm pid={current().id} lang={lang.v} onconfirm={doReset} oncancel={() => (step = 'idle')} />
 {:else if step === 'shred'}
   <Shredder name={current().name} lang={info().short} onend={() => (step = 'done')} />
 {/if}

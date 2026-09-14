@@ -1,33 +1,47 @@
 <script lang="ts">
   import { fade, scale } from 'svelte/transition';
-  import Avatar from '../Avatar.svelte';
-  import Icon from '../Icon.svelte';
-  import { info } from '$lib/lang.svelte';
-  import { current } from '$lib/profiles.svelte';
-  import { stats, earned, quiz } from '$lib/progress.svelte';
-  // 最終確認: 誰の・どのことばの・何が消えるかを数字で見せ、チェックを入れないと削除できない
-  let { onconfirm, oncancel }: { onconfirm: () => void; oncancel: () => void } = $props();
-  const s = $derived(stats());
+  import Avatar from './Avatar.svelte';
+  import Icon from './Icon.svelte';
+  import { LANGS, info, type Lang } from '$lib/lang.svelte';
+  import { byId } from '$lib/profiles.svelte';
+  import { summaryOf } from '$lib/progress.svelte';
+  // 最終確認: 誰の・どのことばの・何が消えるかを数字で見せ、チェックを入れないと削除できない。
+  // mode 'records' はことば 1 つの記録、'person' は人ごと（全ことばの記録とアバター）
+  let {
+    pid,
+    lang,
+    mode = 'records',
+    onconfirm,
+    oncancel
+  }: { pid: string; lang?: Lang; mode?: 'records' | 'person'; onconfirm: () => void; oncancel: () => void } = $props();
+  const p = $derived(byId(pid));
+  const langs = $derived(mode === 'person' ? LANGS : [lang!]);
+  const target = $derived(mode === 'person' ? 'すべての記録' : `${info(lang).short} の記録`);
+  const sums = $derived(langs.map((l) => summaryOf(pid, l)));
+  const total = (k: keyof (typeof sums)[number]) => sums.reduce((a, s) => a + s[k], 0);
   const rows = $derived([
-    ['クリアした文字', s.chars],
-    ['金の星', s.gold],
-    ['星のついた単語', s.words],
-    ['王冠のついた単語', s.crowns],
-    ['メダル', Object.keys(earned()).length],
-    ['練習した日', s.days],
-    ['クイズの正解数', Object.values(quiz()).reduce((a, b) => a + b, 0)]
+    ['クリアした文字', total('chars')],
+    ['金の星', total('gold')],
+    ['星のついた単語', total('words')],
+    ['王冠のついた単語', total('crowns')],
+    ['メダル', total('medals')],
+    ['練習した日', total('days')],
+    ['クイズの正解数', total('quiz')]
   ]);
   let agreed = $state(false);
 </script>
 
 <div class="dim" transition:fade={{ duration: 150 }} role="presentation" onclick={oncancel}></div>
 <section class="card confirm" transition:scale={{ duration: 200, start: 0.9 }} aria-labelledby="rc-title">
-  <h2 id="rc-title"><Icon name="trash" size={24} /> 本当に削除しますか？</h2>
+  <h2 id="rc-title">
+    <Icon name="trash" size={24} />
+    {mode === 'person' ? 'この人を本当に削除しますか？' : '本当に削除しますか？'}
+  </h2>
   <div class="who">
-    <Avatar avatar={current().avatar} size={64} />
+    <Avatar avatar={p?.avatar ?? 'cat'} size={64} />
     <div>
-      <b class="name">{current().name}</b>
-      <span class="lang">{info().short} の記録</span>
+      <b class="name">{p?.name}</b>
+      <span class="lang">{target}</span>
     </div>
   </div>
   <table>
@@ -37,11 +51,22 @@
       {/each}
     </tbody>
   </table>
-  <p>上の記録がすべて消えて、最初の状態に戻ります。<b>元に戻せません。</b>ほかの人や、ほかのことばの記録は残ります。</p>
-  <label class="agree"
-    ><input type="checkbox" bind:checked={agreed} /> 「{current().name}」の「{info()
-      .short}」の記録を消すことを確認しました</label
-  >
+  {#if mode === 'person'}
+    <p>
+      ひらがな・かたかな・えいご の上の記録と、名前・アバターがすべて消えます。<b>元に戻せません。</b
+      >ほかの人の記録は残ります。
+    </p>
+    <label class="agree"
+      ><input type="checkbox" bind:checked={agreed} /> 「{p?.name}」を削除することを確認しました</label
+    >
+  {:else}
+    <p>
+      上の記録がすべて消えて、最初の状態に戻ります。<b>元に戻せません。</b>ほかの人や、ほかのことばの記録は残ります。
+    </p>
+    <label class="agree"
+      ><input type="checkbox" bind:checked={agreed} /> 「{p?.name}」の「{target}」を消すことを確認しました</label
+    >
+  {/if}
   <div class="actions">
     <button class="cancel" onclick={oncancel}>やめる</button>
     <button class="go" disabled={!agreed} onclick={onconfirm}><Icon name="trash" size={20} /> 削除する</button>
