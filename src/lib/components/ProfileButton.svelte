@@ -21,6 +21,22 @@
     font-size: 15px;
     white-space: nowrap;
   }
+  /* 名前は 10 文字まで保存できるが、ヘッダーを 1 行に保つため長い名前は省略して見せる */
+  .who b {
+    display: block;
+    max-width: 6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* iPad Air / Pro 11（1180〜1194）ではことばの切替に幅を譲る */
+  @media (max-width: 1240px) {
+    .who {
+      padding-right: 10px;
+    }
+    .who b {
+      max-width: 3em;
+    }
+  }
   /* 幅 1024 の iPad ではアバターだけ */
   @media (max-width: 1130px) {
     .who {
