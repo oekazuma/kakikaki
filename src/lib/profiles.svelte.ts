@@ -7,7 +7,10 @@ export const MAX_PROFILES = 10;
 export const NAME_MAX = 10;
 export const DEFAULT_AVATAR = 'cat';
 const KEY = 'kk:profiles';
-const DATA_NAMES = ['progress', 'earned', 'days', 'quiz'];
+// 人と言語ごとの記録。名前を足すときはここだけ増やす（削除・リセット・移行がすべてこの一覧を回る）
+export const DATA_NAMES = ['progress', 'earned', 'days', 'quiz'] as const;
+export type DataName = (typeof DATA_NAMES)[number];
+export const keyOf = (pid: string, l: Lang, name: DataName) => `kk:${pid}:${l}:${name}`;
 type Saved = { list: Profile[]; cur: string };
 
 const move = (from: string, to: string) => {
@@ -20,7 +23,7 @@ const move = (from: string, to: string) => {
 // プロフィール導入前の記録は p1 に引き継ぐ（kk:progress → kk:ja:progress → kk:p1:ja:progress の順に 1 回だけ）
 function migrate(): Saved {
   for (const n of DATA_NAMES) move(`kk:${n}`, `kk:ja:${n}`);
-  for (const l of LANGS) for (const n of DATA_NAMES) move(`kk:${l}:${n}`, `kk:p1:${l}:${n}`);
+  for (const l of LANGS) for (const n of DATA_NAMES) move(`kk:${l}:${n}`, keyOf('p1', l, n));
   const old = getRaw('kk:lang');
   const lang = LANGS.find((l) => l === old) ?? 'ja';
   const s = { list: [{ id: 'p1', name: 'わたし', avatar: DEFAULT_AVATAR, lang }], cur: 'p1' };
@@ -88,6 +91,6 @@ export function removeProfile(id: string): boolean {
   profiles.list = profiles.list.filter((p) => p.id !== id);
   if (profiles.cur === id) profiles.cur = profiles.list[0].id;
   save();
-  for (const l of LANGS) for (const n of DATA_NAMES) removeKey(`kk:${id}:${l}:${n}`);
+  for (const l of LANGS) for (const n of DATA_NAMES) removeKey(keyOf(id, l, n));
   return true;
 }
