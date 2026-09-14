@@ -13,7 +13,7 @@
   import { lang, info } from '$lib/lang.svelte';
   import LangToggle from '$lib/components/LangToggle.svelte';
   import ProfileButton from '$lib/components/ProfileButton.svelte';
-  import { update } from '$lib/update.svelte';
+  import { updated } from '$app/state';
   const s = $derived(stats());
   const total = $derived(TOTAL(lang.v));
   const badgeCount = $derived(badgesOf(lang.v).length);
@@ -56,10 +56,10 @@
       <a
         class="card btn help"
         href={resolve('/about')}
-        aria-label={update.ready ? 'アプリについて（あたらしい バージョンが あります）' : 'アプリについて'}
+        aria-label={updated.current ? 'アプリについて（あたらしい バージョンが あります）' : 'アプリについて'}
       >
         <Icon name="help" size={22} />
-        {#if update.ready}<span class="dot"></span>{/if}
+        {#if updated.current}<span class="dot"></span>{/if}
       </a>
     </nav>
   </header>

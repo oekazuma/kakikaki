@@ -30,6 +30,8 @@ sw.addEventListener('activate', (e) => {
 // cache-first。?w=... 付きの練習画面もクエリ無視で prerendered の shell に当てる
 sw.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
+  // SvelteKit の更新検知（updated.check）が読む version.json は常にネットワークから。キャッシュすると新版に気づけない
+  if (new URL(e.request.url).pathname.endsWith('/_app/version.json')) return;
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then(
       (hit) =>

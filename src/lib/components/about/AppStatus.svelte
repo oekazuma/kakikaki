@@ -1,14 +1,22 @@
 <script lang="ts">
   import { version } from '$app/environment';
+  import { updated } from '$app/state';
   import Icon from '../Icon.svelte';
   import { updateApp, type PwaStatus } from '$lib/pwa';
-  import { update as upd, checkForUpdate } from '$lib/update.svelte';
   let { status }: { status: PwaStatus } = $props();
 
   // version は「ビルド時刻(ms)-gitハッシュ」（vite.config.ts）
   const [stamp, hash = ''] = version.split('-');
   const built = Number.isFinite(Number(stamp)) ? new Date(Number(stamp)).toLocaleString('ja-JP') : stamp;
   let updating = $state(false);
+  let checking = $state(false);
+  let checked = $state(false);
+  async function check() {
+    checking = true;
+    await updated.check();
+    checking = false;
+    checked = true;
+  }
   function update() {
     if (!navigator.onLine) return alert('インターネットに接続してから押してください');
     updating = true;
@@ -31,16 +39,16 @@
 
 <section class="card">
   <h2>更新</h2>
-  <p class={['state', { new: upd.ready }]}>
-    {upd.ready ? 'あたらしい バージョンが あります' : upd.checking ? '確認しています…' : '最新版です'}
+  <p class={['state', { new: updated.current }]}>
+    {updated.current ? 'あたらしい バージョンが あります' : checking ? '確認しています…' : '最新版です'}
   </p>
-  <button class={['update', { ready: upd.ready }]} onclick={update} disabled={updating || !upd.ready}
+  <button class={['update', { ready: updated.current }]} onclick={update} disabled={updating || !updated.current}
     ><Icon name="redo" size={20} /> {updating ? '更新中…' : '最新版に更新'}</button
   >
   <small>いまのバージョン: {built}<br /><code>{hash || version}</code></small>
-  {#if !upd.ready}
-    <button class="check" onclick={() => checkForUpdate()} disabled={upd.checking}>
-      {upd.checkedAt && !upd.checking ? '確認しました（最新版です）' : 'あたらしい バージョンが ないか 確認する'}
+  {#if !updated.current}
+    <button class="check" onclick={check} disabled={checking}>
+      {checked && !checking ? '確認しました（最新版です）' : 'あたらしい バージョンが ないか 確認する'}
     </button>
   {/if}
 </section>

@@ -3,9 +3,15 @@
   import Icon from '$lib/components/Icon.svelte';
   import { lang } from '$lib/lang.svelte';
   import { rememberLang } from '$lib/progress.svelte';
-  import { watchUpdates } from '$lib/update.svelte';
+  import { updated } from '$app/state';
   let { children } = $props();
-  $effect(() => watchUpdates());
+  // ホーム画面のアプリはページ遷移が少なくポーリングも止まりがちなので、前面に戻ったときに新版を確認する（1 分に 1 回まで）
+  let lastCheck = 0;
+  function onVisible() {
+    if (document.visibilityState !== 'visible' || Date.now() - lastCheck < 60_000) return;
+    lastCheck = Date.now();
+    updated.check();
+  }
   $effect(() => {
     document.documentElement.dataset.lang = lang.v;
     rememberLang(lang.v);
@@ -21,6 +27,7 @@
 </script>
 
 <svelte:window bind:innerWidth={w} bind:innerHeight={h} />
+<svelte:document onvisibilitychange={onVisible} />
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
 {@render children()}
