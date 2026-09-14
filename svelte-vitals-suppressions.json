@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "suppressions": [
+    {
+      "id": "architecture/component-size",
+      "route": "src/lib/components/Canvas.svelte",
+      "location": "src/lib/components/Canvas.svelte"
+    },
+    {
+      "id": "architecture/component-size",
+      "route": "src/routes/+page.svelte",
+      "location": "src/routes/+page.svelte"
+    },
+    {
+      "id": "architecture/component-size",
+      "route": "src/routes/about/+page.svelte",
+      "location": "src/routes/about/+page.svelte"
+    },
+    {
+      "id": "architecture/component-size",
+      "route": "src/routes/practice/+page.svelte",
+      "location": "src/routes/practice/+page.svelte"
+    },
+    {
+      "id": "architecture/component-size",
+      "route": "src/routes/quiz/read/+page.svelte",
+      "location": "src/routes/quiz/read/+page.svelte"
+    },
+    {
+      "id": "architecture/component-size",
+      "route": "src/routes/quiz/write/+page.svelte",
+      "location": "src/routes/quiz/write/+page.svelte"
+    },
+    {
+      "id": "architecture/component-size",
+      "route": "src/routes/trophies/+page.svelte",
+      "location": "src/routes/trophies/+page.svelte"
+    }
+  ]
+}

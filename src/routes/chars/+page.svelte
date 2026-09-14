@@ -26,9 +26,9 @@
 
 {#snippet table(cols: string[][])}
   <div class="table" style:--n={cols.length}>
-    {#each cols as col, r (r)}
+    {#each cols as col (col.join('|'))}
       <div class="col">
-        {#each col as c, k (k)}{@render cell(c)}{/each}
+        {#each col as c, k (k + c)}{@render cell(c)}{/each}
       </div>
     {/each}
   </div>
@@ -54,12 +54,12 @@
     </div>
   {:else}
     <div class="en">
-      {#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)]] as [name, rows] (name)}
+      {#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)]] as const as [name, rows] (name)}
         <section class="card group">
           <h2 class="ltr">{name}</h2>
-          {#each rows as row, r (r)}
+          {#each rows as row (row.join(''))}
             <div class="row">
-              {#each row as c, k (k)}{@render cell(c)}{/each}
+              {#each row as c (c)}{@render cell(c)}{/each}
             </div>
           {/each}
         </section>

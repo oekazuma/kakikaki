@@ -97,13 +97,13 @@
                 disabled={wrong.includes(w.id)}
                 onclick={(e) => pick(w, e)}
               >
-                <img src={imageUrl(w)} alt="" />
+                <img src={imageUrl(w)} alt={nameOf(w)} width="280" height="200" loading="eager" />
               </button>
             {/each}
           </div>
         {:else}
           <div class="prompt card pic">
-            <img src={imageUrl(q.answer)} alt="" />
+            <img src={imageUrl(q.answer)} alt="" width="280" height="200" loading="eager" />
             <span>これは なに？</span>
           </div>
           <div class="choices">

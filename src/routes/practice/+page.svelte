@@ -216,10 +216,10 @@
     <h1>{cur.title}</h1>
   </header>
 
-  <aside class="left">
+  <div class="left">
     <WordCard {word} size={240} />
     <div class={['tabs', { compact: chars.length > 6 }]}>
-      {#each chars as ch, n (n)}
+      {#each chars as ch, n (n + ch)}
         {@const lock = !unlocked(n)}
         <button
           class={['tab', 'card', { on: n === i, lock, done: charCleared(ch), shake: shaking === n }]}
@@ -243,7 +243,7 @@
       <div class="row"><span>じぶんで かく</span><Stars n={1} k={get(c).free} size={20} /></div>
       <div class="row gold"><span>おてほんなし</span><Stars n={1} k={get(c).test} size={20} /></div>
     </div>
-  </aside>
+  </div>
 
   <section class="center">
     <div class="modes card">
@@ -281,7 +281,7 @@
     </p>
   </section>
 
-  <aside class="right">
+  <div class="right">
     <button class={['rb', { speaking }]} onclick={hear}
       ><span class="card ic"><Icon name="speaker" size={32} /></span>きく</button
     >
@@ -293,14 +293,29 @@
         ><span class="card ic"><Icon name="check" size={36} /></span>できた</button
       >
     {/if}
-  </aside>
+  </div>
 
   {#if drive}
-    <img class="drive" src={imageUrl(word)} alt="" onerror={() => (drive = false)} />
+    <img
+      class="drive"
+      src={imageUrl(word)}
+      alt=""
+      width="280"
+      height="200"
+      loading="eager"
+      onerror={() => (drive = false)}
+    />
   {/if}
   {#if complete}
     <div class="complete card" in:fly={{ y: 40, duration: 350 }}>
-      <img src={imageUrl(word)} alt="" onerror={(e) => ((e.currentTarget as HTMLImageElement).hidden = true)} />
+      <img
+        src={imageUrl(word)}
+        alt=""
+        width="170"
+        height="120"
+        loading="eager"
+        onerror={(e) => ((e.currentTarget as HTMLImageElement).hidden = true)}
+      />
       <b class="cname">{nameOf(word)}</b>
       <p>ぜんぶ できた！</p>
       <div class="marks">

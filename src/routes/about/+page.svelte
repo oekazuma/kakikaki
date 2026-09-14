@@ -177,7 +177,7 @@
       </section>
     </div>
 
-    <aside class="right">
+    <div class="right">
       <section class="card">
         <h2>更新</h2>
         <button class="update" onclick={update} disabled={updating}
@@ -213,7 +213,7 @@
           </form>
         {/if}
       </section>
-    </aside>
+    </div>
   </div>
 </main>
 

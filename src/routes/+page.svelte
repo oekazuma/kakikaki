@@ -29,7 +29,13 @@
   <header>
     {#key lang.v}
       <h1 in:fly={{ y: -16, duration: 300 }}>
-        <img src="{base}/logo-mark{lang.v === 'ja' ? '' : `-${lang.v}`}.svg" alt="" /><span class="kaki">かきかき</span>
+        <img
+          src="{base}/logo-mark{lang.v === 'ja' ? '' : `-${lang.v}`}.svg"
+          alt=""
+          width="52"
+          height="52"
+          loading="eager"
+        /><span class="kaki">かきかき</span>
         <span class="hira">{info().short}</span>
       </h1>
     {/key}
@@ -59,10 +65,11 @@
       {#each CATEGORIES as cat (cat)}
         <h2>{cat}</h2>
         <div class="row">
-          {#each WORDS.filter((w) => w.category === cat) as w (w.id)}
+          {#each WORDS.filter((w) => w.category === cat) as w, n (w.id)}
             <WordCard
               word={w}
               size={150}
+              lazy={cat !== CATEGORIES[0] || n >= 7}
               onclick={() => {
                 unlock();
                 goto(practiceUrl(w.id));

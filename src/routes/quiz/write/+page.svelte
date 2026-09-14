@@ -112,19 +112,19 @@
   </header>
 
   {#if word}
-    <aside class="left">
+    <div class="left">
       <div class="card pic">
-        <img src={imageUrl(word)} alt="" />
+        <img src={imageUrl(word)} alt="" width="210" height="150" loading="eager" />
         <button class={['hear', { speaking }]} onclick={hear}><Icon name="speaker" size={22} /> きく</button>
       </div>
       <div class="slots">
-        {#each letters as ch, n (n)}
+        {#each letters as ch, n (n + ch)}
           <span class={['slot', 'card', { on: n === k, ok: n < k }]}
             >{n < k ? ch : n === k && mode === 'trace' ? ch : '?'}</span
           >
         {/each}
       </div>
-    </aside>
+    </div>
 
     <section class="center">
       <div class="board card">
@@ -137,7 +137,7 @@
       </p>
     </section>
 
-    <aside class="right">
+    <div class="right">
       <button class="rb" onclick={() => nextLetter(k)}
         ><span class="card ic"><Icon name="redo" size={32} /></span>やりなおす</button
       >
@@ -146,7 +146,7 @@
           ><span class="card ic"><Icon name="check" size={36} /></span>できた</button
         >
       {/if}
-    </aside>
+    </div>
   {/if}
   {#if done}
     <QuizResult {correct} total={words.length} onRetry={start} />

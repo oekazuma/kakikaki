@@ -13,6 +13,7 @@ pnpm dev                      # http://localhost:5173/kakikaki/
 pnpm test:run                 # vitest 一括実行（unit プロジェクト、happy-dom）。pnpm test で watch
 pnpm exec vitest run src/lib/judge.test.ts   # 単一ファイル
 pnpm lint                     # prettier --check と eslint（CI と同じ）
+pnpm vitals                   # svelte-vitals の全体スキャン。編集後は `pnpm vitals --diff`、コミット前は `pnpm vitals --staged`
 pnpm format                   # prettier --write
 pnpm check                    # svelte-check
 pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
@@ -21,6 +22,8 @@ pnpm strokes:en               # アルファベット 52 文字の書き順を�
 pnpm images                   # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
 pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
+
+svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。200 行超えのコンポーネント 7 件は `svelte-vitals-suppressions.json` に記録済みで、新たな超過だけが検出される。Vite プラグインは `ssr = false` の殻 HTML を見て title/h1/main を誤検出するため、`vite.config.ts` のプラグイン側 overrides でそれらを外している（CLI のソース解析では検査される。svelte-vitals#682 を参照）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は lint / check / test / build を並列に回す。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 

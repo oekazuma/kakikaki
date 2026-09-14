@@ -4,7 +4,12 @@
   import { wordStar, wordCrown } from '$lib/progress.svelte';
   import { nameOf, subOf } from '$lib/lang.svelte';
   import Icon from './Icon.svelte';
-  let { word, onclick, size = 180 }: { word: Word; onclick?: () => void; size?: number } = $props();
+  let {
+    word,
+    onclick,
+    size = 180,
+    lazy = false
+  }: { word: Word; onclick?: () => void; size?: number; lazy?: boolean } = $props();
   let missing = $state(false);
 </script>
 
@@ -12,12 +17,20 @@
   {#if wordCrown(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span
     >{:else if wordStar(word)}<span class="badge"><Icon name="star" size={18} fill /></span>{/if}
   {#if missing}
-    <div class="initial" style:height="{size * 0.6}px">{word.name[0]}</div>
+    <span class="initial" style:height="{size * 0.6}px">{word.name[0]}</span>
   {:else}
-    <img src={imageUrl(word)} alt="" style:height="{size * 0.6}px" onerror={() => (missing = true)} />
+    <img
+      src={imageUrl(word)}
+      alt=""
+      width={size - 20}
+      height={size * 0.6}
+      loading={lazy ? 'lazy' : 'eager'}
+      style:height="{size * 0.6}px"
+      onerror={() => (missing = true)}
+    />
   {/if}
-  <div class="name">{nameOf(word)}</div>
-  {#each subOf(word) as line, i (i)}<div class="desc">{line}</div>{/each}
+  <span class="name">{nameOf(word)}</span>
+  {#each subOf(word) as line (line)}<span class="desc">{line}</span>{/each}
 </button>
 
 <style>
@@ -47,10 +60,12 @@
     border-radius: 14px;
   }
   .name {
+    display: block;
     font-size: 20px;
     font-weight: bold;
   }
   .desc {
+    display: block;
     font-size: 12px;
     color: var(--sub);
     white-space: nowrap;

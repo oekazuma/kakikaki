@@ -16,7 +16,8 @@
     "strokes": "node scripts/fetch-strokes.ts",
     "strokes:en": "node scripts/make-strokes-en.ts",
     "images": "node scripts/fetch-images.ts",
-    "icon": "node scripts/make-icon.ts"
+    "icon": "node scripts/make-icon.ts",
+    "vitals": "svelte-vitals ."
   },
   "packageManager": "pnpm@12.3.4",
   "devEngines": {
@@ -29,6 +30,7 @@
   "devDependencies": {
     "@eslint/compat": "catalog:",
     "@eslint/js": "catalog:",
+    "@svelte-vitals/vite": "catalog:",
     "@sveltejs/adapter-static": "catalog:",
     "@sveltejs/kit": "catalog:",
     "@sveltejs/vite-plugin-svelte": "catalog:",
@@ -43,6 +45,7 @@
     "prettier-plugin-svelte": "catalog:",
     "svelte": "catalog:",
     "svelte-check": "catalog:",
+    "svelte-vitals": "catalog:",
     "typescript": "catalog:",
     "typescript-eslint": "catalog:",
     "vite": "catalog:",
