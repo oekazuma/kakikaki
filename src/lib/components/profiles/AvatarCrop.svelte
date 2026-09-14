@@ -15,23 +15,65 @@
   const w = $derived(img.naturalWidth * base * zoom);
   const h = $derived(img.naturalHeight * base * zoom);
   const clamp = (v: number, size: number) => Math.min(0, Math.max(V - size, v));
-  // 初期位置と、拡大縮小したときは中心を保つ
-  let prev = 1;
-  $effect(() => {
-    const k = zoom / prev;
-    prev = zoom;
-    ox = clamp((ox - V / 2) * k + V / 2, w);
-    oy = clamp((oy - V / 2) * k + V / 2, h);
-  });
+  const ZOOM_MAX = 4;
+  // (cx, cy) の下にある写真の点を動かさずに拡大縮小する
+  function setZoom(z: number, cx: number, cy: number) {
+    z = Math.min(ZOOM_MAX, Math.max(1, z));
+    const k = z / zoom;
+    zoom = z;
+    ox = clamp(cx - (cx - ox) * k, w);
+    oy = clamp(cy - (cy - oy) * k, h);
+  }
+
+  // 指の位置。1 本なら移動、2 本ならピンチで拡大縮小（iPad）。描画には使わないので反応性は不要
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
+  const pts = new Map<number, { x: number; y: number }>();
   let drag: { x: number; y: number; ox: number; oy: number } | null = null;
+  let pinch: { d: number; zoom: number; mx: number; my: number; ox: number; oy: number } | null = null;
+  const dist = () => {
+    const [a, b] = [...pts.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+  const mid = () => {
+    const [a, b] = [...pts.values()];
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  };
   function down(e: PointerEvent) {
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    drag = { x: e.clientX, y: e.clientY, ox, oy };
+    const el = e.currentTarget as HTMLElement;
+    el.setPointerCapture(e.pointerId);
+    const r = el.getBoundingClientRect();
+    pts.set(e.pointerId, { x: e.clientX - r.left, y: e.clientY - r.top });
+    if (pts.size === 2) {
+      drag = null;
+      const m = mid();
+      pinch = { d: dist(), zoom, mx: m.x, my: m.y, ox, oy };
+    } else if (pts.size === 1) drag = { x: e.clientX, y: e.clientY, ox, oy };
   }
   function move(e: PointerEvent) {
-    if (!drag) return;
-    ox = clamp(drag.ox + e.clientX - drag.x, w);
-    oy = clamp(drag.oy + e.clientY - drag.y, h);
+    if (!pts.has(e.pointerId)) return;
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    pts.set(e.pointerId, { x: e.clientX - r.left, y: e.clientY - r.top });
+    if (pinch && pts.size >= 2) {
+      const z = Math.min(ZOOM_MAX, Math.max(1, (pinch.zoom * dist()) / pinch.d));
+      const k = z / pinch.zoom;
+      const m = mid();
+      zoom = z;
+      ox = clamp(m.x - (pinch.mx - pinch.ox) * k, w);
+      oy = clamp(m.y - (pinch.my - pinch.oy) * k, h);
+    } else if (drag) {
+      ox = clamp(drag.ox + e.clientX - drag.x, w);
+      oy = clamp(drag.oy + e.clientY - drag.y, h);
+    }
+  }
+  function up(e: PointerEvent) {
+    pts.delete(e.pointerId);
+    pinch = null;
+    drag = null;
+    if (pts.size === 1) {
+      const [p] = [...pts.values()];
+      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      drag = { x: p.x + r.left, y: p.y + r.top, ox, oy };
+    }
   }
   function pick() {
     const k = base * zoom;
@@ -48,8 +90,8 @@
     style:height="{V}px"
     onpointerdown={down}
     onpointermove={move}
-    onpointerup={() => (drag = null)}
-    onpointercancel={() => (drag = null)}
+    onpointerup={up}
+    onpointercancel={up}
   >
     <img
       src={img.src}
@@ -62,8 +104,17 @@
     <span class="ring"></span>
   </div>
   <div class="side">
-    <p>ゆびで うごかして、まるの なかに かおを いれてね</p>
-    <label>おおきさ <input type="range" min="1" max="4" step="0.01" bind:value={zoom} /></label>
+    <p>ゆびで うごかして、まるの なかに かおを いれてね（2 ほんの ゆびで おおきく できるよ）</p>
+    <label
+      >おおきさ <input
+        type="range"
+        min="1"
+        max={ZOOM_MAX}
+        step="0.01"
+        value={zoom}
+        oninput={(e) => setZoom(Number(e.currentTarget.value), V / 2, V / 2)}
+      /></label
+    >
     <div class="actions">
       <button class="cancel" onclick={oncancel}>やめる</button>
       <button class="ok" onclick={pick}><Icon name="check" size={22} /> きめる</button>
