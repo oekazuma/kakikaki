@@ -150,6 +150,17 @@ export const WORDS: Word[] = [
     ['yummy', 'おいしい', '😋', 'yummy'],
     ['shy', 'はずかしい', '😳', 'shy']
   ]),
+  ...W('ひと', [
+    ['baby', 'あかちゃん', '👶', 'baby'],
+    ['teacher', 'せんせい', '🧑‍🏫', 'teacher'],
+    ['doctor', 'おいしゃさん', '🧑‍⚕️', 'doctor'],
+    ['police', 'おまわりさん', '👮', 'police'],
+    ['firefighter', 'しょうぼうし', '🧑‍🚒', 'firefighter'],
+    ['astronaut', 'うちゅうひこうし', '🧑‍🚀', 'astronaut'],
+    ['ninja', 'にんじゃ', '🥷', 'ninja'],
+    ['king', 'おうさま', '🤴', 'king'],
+    ['queen', 'じょおう', '👸', 'queen']
+  ]),
   ...W('たべもの', [
     ['bread', 'ぱん', '🍞', 'bread'],
     ['rice-ball', 'おにぎり', '🍙', 'rice ball'],
@@ -202,8 +213,7 @@ export const WORDS: Word[] = [
     ['pool', 'ぷーる', '🏊', 'pool'],
     ['ferris-wheel', 'かんらんしゃ', '🎡', 'ferris wheel'],
     ['yoyo', 'よーよー', '🪀', 'yoyo'],
-    ['violin', 'ばいおりん', '🎻', 'violin'],
-    ['queen', 'じょおう', '👸', 'queen']
+    ['violin', 'ばいおりん', '🎻', 'violin']
   ]),
   ...W('やさい', [
     ['carrot', 'にんじん', '🥕', 'carrot'],
