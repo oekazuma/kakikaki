@@ -20,28 +20,37 @@ describe('quiz', () => {
     expect(levelOf(wordById('ship')!, 'en')).toBe(1);
     expect(levelOf(wordById('shinkansen')!, 'ja')).toBe(3);
   });
-  it('よみクイズは 10 問、3 択で正解を含み、重複なし', () => {
+  it('よみクイズは 10 問、5 形式が 2 回ずつ、3 択で正解を含み、重複なし', () => {
     const qs = makeReadQuiz('ja', 2, 10, seeded());
     expect(qs.length).toBe(10);
     expect(new Set(qs.map((q) => q.answer.id)).size).toBe(10);
+    const count: Record<string, number> = {};
     for (const q of qs) {
-      expect(q.choices.length).toBe(3);
-      expect(q.choices.some((c) => c.id === q.answer.id)).toBe(true);
-      expect(new Set(q.choices.map((c) => c.id)).size).toBe(3);
-      for (const c of q.choices) expect(levelOf(c, 'ja')).toBe(2);
+      count[q.kind] = (count[q.kind] ?? 0) + 1;
+      if (q.kind === 'blank') {
+        expect(q.letters!.length).toBe(3);
+        expect(new Set(q.letters).size).toBe(3);
+        expect(q.letters).toContain(q.key);
+        expect(lettersOf(q.answer, 'ja')[q.blank!]).toBe(q.key);
+      } else {
+        expect(q.key).toBe(q.answer.id);
+        expect(q.choices.length).toBe(3);
+        expect(q.choices.some((c) => c.id === q.answer.id)).toBe(true);
+        expect(new Set(q.choices.map((c) => c.id)).size).toBe(3);
+        for (const c of q.choices) expect(levelOf(c, 'ja')).toBe(2);
+      }
+      if (q.kind === 'initial') {
+        const first = lettersOf(q.answer, 'ja')[0];
+        for (const c of q.choices) if (c.id !== q.answer.id) expect(lettersOf(c, 'ja')[0]).not.toBe(first);
+      }
     }
-    expect(qs.map((q) => q.kind)).toEqual([
-      'word',
-      'picture',
-      'word',
-      'picture',
-      'word',
-      'picture',
-      'word',
-      'picture',
-      'word',
-      'picture'
-    ]);
+    expect(count).toEqual({ word: 2, picture: 2, listen: 2, initial: 2, blank: 2 });
+  });
+  it('1 文字の語は穴埋めにせず、英語の穴埋めは大文字小文字を合わせる', () => {
+    for (const q of makeReadQuiz('ja', 1, 20, seeded(5)))
+      if (q.kind === 'blank') expect(lettersOf(q.answer, 'ja').length).toBeGreaterThan(1);
+    for (const q of makeReadQuiz('en', 2, 20, seeded(7)))
+      if (q.kind === 'blank') for (const c of q.letters!) expect(c).toBe(c.toLowerCase());
   });
   it('むずかしい の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
     const answer = wordById('shinkansen')!; // しんかんせん 6 文字

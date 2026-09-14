@@ -10,7 +10,6 @@
   import { LEVEL_NAME } from '$lib/quiz';
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
-  import type { Word } from '$lib/words';
 
   const level = $derived(levelFromParam(page.url.searchParams.get('level')));
   // 級が変わったときだけ作り直す（コンストラクタが読む言語ストアには反応させない）
@@ -21,9 +20,9 @@
     );
   });
 
-  function pick(w: Word, e: MouseEvent) {
+  function pick(key: string, e: MouseEvent) {
     unlock();
-    if (r.pick(w) === 'hit') fx.burst(e.clientX, e.clientY, 24);
+    if (r.pick(key) === 'hit') fx.burst(e.clientX, e.clientY, 24);
   }
 </script>
 
@@ -36,7 +35,7 @@
   <QuizHeader title="よみクイズ" {level} i={r.i} total={r.qs.length} />
   {#if r.q}
     {#key r.i}
-      <div in:fly={{ x: 60, duration: 300 }}><ReadQuestion {r} onpick={pick} /></div>
+      <div class="qwrap" in:fly={{ x: 60, duration: 300 }}><ReadQuestion {r} onpick={pick} /></div>
     {/key}
   {/if}
   {#if r.hit}
@@ -50,11 +49,13 @@
 <style>
   main {
     padding: 16px 22px 30px;
-    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     display: grid;
     grid-template-rows: auto 1fr;
     gap: 14px;
-    align-content: start;
+  }
+  .qwrap {
+    min-height: 0;
   }
   .ok {
     position: fixed;

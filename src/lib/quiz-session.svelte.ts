@@ -44,14 +44,15 @@ export class ReadQuiz {
     this.hit = null;
     this.done = false;
   }
-  pick(w: Word): 'hit' | 'wrong' | 'ignored' {
+  // key は単語の id か、穴埋めなら文字
+  pick(key: string): 'hit' | 'wrong' | 'ignored' {
     if (this.hit) return 'ignored';
-    if (w.id !== this.q.answer.id) {
-      this.wrong = [...this.wrong, w.id];
+    if (key !== this.q.key) {
+      this.wrong = [...this.wrong, key];
       this.fx.buu?.();
       return 'wrong';
     }
-    this.hit = w.id;
+    this.hit = key;
     if (this.wrong.length === 0) this.correct++;
     this.fx.kira?.();
     setTimeout(() => {
