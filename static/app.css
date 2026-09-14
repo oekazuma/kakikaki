@@ -27,6 +27,19 @@ main * {
     color 0.4s,
     border-color 0.4s;
 }
+/* 教科書体（Klee One、SIL OFL）。書き順のお手本（KanjiVG）と同じ字形で り・き・さ を見せるため、ひらがな・カタカナ・英字を自前で持つ */
+@font-face {
+  font-family: 'Klee One';
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/KleeOne-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Klee One';
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/KleeOne-SemiBold.woff2') format('woff2');
+}
 * {
   box-sizing: border-box;
 }
@@ -36,7 +49,7 @@ body {
   height: 100%;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Hiragino Sans', sans-serif;
+  font-family: 'Klee One', 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Hiragino Sans', sans-serif;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;

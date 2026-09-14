@@ -45,4 +45,5 @@ SvelteKit（Svelte 5）+ adapter-static の PWA で、追加のランタイム�
 ## クレジット
 
 - 書き順データ（ひらがな・カタカナ）: [KanjiVG](https://kanjivg.tagaini.net)（CC BY-SA 3.0）。アルファベットは自作
+- 文字のフォント: [Klee One](https://github.com/fontworks-fonts/Klee)（SIL OFL 1.1）。書き順のお手本と同じ教科書体で り・き・さ などを表示する
 - イラスト: [Twemoji](https://github.com/jdecked/twemoji)（CC BY 4.0）。乗り物 8 種、うどん、かぶとむし、たこ、いか、めろん、つみき は自作
