@@ -1,6 +1,6 @@
 import { makeReadQuiz, makeWriteQuiz, type Kind, type Level, type ReadQ } from './quiz';
 import { lettersOf, lang } from './lang.svelte';
-import { recordQuiz, checkBadges, type Mode } from './progress.svelte';
+import { recordQuiz, recordMiss, checkBadges, type Mode } from './progress.svelte';
 import type { Word } from './words';
 import type { Result } from './tracer.svelte';
 import type { Effects } from './practice.svelte';
@@ -119,6 +119,7 @@ export class WriteQuiz {
   onDone(r: Result) {
     if (r.mode === 'test' && !r.ok) {
       this.miss++;
+      recordMiss(this.c);
       this.fx.buu?.();
       if (this.miss >= 2) {
         this.helped = true;

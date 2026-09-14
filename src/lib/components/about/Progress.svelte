@@ -3,13 +3,13 @@
   import Bar from '../Bar.svelte';
   import { LANGS, info } from '$lib/lang.svelte';
   import { profiles } from '$lib/profiles.svelte';
-  import { summaryOf } from '$lib/progress.svelte';
+  import { summaryOf, weakOf } from '$lib/progress.svelte';
   import { TOTAL } from '$lib/badges';
   // 保護者向け: 全員 × 3 ことば の進み具合を、ことばを切り替えずに一覧する（記録は保存値から直接読む）
   const rows = $derived(
     profiles.list.map((p) => ({
       p,
-      cells: LANGS.map((l) => ({ l, s: summaryOf(p.id, l), total: TOTAL(l) }))
+      cells: LANGS.map((l) => ({ l, s: summaryOf(p.id, l), total: TOTAL(l), weak: weakOf(p.id, l).slice(0, 5) }))
     }))
   );
   const empty = (s: { chars: number; words: number; medals: number; days: number; quiz: number }) =>
@@ -30,7 +30,7 @@
       {#each rows as { p, cells } (p.id)}
         <tr>
           <th class="who"><Avatar avatar={p.avatar} size={36} /><span>{p.name}</span></th>
-          {#each cells as { l, s, total } (l)}
+          {#each cells as { l, s, total, weak } (l)}
             <td>
               {#if empty(s)}
                 <span class="none">まだ</span>
@@ -42,6 +42,7 @@
                   <span>単語 {s.words}/{total.words}</span><Bar have={s.words} need={total.words} color="var(--teal)" />
                 </div>
                 <small>金の星 {s.gold}・メダル {s.medals}・{s.days} 日・クイズ {s.quiz} 問</small>
+                {#if weak.length}<small class="weak">苦手: <span class="kyokasho">{weak.join('・')}</span></small>{/if}
               {/if}
             </td>
           {/each}
@@ -94,5 +95,8 @@
   }
   .none {
     color: var(--sub);
+  }
+  .weak {
+    color: var(--danger-ink);
   }
 </style>
