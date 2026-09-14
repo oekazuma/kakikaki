@@ -53,11 +53,15 @@ describe('quiz', () => {
       if (q.kind === 'blank') for (const c of q.letters!) expect(c).toBe(c.toLowerCase());
   });
   it('むずかしい の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
-    const answer = wordById('shinkansen')!; // しんかんせん 6 文字
-    const ch = pickChoices(answer, wordsOf('ja', 3), 'ja', 3, seeded(3)).filter((c) => c.id !== answer.id);
-    for (const c of ch) expect(c.category).toBe('のりもの');
-    // のりもの の 6 文字は他に無いので文字数一致は保証されないが、カテゴリは揃う
-    expect(ch.length).toBe(2);
+    const answer = wordById('hamburger')!; // はんばーがー 6 文字。たべもの には同じ 6 文字の語が 4 つある
+    for (const seed of [1, 2, 3]) {
+      const ch = pickChoices(answer, wordsOf('ja', 3), 'ja', 3, seeded(seed)).filter((c) => c.id !== answer.id);
+      expect(ch.length).toBe(2);
+      for (const c of ch) {
+        expect(c.category).toBe('たべもの');
+        expect(lettersOf(c, 'ja').length).toBe(6);
+      }
+    }
   });
   it('かきクイズは 5 問、英語は文字が分かれている', () => {
     const ws = makeWriteQuiz('en', 1, 5, seeded(2));

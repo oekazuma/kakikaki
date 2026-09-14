@@ -15,13 +15,11 @@ describe('ふうせん ぽん', () => {
     expect(g.balloons[0].y).toBeLessThan(y0);
     expect(g.pop(g.balloons[0].id)).toBe(points(1));
     expect([g.score, g.combo, g.popped]).toEqual([10, 1, 1]);
-    // 2 つ目・3 つ目を続けて割るとコンボ 2, 3 → 15, 20 点
+    // 2 秒で 2 つ出る。続けて割るとコンボ 2, 3 → 15, 20 点で合計 45
     g.tick(2);
+    expect(g.balloons.length).toBe(2);
     for (const b of [...g.balloons]) g.pop(b.id);
-    expect(g.combo).toBeGreaterThanOrEqual(3);
-    expect(g.score).toBe(
-      10 + 15 + 20 + (g.combo > 3 ? [...Array(g.combo - 3)].reduce((a, _, i) => a + points(4 + i), 0) : 0)
-    );
+    expect([g.combo, g.score]).toEqual([3, 45]);
     expect(g.pop(999)).toBe(0);
     // 見逃す: 何も割らずに待つ（風船が上端を越える）
     for (let i = 0; i < 60 && g.misses === 0; i++) g.tick(0.1);

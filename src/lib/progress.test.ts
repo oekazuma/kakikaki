@@ -1,5 +1,16 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { get, record, charCleared, charGold, wordStar, wordCrown, reset, switchProfile, days } from './progress.svelte';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {
+  get,
+  record,
+  recordQuiz,
+  charCleared,
+  charGold,
+  wordStar,
+  wordCrown,
+  reset,
+  switchProfile,
+  days
+} from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 
@@ -49,6 +60,21 @@ describe('progress', () => {
     setLang('ja');
     expect(wordStar(bus)).toBe(false);
     expect(get('あ').trace).toBe(1);
+  });
+  it('練習した日付は 1 日に 1 つだけ増え、翌日のクイズでも増える', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2026, 8, 14, 10));
+      record('あ', 'trace');
+      record('い', 'trace');
+      expect(days()).toEqual(['2026-09-14']);
+      vi.setSystemTime(new Date(2026, 8, 15, 9));
+      recordQuiz('read', 1, 3);
+      expect(days()).toEqual(['2026-09-14', '2026-09-15']);
+      expect(JSON.parse(localStorage.getItem('kk:p1:ja:days')!)).toEqual(['2026-09-14', '2026-09-15']);
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it('壊れた記録の保存値は空として読む', () => {
     localStorage.setItem('kk:p1:ja:days', '"x"');

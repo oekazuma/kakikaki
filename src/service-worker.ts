@@ -3,6 +3,7 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 import { base, build, files, prerendered, version } from '$service-worker';
+import { bypass, cacheable } from './lib/sw-rules';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 const CACHE = `kk-${version}`;
@@ -30,15 +31,14 @@ sw.addEventListener('activate', (e) => {
 // cache-first。?w=... 付きの練習画面もクエリ無視で prerendered の shell に当てる
 sw.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  // SvelteKit の更新検知（updated.check）が読む version.json は常にネットワークから。キャッシュすると新版に気づけない
-  if (new URL(e.request.url).pathname.endsWith('/_app/version.json')) return;
+  if (bypass(e.request.url)) return;
   e.respondWith(
     caches.match(e.request, { ignoreSearch: true }).then(
       (hit) =>
         hit ??
         fetch(e.request)
           .then((res) => {
-            if (res.ok && new URL(e.request.url).origin === location.origin) {
+            if (cacheable(res, e.request.url, location.origin)) {
               const copy = res.clone();
               void caches.open(CACHE).then((c) => c.put(e.request, copy));
             }
