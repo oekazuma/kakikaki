@@ -1,38 +1,53 @@
 <script lang="ts">
   import Avatar from '../Avatar.svelte';
   import Icon from '../Icon.svelte';
-  import { AVATARS, fileToAvatar } from '$lib/avatar';
+  import AvatarCrop from './AvatarCrop.svelte';
+  import { AVATARS, loadImage } from '$lib/avatar';
   let { value = $bindable() }: { value: string } = $props();
   let error = $state('');
+  let cropping = $state<HTMLImageElement | null>(null);
 
   async function upload(e: Event) {
-    const f = (e.currentTarget as HTMLInputElement).files?.[0];
+    const input = e.currentTarget as HTMLInputElement;
+    const f = input.files?.[0];
+    input.value = ''; // 同じ写真をもう一度選べるように
     if (!f) return;
     error = '';
     try {
-      value = await fileToAvatar(f);
+      cropping = await loadImage(f);
     } catch {
       error = 'この画像は読み込めませんでした';
     }
   }
 </script>
 
-<div class="picker">
-  <div class="preview"><Avatar avatar={value} size={120} /></div>
-  <div class="grid">
-    {#each AVATARS as a (a)}
-      <button class={['pick', { on: value === a }]} onclick={() => (value = a)} aria-label={a}
-        ><Avatar avatar={a} size={56} /></button
-      >
-    {/each}
-    <label class={['pick', 'file', { on: value.startsWith('data:') }]}>
-      <Icon name="upload" size={26} />
-      <small>しゃしん</small>
-      <input type="file" accept="image/*" onchange={upload} />
-    </label>
+{#if cropping}
+  <AvatarCrop
+    img={cropping}
+    onpick={(url) => {
+      value = url;
+      cropping = null;
+    }}
+    oncancel={() => (cropping = null)}
+  />
+{:else}
+  <div class="picker">
+    <div class="preview"><Avatar avatar={value} size={120} /></div>
+    <div class="grid">
+      {#each AVATARS as a (a)}
+        <button class={['pick', { on: value === a }]} onclick={() => (value = a)} aria-label={a}
+          ><Avatar avatar={a} size={56} /></button
+        >
+      {/each}
+      <label class={['pick', 'file', { on: value.startsWith('data:') }]}>
+        <Icon name="upload" size={26} />
+        <small>しゃしん</small>
+        <input type="file" accept="image/*" onchange={upload} />
+      </label>
+    </div>
+    {#if error}<p class="err">{error}</p>{/if}
   </div>
-  {#if error}<p class="err">{error}</p>{/if}
-</div>
+{/if}
 
 <style>
   .picker {

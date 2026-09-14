@@ -28,26 +28,27 @@ export const AVATARS = [
 ] as const;
 export const AVATAR_PX = 160;
 
-// 写真は端末内にだけ保存する。localStorage の上限（Safari は約 5MB）に収まるよう小さな正方形の JPEG にする
-export function fileToAvatar(file: File): Promise<string> {
+// 選んだ画像ファイルを <img> として読み込む（切り抜き画面で使う）
+export function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((ok, ng) => {
     const url = URL.createObjectURL(file);
     const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      const c = document.createElement('canvas');
-      c.width = c.height = AVATAR_PX;
-      const g = c.getContext('2d')!;
-      g.fillStyle = '#fff'; // JPEG は透過できないので白で埋める
-      g.fillRect(0, 0, AVATAR_PX, AVATAR_PX);
-      const s = Math.min(img.width, img.height);
-      g.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, AVATAR_PX, AVATAR_PX);
-      ok(c.toDataURL('image/jpeg', 0.85));
-    };
+    img.onload = () => ok(img);
     img.onerror = () => {
       URL.revokeObjectURL(url);
       ng(new Error('image'));
     };
     img.src = url;
   });
+}
+
+// 写真は端末内にだけ保存する。localStorage の上限（Safari は約 5MB）に収まるよう、選んだ正方形を小さな JPEG にする
+export function cropAvatar(img: HTMLImageElement, sx: number, sy: number, s: number): string {
+  const c = document.createElement('canvas');
+  c.width = c.height = AVATAR_PX;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#fff'; // JPEG は透過できないので白で埋める
+  g.fillRect(0, 0, AVATAR_PX, AVATAR_PX);
+  g.drawImage(img, sx, sy, s, s, 0, 0, AVATAR_PX, AVATAR_PX);
+  return c.toDataURL('image/jpeg', 0.85);
 }
