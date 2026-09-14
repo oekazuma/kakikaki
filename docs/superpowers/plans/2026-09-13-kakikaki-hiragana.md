@@ -1,5 +1,7 @@
 # かきかき ひらがな 実装計画
 
+> 2026-09-13 時点の初期計画。すべて実装済みで、現行仕様は `CLAUDE.md` が正。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** iPad 横画面用のひらがな書き練習 PWA を SvelteKit で作り、GitHub Pages に公開する。
@@ -8,7 +10,7 @@
 
 **Tech Stack:** SvelteKit (Svelte 5 runes, TypeScript), adapter-static, vitest, pnpm, Node 24。追加ランタイム依存なし。
 
-**Spec:** `docs/superpowers/specs/2026-09-13-kakikaki-design.md`
+**Spec:** `docs/superpowers/specs/2026-09-13-kakikaki-hiragana-design.md`
 
 ## Global Constraints
 

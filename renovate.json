@@ -10,6 +10,11 @@
   "platformAutomerge": true,
   "packageRules": [
     {
+      "description": "自分のツールは pnpm 側の minimumReleaseAgeExclude と同じく待たずに取り込む",
+      "matchPackageNames": ["svelte-vitals{/,}**", "@svelte-vitals{/,}**"],
+      "minimumReleaseAge": null
+    },
+    {
       "description": "Auto-merge everything except major updates (those need review) — CI still has to pass first.",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
