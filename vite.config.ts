@@ -30,6 +30,8 @@ export default defineConfig({
       adapter: adapter(),
       paths: { base: (process.env.BASE_PATH ?? '/kakikaki') as `/${string}` },
       serviceWorker: { register: true },
+      // かくしゲームはどこからもリンクされないので、プリレンダー対象に明示する
+      prerender: { entries: ['*', '/balloon'] },
       // pollInterval: 開いている間は 5 分ごとに _app/version.json を見て updated.current を立てる
       version: { name: `${process.env.KK_BUILD}-${gitHash}`, pollInterval: 300_000 }
     })

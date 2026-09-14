@@ -6,6 +6,7 @@
   import Avatar from '$lib/components/Avatar.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import ProfileEditor from '$lib/components/profiles/ProfileEditor.svelte';
+  import Egg from '$lib/components/balloon/Egg.svelte';
   import { info } from '$lib/lang.svelte';
   import { profiles, MAX_PROFILES } from '$lib/profiles.svelte';
   import { switchProfile } from '$lib/progress.svelte';
@@ -54,6 +55,7 @@
   {#if editing !== null}
     <ProfileEditor id={editing || null} onclose={() => (editing = null)} />
   {/if}
+  <Egg />
 </main>
 
 <style>
