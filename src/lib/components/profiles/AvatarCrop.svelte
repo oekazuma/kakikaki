@@ -9,8 +9,9 @@
   // 短辺が窓にぴったり。画像は開いたときのものを使う（親は差し替えない）
   const base = untrack(() => V / Math.min(img.naturalWidth, img.naturalHeight));
   let zoom = $state(1);
-  let ox = $state(0); // 画像左上の窓からのずれ（0 以下）
-  let oy = $state(0);
+  // 画像左上の窓からのずれ（0 以下）。最初は写真の中央を窓に合わせる
+  let ox = $state(untrack(() => Math.min(0, (V - img.naturalWidth * base) / 2)));
+  let oy = $state(untrack(() => Math.min(0, (V - img.naturalHeight * base) / 2)));
   const w = $derived(img.naturalWidth * base * zoom);
   const h = $derived(img.naturalHeight * base * zoom);
   const clamp = (v: number, size: number) => Math.min(0, Math.max(V - size, v));
