@@ -96,6 +96,9 @@
 
   <div class="right">
     <ActionButton icon="speaker" label="きく" active={speaking} onclick={hear} />
+    {#if s.mode !== 'test'}
+      <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
+    {/if}
     <ActionButton icon="redo" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
     {#if s.mode === 'test'}
       <ActionButton icon="check" label="できた" done ready={s.drawn} onclick={() => canvas?.judge()} />
