@@ -106,11 +106,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     transition: color 0.3s;
   }
   .toggle button small {
-    font-size: 13px;
+    font-size: 12px;
+    white-space: nowrap;
   }
   .toggle .on {
     color: #fff;
