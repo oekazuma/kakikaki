@@ -1,28 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 140">
-  <!-- うで 8 本: 短めに丸く -->
-  <g fill="none" stroke="#ef7c6e" stroke-width="11" stroke-linecap="round">
-    <path d="M60 92 C40 98 30 110 36 124"/>
-    <path d="M72 98 C60 108 58 118 64 128"/>
-    <path d="M88 102 C84 112 86 122 92 130"/>
-    <path d="M100 103 C100 113 100 122 100 130"/>
-    <path d="M112 102 C116 112 114 122 108 130"/>
-    <path d="M128 98 C140 108 142 118 136 128"/>
-    <path d="M140 92 C160 98 170 110 164 124"/>
-    <path d="M78 100 C70 112 72 120 78 126"/>
+  <!-- あし 8 本: 下へ広がり、先が少し上に曲がる -->
+  <g fill="none" stroke="#e5322d" stroke-width="13" stroke-linecap="round">
+    <path d="M56 88 C34 92 20 100 18 112 C17 120 26 122 28 114"/>
+    <path d="M66 96 C52 106 46 118 50 130"/>
+    <path d="M80 102 C74 112 74 124 78 132"/>
+    <path d="M94 105 C92 114 94 124 98 132"/>
+    <path d="M106 105 C108 114 106 124 102 132"/>
+    <path d="M120 102 C126 112 126 124 122 132"/>
+    <path d="M134 96 C148 106 154 118 150 130"/>
+    <path d="M144 88 C166 92 180 100 182 112 C183 120 174 122 172 114"/>
   </g>
   <!-- 吸盤 -->
-  <g fill="#ffd1cb">
-    <circle cx="40" cy="112" r="3"/><circle cx="60" cy="116" r="3"/><circle cx="88" cy="118" r="3"/>
-    <circle cx="112" cy="118" r="3"/><circle cx="140" cy="116" r="3"/><circle cx="160" cy="112" r="3"/>
+  <g fill="#f5842a">
+    <circle cx="36" cy="96" r="3.2"/><circle cx="26" cy="106" r="3.2"/>
+    <circle cx="164" cy="96" r="3.2"/><circle cx="174" cy="106" r="3.2"/>
+    <circle cx="56" cy="108" r="3.2"/><circle cx="50" cy="120" r="3.2"/>
+    <circle cx="144" cy="108" r="3.2"/><circle cx="150" cy="120" r="3.2"/>
+    <circle cx="76" cy="114" r="3.2"/><circle cx="76" cy="126" r="3.2"/>
+    <circle cx="124" cy="114" r="3.2"/><circle cx="124" cy="126" r="3.2"/>
+    <circle cx="93" cy="118" r="3.2"/><circle cx="107" cy="118" r="3.2"/>
   </g>
-  <!-- あたま: まるく -->
-  <path d="M46 78 C46 30 154 30 154 78 C154 96 130 106 100 106 C70 106 46 96 46 78 Z" fill="#f28b7d"/>
-  <path d="M62 56 C74 40 126 40 138 56 C126 48 74 48 62 56 Z" fill="#f7a99d" opacity=".9"/>
-  <!-- め: 大きく、白目あり -->
-  <ellipse cx="80" cy="76" rx="13" ry="14" fill="#fff"/><ellipse cx="120" cy="76" rx="13" ry="14" fill="#fff"/>
-  <circle cx="82" cy="79" r="6.5" fill="#333"/><circle cx="122" cy="79" r="6.5" fill="#333"/>
-  <circle cx="84.5" cy="76.5" r="2.2" fill="#fff"/><circle cx="124.5" cy="76.5" r="2.2" fill="#fff"/>
-  <!-- ほっぺ と くち -->
-  <circle cx="64" cy="90" r="5.5" fill="#ffb3aa"/><circle cx="136" cy="90" r="5.5" fill="#ffb3aa"/>
-  <path d="M94 93 Q100 98 106 93" fill="none" stroke="#c94a3f" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- あたま: 大きな丸 -->
+  <circle cx="100" cy="60" r="50" fill="#e5322d"/>
+  <!-- まゆ・め -->
+  <path d="M76 44 Q82 41 86 45" fill="none" stroke="#b71c1c" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M114 45 Q118 41 124 44" fill="none" stroke="#b71c1c" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="82" cy="56" r="4.5" fill="#222"/><circle cx="118" cy="56" r="4.5" fill="#222"/>
+  <!-- くち: すぼめた丸 -->
+  <circle cx="100" cy="76" r="9" fill="#f5842a"/>
+  <circle cx="100" cy="76" r="5" fill="#b71c1c"/>
 </svg>
