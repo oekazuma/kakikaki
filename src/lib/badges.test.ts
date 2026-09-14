@@ -68,7 +68,7 @@ describe('badges', () => {
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
-      expect(badgesOf(l).length).toBe(l === 'en' ? 48 : 53);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 49 : 54);
     }
   });
   it('need は [達成数, 必要数]', () => {
