@@ -72,15 +72,13 @@
   <div class="left">
     <WordWithHear {word} />
     <CharTabs {s} />
-    {#if s.mode === 'test'}
-      <Sample char={s.c} strokes={total} />
-    {/if}
   </div>
 
   <section class="center">
     <ModeBar mode={s.mode} onselect={(m) => s.select(s.i, m)} />
     <div class="board card">
       <span class="count">{Math.min(s.stroke + 1, total)} / {total}</span>
+      {#if s.mode === 'test'}<Sample char={s.c} strokes={total} />{/if}
       {#key `${lang.v}-${s.c}-${s.mode}-${s.gen}`}
         <Canvas
           bind:this={canvas}
