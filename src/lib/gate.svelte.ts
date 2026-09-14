@@ -19,7 +19,7 @@ export class Gate {
     this.b = Math.floor(rnd() * 7) + 3;
     try {
       const g = JSON.parse(store.getItem(KEY) ?? 'null');
-      if (g?.date === today()) this.fails = g.fails;
+      if (g?.date === today() && Number.isInteger(g.fails) && g.fails >= 0) this.fails = g.fails;
     } catch {
       /* 壊れた保存値は 0 回扱い */
     }

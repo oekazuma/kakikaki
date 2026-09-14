@@ -1,4 +1,5 @@
 import { LANGS, type Lang } from './lang.svelte';
+import { getRaw, isObject, loadJSON, removeKey, saveJSON, setRaw } from './storage';
 
 // 使う人（きょうだい・大人）ごとの記録の入れ物。記録のキーは kk:<id>:<lang>:<name>
 export type Profile = { id: string; name: string; avatar: string; lang: Lang };
@@ -7,34 +8,42 @@ export const NAME_MAX = 10;
 export const DEFAULT_AVATAR = 'cat';
 const KEY = 'kk:profiles';
 const DATA_NAMES = ['progress', 'earned', 'days', 'quiz'];
-const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
 type Saved = { list: Profile[]; cur: string };
 
 const move = (from: string, to: string) => {
-  const v = store()?.getItem(from);
+  const v = getRaw(from);
   if (v == null) return;
-  if (store()?.getItem(to) == null) store()?.setItem(to, v);
-  store()?.removeItem(from);
+  if (getRaw(to) == null) setRaw(to, v);
+  removeKey(from);
 };
 
 // プロフィール導入前の記録は p1 に引き継ぐ（kk:progress → kk:ja:progress → kk:p1:ja:progress の順に 1 回だけ）
 function migrate(): Saved {
   for (const n of DATA_NAMES) move(`kk:${n}`, `kk:ja:${n}`);
   for (const l of LANGS) for (const n of DATA_NAMES) move(`kk:${l}:${n}`, `kk:p1:${l}:${n}`);
-  const old = store()?.getItem('kk:lang');
+  const old = getRaw('kk:lang');
   const lang = LANGS.find((l) => l === old) ?? 'ja';
   const s = { list: [{ id: 'p1', name: 'わたし', avatar: DEFAULT_AVATAR, lang }], cur: 'p1' };
-  store()?.setItem(KEY, JSON.stringify(s));
+  saveJSON(KEY, s);
   return s;
 }
+const isProfile = (v: unknown): v is Profile =>
+  isObject(v) &&
+  typeof v.id === 'string' &&
+  typeof v.name === 'string' &&
+  typeof v.avatar === 'string' &&
+  LANGS.includes(v.lang as Lang);
+// 壊れた保存値は作り直す（他の人の記録キーには触れない）。cur が一覧に無ければ先頭の人にする
 function load(): Saved {
-  try {
-    const s = JSON.parse(store()?.getItem(KEY) ?? 'null');
-    if (s?.list?.length) return s;
-  } catch {
-    /* 壊れた保存値は作り直す */
-  }
-  return migrate();
+  const s = loadJSON<{ list: unknown[]; cur: unknown }>(
+    KEY,
+    { list: [], cur: '' },
+    (v) => isObject(v) && Array.isArray(v.list)
+  );
+  const list = s.list.filter(isProfile);
+  if (list.length === 0) return migrate();
+  const cur = list.some((p) => p.id === s.cur) ? (s.cur as string) : list[0].id;
+  return { list, cur };
 }
 
 export const profiles = $state<Saved>(load());
@@ -42,14 +51,7 @@ export const current = () => profiles.list.find((p) => p.id === profiles.cur) ??
 export const byId = (id: string) => profiles.list.find((p) => p.id === id);
 
 // アバター画像（data URL）が大きいと Safari の 5MB 上限に当たるので、保存失敗は呼び出し側に知らせる
-function save(): boolean {
-  try {
-    store()?.setItem(KEY, JSON.stringify({ list: profiles.list, cur: profiles.cur }));
-    return true;
-  } catch {
-    return false;
-  }
-}
+const save = () => saveJSON(KEY, { list: profiles.list, cur: profiles.cur });
 
 export function addProfile(name: string, avatar = DEFAULT_AVATAR, lang: Lang = 'ja'): Profile | null {
   if (profiles.list.length >= MAX_PROFILES) return null;
@@ -86,6 +88,6 @@ export function removeProfile(id: string): boolean {
   profiles.list = profiles.list.filter((p) => p.id !== id);
   if (profiles.cur === id) profiles.cur = profiles.list[0].id;
   save();
-  for (const l of LANGS) for (const n of DATA_NAMES) store()?.removeItem(`kk:${id}:${l}:${n}`);
+  for (const l of LANGS) for (const n of DATA_NAMES) removeKey(`kk:${id}:${l}:${n}`);
   return true;
 }

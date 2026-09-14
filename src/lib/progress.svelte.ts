@@ -2,6 +2,7 @@ import { computeStats, earnedBadges, type Badge } from './badges';
 import { lang, lettersOf, setLang, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile } from './profiles.svelte';
 import type { Word } from './words';
+import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 
 export type Mode = 'trace' | 'free' | 'test';
 export type CharProgress = { trace: number; free: number; test: number };
@@ -14,24 +15,18 @@ type Data = {
 };
 
 const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
-const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
 const keyOf = (pid: string, l: Lang, name: string) => `kk:${pid}:${l}:${name}`;
 const key = (l: Lang, name: string) => keyOf(profiles.cur, l, name);
 
-function loadJSON<T>(k: string, fallback: T): T {
-  try {
-    return JSON.parse(store()?.getItem(k) ?? 'null') ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
+const isDays = (v: unknown) => Array.isArray(v) && v.every((d) => typeof d === 'string');
 const load = (l: Lang): Data => ({
-  progress: loadJSON(key(l, 'progress'), {}),
-  earned: loadJSON(key(l, 'earned'), {}),
-  days: loadJSON(key(l, 'days'), []),
-  quiz: loadJSON(key(l, 'quiz'), {})
+  progress: loadJSON<Data['progress']>(key(l, 'progress'), {}, isObject),
+  earned: loadJSON<Data['earned']>(key(l, 'earned'), {}, isObject),
+  days: loadJSON<Data['days']>(key(l, 'days'), [], isDays),
+  quiz: loadJSON<Data['quiz']>(key(l, 'quiz'), {}, isObject)
 });
-const save = (l: Lang, name: keyof Data) => store()?.setItem(key(l, name), JSON.stringify(data[l][name]));
+// 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
+const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
 
 export const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
 const cur = () => data[lang.v];
@@ -101,7 +96,7 @@ export const wordCrown = (w: Word) => lettersOf(w).every(charGold);
 // 任意の人・ことばの記録を消す。使用中の人なら画面の状態も空にする
 export function resetRecords(pid: string, langs: Lang[]) {
   for (const l of langs) {
-    for (const name of ['progress', 'earned', 'days', 'quiz'] as const) store()?.removeItem(keyOf(pid, l, name));
+    for (const name of ['progress', 'earned', 'days', 'quiz'] as const) removeKey(keyOf(pid, l, name));
     if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
   }
 }
@@ -121,21 +116,21 @@ export type Summary = {
   quiz: number;
 };
 export function summaryOf(pid: string, l: Lang): Summary {
-  const progress = loadJSON<Record<string, CharProgress>>(keyOf(pid, l, 'progress'), {});
+  const progress = loadJSON<Record<string, CharProgress>>(keyOf(pid, l, 'progress'), {}, isObject);
   const g = (c: string) => progress[c] ?? { trace: 0, free: 0, test: 0 };
   const st = computeStats(
     l,
     (c) => g(c).trace >= 2 && g(c).free >= 1,
     (c) => g(c).test >= 1,
-    loadJSON<string[]>(keyOf(pid, l, 'days'), []).length,
-    loadJSON<Record<string, number>>(keyOf(pid, l, 'quiz'), {})
+    loadJSON<string[]>(keyOf(pid, l, 'days'), [], isDays).length,
+    loadJSON<Record<string, number>>(keyOf(pid, l, 'quiz'), {}, isObject)
   );
   return {
     chars: st.chars,
     gold: st.gold,
     words: st.words,
     crowns: st.crowns,
-    medals: Object.keys(loadJSON<Record<string, string>>(keyOf(pid, l, 'earned'), {})).length,
+    medals: Object.keys(loadJSON<Record<string, string>>(keyOf(pid, l, 'earned'), {}, isObject)).length,
     days: st.days,
     quiz: Object.values(st.quiz).reduce((a, b) => a + b, 0)
   };

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Gate, MAX_FAILS } from './gate.svelte';
+import { today } from './progress.svelte';
 
 describe('Gate', () => {
   beforeEach(() => localStorage.clear());
@@ -25,6 +26,8 @@ describe('Gate', () => {
     localStorage.setItem('kk:gate', JSON.stringify({ date: '2000-01-01', fails: 3 }));
     expect(new Gate().locked).toBe(false);
     localStorage.setItem('kk:gate', '{broken');
+    expect(new Gate().fails).toBe(0);
+    localStorage.setItem('kk:gate', JSON.stringify({ date: today(), fails: 'abc' }));
     expect(new Gate().fails).toBe(0);
   });
 });

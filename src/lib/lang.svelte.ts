@@ -3,19 +3,19 @@ import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
 import type { Word } from './words';
+import { getRaw, setRaw } from './storage';
 
 export type Lang = 'ja' | 'kana' | 'en';
 export const LANGS: Lang[] = ['ja', 'kana', 'en'];
 const KEY = 'kk:lang';
-const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
 
 // 現在の言語。ホームのトグルで切り替え、全画面が参照する
-const saved = store()?.getItem(KEY);
+const saved = getRaw(KEY);
 export const lang = $state<{ v: Lang }>({ v: saved === 'en' || saved === 'kana' ? saved : 'ja' });
 
 export function setLang(v: Lang) {
   lang.v = v;
-  store()?.setItem(KEY, v);
+  setRaw(KEY, v);
 }
 
 export const LANG_INFO: Record<
