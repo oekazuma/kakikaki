@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Icon from '../Icon.svelte';
   import { today } from '$lib/today';
   // 今月のカレンダー。3 ことば をまたいで練習した日に印。連続した日数を上に出す（切れたことは言わない）
   let { days, streak }: { days: string[]; streak: number } = $props();
@@ -15,13 +16,13 @@
 <section class="card cal">
   <div class="head">
     <b>{m} がつ</b>
-    {#if streak > 0}<span class="streak">🔥 つづけて {streak} にち</span>{/if}
+    {#if streak > 0}<span class="streak"><Icon name="star" size={16} fill /> つづけて {streak} にち</span>{/if}
   </div>
   <div class="grid">
     {#each ['にち', 'げつ', 'か', 'すい', 'もく', 'きん', 'ど'] as w (w)}<span class="w">{w}</span>{/each}
     {#each cells as d (d)}
       {#if d < 0}<span></span>{:else}
-        <span class={['d', { on: set.has(key(d)), today: key(d) === t }]}>{d}</span>
+        <span class="cell"><span class={['d', { on: set.has(key(d)), today: key(d) === t }]}>{d}</span></span>
       {/if}
     {/each}
   </div>
@@ -40,13 +41,20 @@
     font-size: 16px;
   }
   .streak {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 14px;
+    background: #fff3c4;
     color: var(--warn);
+    font-size: 14px;
     font-weight: bold;
   }
   .grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 6px 4px;
     text-align: center;
     font-size: 13px;
   }
@@ -54,18 +62,26 @@
     color: var(--sub);
     font-size: 11px;
   }
+  .cell {
+    display: grid;
+    place-items: center;
+  }
+  /* 印は固定サイズの丸。マスの幅に引きずられて楕円にならないように */
   .d {
-    height: 30px;
-    line-height: 30px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
     border-radius: 50%;
     color: var(--sub);
   }
   .d.on {
-    background: var(--star);
+    background: var(--blue);
     color: #fff;
     font-weight: bold;
   }
   .d.today {
-    outline: 2px solid var(--blue);
+    box-shadow:
+      0 0 0 2px var(--card),
+      0 0 0 4px var(--blue);
   }
 </style>
