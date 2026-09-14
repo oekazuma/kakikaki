@@ -1,12 +1,11 @@
 <script lang="ts">
   import Bar from '../Bar.svelte';
-  import { badgesOf, BADGE_GROUPS, groupOf } from '$lib/badges';
-  import { earned, stats, today } from '$lib/progress.svelte';
-  import { lang } from '$lib/lang.svelte';
+  import { BADGE_GROUPS, groupOf, type Badge, type Stats } from '$lib/badges';
+  import { today } from '$lib/progress.svelte';
   // メダルをテーマごとの段に並べる。獲得済みは色つき、未獲得は灰色で進み具合のバー、きょう取ったものは NEW
-  const s = $derived(stats());
+  let { s, badges, got }: { s: Stats; badges: Badge[]; got: Record<string, string> } = $props();
   const groups = $derived(
-    BADGE_GROUPS.map((g) => ({ name: g, items: badgesOf(lang.v).filter((b) => groupOf(b.id) === g) })).filter(
+    BADGE_GROUPS.map((g) => ({ name: g, items: badges.filter((b) => groupOf(b.id) === g) })).filter(
       (g) => g.items.length
     )
   );
@@ -14,7 +13,7 @@
 </script>
 
 {#each groups as g (g.name)}
-  {@const done = g.items.filter((b) => earned()[b.id]).length}
+  {@const done = g.items.filter((b) => got[b.id]).length}
   <section class="group">
     <h2>
       {g.name}
@@ -23,7 +22,7 @@
     <div class="badges">
       {#each g.items as b (b.id)}
         {@const [have, need] = b.need(s)}
-        {@const date = earned()[b.id]}
+        {@const date = got[b.id]}
         {@const ok = !!date}
         <div class={['card', 'badge', { ok, fresh: ok && isToday(date) }]}>
           {#if ok && isToday(date)}<span class="new">NEW!</span>{/if}

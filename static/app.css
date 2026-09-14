@@ -21,7 +21,12 @@
   --dark: #b8502c;
 }
 main,
-main * {
+.card,
+h1,
+h2,
+button,
+a,
+.kyokasho {
   transition:
     background-color 0.4s,
     color 0.4s,

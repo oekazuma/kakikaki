@@ -23,11 +23,22 @@
   const ds = $derived(t.strokes[t.char]);
   let svg: SVGSVGElement;
 
+  // 画面 ↔ viewBox の行列は指を置いたときに 1 回だけ取る（pointermove ごとに getScreenCTM を呼ぶとレイアウトを強制する）
+  let ctm: DOMMatrix | null = null;
+  let inv: DOMMatrix | null = null;
+  const refresh = () => {
+    ctm = svg.getScreenCTM();
+    inv = ctm?.inverse() ?? null;
+  };
   const toView = (e: PointerEvent): Pt => {
-    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM()!.inverse());
+    if (!inv) refresh();
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(inv!);
     return { x: p.x, y: p.y };
   };
-  export const toScreen = (p: Pt) => new DOMPoint(p.x, p.y).matrixTransform(svg.getScreenCTM()!);
+  export const toScreen = (p: Pt) => {
+    if (!ctm) refresh();
+    return new DOMPoint(p.x, p.y).matrixTransform(ctm!);
+  };
   const poly = (pts: Pt[]) => pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
 </script>
 
@@ -37,7 +48,7 @@
     viewBox="0 0 109 109"
     role="img"
     aria-label="かきとりめん"
-    onpointerdown={(e) => on.down(toView(e), e.pointerId) && svg.setPointerCapture(e.pointerId)}
+    onpointerdown={(e) => (refresh(), on.down(toView(e), e.pointerId) && svg.setPointerCapture(e.pointerId))}
     onpointermove={(e) => on.move(toView(e), e.pointerId)}
     onpointerup={(e) => on.up(e.pointerId)}
     onpointercancel={(e) => on.up(e.pointerId)}

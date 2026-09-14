@@ -1,16 +1,15 @@
 <script lang="ts">
   import Avatar from '../Avatar.svelte';
   import Bar from '../Bar.svelte';
-  import { badgesOf, nextBadge } from '$lib/badges';
-  import { earned, stats } from '$lib/progress.svelte';
-  import { lang, info } from '$lib/lang.svelte';
+  import { nextBadge, type Badge, type Stats } from '$lib/badges';
+  import { info } from '$lib/lang.svelte';
   import { current } from '$lib/profiles.svelte';
   // 実績のいちばん上: 誰の記録か、メダルの輪、つぎに近いメダル
-  const badges = $derived(badgesOf(lang.v));
-  const got = $derived(Object.keys(earned()).length);
+  let { s, badges, got: earnedMap }: { s: Stats; badges: Badge[]; got: Record<string, string> } = $props();
+  const got = $derived(Object.keys(earnedMap).length);
   const pct = $derived(Math.round((100 * got) / badges.length));
-  const next = $derived(nextBadge(badges, stats(), earned()));
-  const need = $derived(next ? next.need(stats()) : ([0, 1] as [number, number]));
+  const next = $derived(nextBadge(badges, s, earnedMap));
+  const need = $derived(next ? next.need(s) : ([0, 1] as [number, number]));
   const R = 52;
   const C = 2 * Math.PI * R;
 </script>

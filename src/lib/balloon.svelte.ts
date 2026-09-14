@@ -40,9 +40,9 @@ export class BalloonGame {
     if (this.over) return;
     this.time += dt;
     for (const b of this.balloons) b.y -= b.vy * dt;
-    const gone = this.balloons.filter((b) => b.y < -0.25);
-    this.balloons = this.balloons.filter((b) => b.y >= -0.25);
-    for (let i = 0; i < gone.length && !this.over; i++) this.miss();
+    const gone = this.balloons.filter((b) => b.y < -0.25).length;
+    if (gone) this.balloons = this.balloons.filter((b) => b.y >= -0.25);
+    for (let i = 0; i < gone && !this.over; i++) this.miss();
     while (!this.over && this.time >= this.nextSpawn) {
       this.spawn();
       // だんだん速く・多く（間隔 0.9 → 0.45 秒、速さ 0.22 → 0.5 画面/秒）
