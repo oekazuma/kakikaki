@@ -150,7 +150,7 @@
             クイズは よみ（10 問）と かき（5 問）。単語の文字数で かんたん・ふつう・むずかしい
             に分かれ、正解数を記録します。
           </li>
-          <li>記録・星・メダル・クイズの正解数は ひらがな と えいご で別々に保存されます。</li>
+          <li>記録・星・メダル・クイズの正解数は ひらがな・かたかな・えいご で別々に保存されます。</li>
         </ul>
       </section>
 
@@ -213,19 +213,19 @@
       <section class="card">
         <h2>アプリの状態</h2>
         <ul class="status">
-          <li class={standalone ? 'ok' : 'ng'}>
+          <li class={standalone ? 'good' : 'bad'}>
             <Icon name={standalone ? 'check' : 'close'} size={18} />
             {standalone
               ? 'ホーム画面からアプリとして起動しています'
               : 'ブラウザで開いています（ホーム画面に追加すると全画面で使えます）'}
           </li>
-          <li class={swActive ? 'ok' : 'ng'}>
+          <li class={swActive ? 'good' : 'bad'}>
             <Icon name={swActive ? 'check' : 'close'} size={18} />
             {swActive
               ? 'オフライン用の保存が有効です'
               : 'オフライン用の保存がまだ有効ではありません（一度読み込み直してください）'}
           </li>
-          <li class={cached > 0 ? 'ok' : 'ng'}>
+          <li class={cached > 0 ? 'good' : 'bad'}>
             <Icon name={cached > 0 ? 'check' : 'close'} size={18} />
             {cached > 0
               ? `文字・イラスト・効果音を端末に保存済み（${cached} ファイル）`
@@ -368,10 +368,10 @@
     padding: 2px;
     color: #fff;
   }
-  .status .ok :global(svg) {
+  .status .good :global(svg) {
     background: #43a047;
   }
-  .status .ng :global(svg) {
+  .status .bad :global(svg) {
     background: #e53935;
   }
   .danger-zone {
