@@ -36,6 +36,7 @@
   <label class="name">
     なまえ
     <input type="text" bind:value={name} maxlength={NAME_MAX} placeholder="なまえ" />
+    <small class={['len', { max: name.length >= NAME_MAX }]}>{name.length} / {NAME_MAX} もじ</small>
   </label>
   <AvatarPicker bind:value={avatar} />
   {#if error}<p class="err">{error}</p>{/if}
@@ -89,6 +90,14 @@
     gap: 12px;
     font-weight: bold;
     font-size: 18px;
+  }
+  .len {
+    font-size: 13px;
+    color: var(--sub);
+    white-space: nowrap;
+  }
+  .len.max {
+    color: #c62828;
   }
   .name input {
     flex: 1;
