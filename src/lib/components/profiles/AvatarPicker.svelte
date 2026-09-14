@@ -33,17 +33,21 @@
     value = url;
     if (!addPhoto(url)) error = 'しゃしんの いちらんが いっぱいです（この人には つかえます）';
   }
-  // 600ms 押し続けたら削除モード。タップ（短い押下）は選択
+  // 600ms 押し続けたら削除モード。タップ（短い押下）は選択。削除モードの写真をもう一度タップすると抜ける
+  let justHeld = false;
   function press(url: string) {
     clearTimeout(timer);
-    timer = setTimeout(() => (holding = url), 600);
+    timer = setTimeout(() => {
+      holding = url;
+      justHeld = true;
+    }, 600);
   }
   function release(url: string) {
     clearTimeout(timer);
-    if (holding !== url) {
-      holding = null;
-      value = url;
-    }
+    if (justHeld) return void (justHeld = false); // 長押しを離した瞬間は削除モードのまま
+    if (holding === url) return void (holding = null);
+    holding = null;
+    value = url;
   }
   function remove(url: string) {
     removePhoto(url);
@@ -58,7 +62,7 @@
     <div class="preview"><Avatar avatar={value} size={120} /></div>
     <div class="grid">
       {#each AVATARS as a (a)}
-        <button class={['pick', { on: value === a }]} onclick={() => (value = a)} aria-label={a}
+        <button class={['pick', { on: value === a }]} onclick={() => ((value = a), (holding = null))} aria-label={a}
           ><Avatar avatar={a} size={56} /></button
         >
       {/each}
@@ -85,7 +89,9 @@
       </label>
     </div>
     {#if error}<p class="err">{error}</p>{/if}
-    <p class="note">しゃしんは ながおしで けせます。ほかの人も おなじ しゃしんを えらべます</p>
+    <p class="note">
+      しゃしんは ながおしで けせます（もういちど タップで もどる）。ほかの人も おなじ しゃしんを えらべます
+    </p>
   </div>
 {/if}
 

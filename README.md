@@ -43,6 +43,10 @@
 
 SvelteKit（Svelte 5）+ adapter-static の PWA で、追加のランタイム依存はない。構成・コマンド・設計の説明は [CLAUDE.md](CLAUDE.md) にある。
 
+## ライセンス
+
+コードは [MIT](LICENSE)。書き順データ（`src/lib/strokes.ts`・`strokes-kana.ts`）は KanjiVG 由来で CC BY-SA 3.0、イラストは Twemoji（CC BY 4.0）、フォントは Klee One（SIL OFL 1.1）で、それぞれ元のライセンスに従う。
+
 ## クレジット
 
 - 書き順データ（ひらがな・カタカナ）: [KanjiVG](https://kanjivg.tagaini.net)（CC BY-SA 3.0）。アルファベットは自作
