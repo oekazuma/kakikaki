@@ -47,7 +47,8 @@ describe('quiz session', () => {
 
   it('かきクイズ: 全文字書けば正解、2 回外すとなぞるに切り替わり正解に数えない', () => {
     const w = new WriteQuiz(1, {}, seeded(3));
-    expect(w.words.length).toBe(5);
+    expect(w.qs.length).toBe(5);
+    expect(w.kind).toBe('picture');
     const ok = (mode: Result['mode']): Result => ({ mode, score: 1, ok: true, top: w.c });
     // 1 語目: 全文字を一発で
     const n1 = w.letters.length;

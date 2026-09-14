@@ -67,9 +67,10 @@ describe('quiz', () => {
       }
     }
   });
-  it('かきクイズは 5 問、英語は文字が分かれている', () => {
+  it('かきクイズは 5 問、絵と音が交互、英語は文字が分かれている', () => {
     const ws = makeWriteQuiz('en', 1, 5, seeded(2));
-    expect(ws.length).toBe(5);
-    for (const w of ws) expect(lettersOf(w, 'en').length).toBeLessThanOrEqual(4);
+    expect(ws.map((q) => q.kind)).toEqual(['picture', 'listen', 'picture', 'listen', 'picture']);
+    expect(new Set(ws.map((q) => q.word.id)).size).toBe(5);
+    for (const { word } of ws) expect(lettersOf(word, 'en').length).toBeLessThanOrEqual(4);
   });
 });

@@ -1,7 +1,6 @@
-import { makeReadQuiz, makeWriteQuiz, type Kind, type Level, type ReadQ } from './quiz';
+import { makeReadQuiz, makeWriteQuiz, type Kind, type Level, type ReadQ, type WriteQ } from './quiz';
 import { lettersOf, lang } from './lang.svelte';
 import { recordQuiz, recordMiss, checkBadges, type Mode } from './progress.svelte';
-import type { Word } from './words';
 import type { Result } from './tracer.svelte';
 import type { Effects } from './practice.svelte';
 
@@ -72,7 +71,7 @@ export class ReadQuiz {
 
 // かきクイズ: イラストを見て 1 文字ずつお手本なしで書く。2 回外すとお手本をなぞる（その単語は正解に数えない）
 export class WriteQuiz {
-  words = $state<Word[]>([]);
+  qs = $state<WriteQ[]>([]);
   i = $state(0); // 問題
   k = $state(0); // 文字
   miss = $state(0);
@@ -92,7 +91,10 @@ export class WriteQuiz {
     this.start();
   }
   get word() {
-    return this.words[this.i];
+    return this.qs[this.i]?.word;
+  }
+  get kind() {
+    return this.qs[this.i]?.kind ?? 'picture';
   }
   get letters() {
     return this.word ? lettersOf(this.word) : [];
@@ -101,7 +103,7 @@ export class WriteQuiz {
     return this.letters[this.k];
   }
   start() {
-    this.words = makeWriteQuiz(lang.v, this.level, undefined, this.rnd);
+    this.qs = makeWriteQuiz(lang.v, this.level, undefined, this.rnd);
     this.i = 0;
     this.correct = 0;
     this.done = false;
@@ -136,12 +138,12 @@ export class WriteQuiz {
     this.fx.confetti?.(80);
     this.msg = this.helped ? 'かけたね！' : 'せいかい！';
     setTimeout(() => {
-      if (this.i < this.words.length - 1) {
+      if (this.i < this.qs.length - 1) {
         this.i++;
         this.nextLetter(0);
       } else {
         this.done = true;
-        finish('write', this.level, this.correct, this.words.length, this.fx);
+        finish('write', this.level, this.correct, this.qs.length, this.fx);
       }
     }, 1400);
   }

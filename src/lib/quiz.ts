@@ -100,5 +100,10 @@ export function makeReadQuiz(l: Lang, level: Level, n = QUESTIONS.read, rnd = Ma
     });
 }
 
-export const makeWriteQuiz = (l: Lang, level: Level, n = QUESTIONS.write, rnd = Math.random): Word[] =>
-  shuffle(wordsOf(l, level), rnd).slice(0, n);
+// かきクイズの出題形式。picture: イラストを見て書く / listen: 聞いて書く（絵なし）。交互に出す
+export type WriteKind = 'picture' | 'listen';
+export type WriteQ = { word: Word; kind: WriteKind };
+export const makeWriteQuiz = (l: Lang, level: Level, n = QUESTIONS.write, rnd = Math.random): WriteQ[] =>
+  shuffle(wordsOf(l, level), rnd)
+    .slice(0, n)
+    .map((word, i) => ({ word, kind: i % 2 ? 'listen' : 'picture' }));
