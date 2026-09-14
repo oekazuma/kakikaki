@@ -13,6 +13,7 @@ pnpm dev                      # http://localhost:5173/kakikaki/
 pnpm test:run                 # vitest 一括実行（unit プロジェクト、happy-dom）。pnpm test で watch
 pnpm exec vitest run src/lib/judge.test.ts   # 単一ファイル
 pnpm lint                     # prettier --check と eslint（CI と同じ）
+pnpm verify                   # lint / check / test:run / vitals をまとめて実行（CI と同じ判定）
 pnpm vitals                   # svelte-vitals の全体スキャン。編集後は `pnpm vitals --diff`、コミット前は `pnpm vitals --staged`
 pnpm format                   # prettier --write
 pnpm check                    # svelte-check
