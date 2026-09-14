@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { badgesOf, ROWS, computeStats, earnedBadges } from './badges';
+import { badgesOf, ROWS, computeStats, earnedBadges, groupOf, nextBadge, BADGE_GROUPS } from './badges';
 import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
 
 describe('badges', () => {
@@ -85,5 +85,23 @@ describe('badges', () => {
         .find((b) => b.id === 'days-3')!
         .need(s)
     ).toEqual([2, 3]);
+  });
+
+  it('メダルは全部どこかのグループに入り、つぎのメダルは達成率が最も高い未獲得', () => {
+    const badges = badgesOf('ja');
+    for (const b of badges) expect(BADGE_GROUPS).toContain(groupOf(b.id));
+    const s = computeStats(
+      'ja',
+      (c) => 'あいうえおかきくけ'.includes(c),
+      () => false,
+      2,
+      {}
+    );
+    const got = { 'first-char': '2026-01-01' };
+    const next = nextBadge(badges, s, got)!;
+    const ratio = (b: (typeof badges)[number]) => b.need(s)[0] / b.need(s)[1];
+    expect(got).not.toHaveProperty(next.id);
+    for (const b of badges) if (!(b.id in got)) expect(ratio(next)).toBeGreaterThanOrEqual(ratio(b));
+    expect(nextBadge(badges, s, Object.fromEntries(badges.map((b) => [b.id, 'x'])))).toBeUndefined();
   });
 });

@@ -1,49 +1,121 @@
 <script lang="ts">
-  import { badgesOf } from '$lib/badges';
-  import { earned, stats } from '$lib/progress.svelte';
+  import Bar from '../Bar.svelte';
+  import { badgesOf, BADGE_GROUPS, groupOf } from '$lib/badges';
+  import { earned, stats, today } from '$lib/progress.svelte';
   import { lang } from '$lib/lang.svelte';
+  // メダルをテーマごとの段に並べる。獲得済みは色つき、未獲得は灰色で進み具合のバー、きょう取ったものは NEW
   const s = $derived(stats());
-  const BADGES = $derived(badgesOf(lang.v));
+  const groups = $derived(
+    BADGE_GROUPS.map((g) => ({ name: g, items: badgesOf(lang.v).filter((b) => groupOf(b.id) === g) })).filter(
+      (g) => g.items.length
+    )
+  );
+  const isToday = (d: string) => d === today();
 </script>
 
-<section class="badges">
-  {#each BADGES as b (b.id)}
-    {@const [have, need] = b.need(s)}
-    {@const ok = !!earned()[b.id]}
-    <div class={['card', 'badge', { ok }]}>
-      <span class="em">{b.emoji}</span>
-      <b>{b.name}</b>
-      <small>{b.desc}</small>
-      {#if ok}<span class="date">{earned()[b.id].replaceAll('-', '/')} ゲット！</span>{:else}<span class="rest"
-          >あと {need - have}</span
-        >{/if}
+{#each groups as g (g.name)}
+  {@const done = g.items.filter((b) => earned()[b.id]).length}
+  <section class="group">
+    <h2>
+      {g.name}
+      <span class={['cnt', { full: done === g.items.length }]}>{done} / {g.items.length}</span>
+    </h2>
+    <div class="badges">
+      {#each g.items as b (b.id)}
+        {@const [have, need] = b.need(s)}
+        {@const date = earned()[b.id]}
+        {@const ok = !!date}
+        <div class={['card', 'badge', { ok, fresh: ok && isToday(date) }]}>
+          {#if ok && isToday(date)}<span class="new">NEW!</span>{/if}
+          <span class="em">{b.emoji}</span>
+          <b>{b.name}</b>
+          <small>{b.desc}</small>
+          {#if ok}
+            <span class="date">{date.replaceAll('-', '/')} ゲット！</span>
+          {:else}
+            <Bar {have} {need} color="var(--teal)" />
+            <span class="rest">あと {Math.max(0, need - have)}</span>
+          {/if}
+        </div>
+      {/each}
     </div>
-  {/each}
-</section>
+  </section>
+{/each}
 
 <style>
+  .group {
+    margin-bottom: 18px;
+  }
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    color: var(--ink);
+    margin: 0 0 8px 4px;
+  }
+  .cnt {
+    font-size: 13px;
+    color: var(--sub);
+    background: #fff;
+    padding: 2px 10px;
+    border-radius: 10px;
+  }
+  .cnt.full {
+    color: #fff;
+    background: var(--star);
+  }
   .badges {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
   }
   .badge {
+    position: relative;
     padding: 12px 10px;
     display: grid;
     justify-items: center;
+    align-content: start;
     text-align: center;
     gap: 3px;
-    filter: grayscale(1);
-    opacity: 0.55;
+    background: #f7f8f5;
+  }
+  .badge :global(.bar) {
+    width: 80%;
+    height: 6px;
+    margin-top: 4px;
   }
   .badge.ok {
-    filter: none;
-    opacity: 1;
-    background: #fffae6;
+    background: linear-gradient(160deg, #fffbe6, #fff1b8);
+    border: 2px solid var(--star);
     animation: pop 0.5s;
+  }
+  .badge.ok .em {
+    animation: shine 2.4s ease-in-out infinite;
+  }
+  .badge.fresh {
+    box-shadow: 0 0 0 4px #ffe58a;
+  }
+  .new {
+    position: absolute;
+    top: -8px;
+    right: -6px;
+    background: #e53935;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 10px;
+    transform: rotate(8deg);
   }
   .em {
     font-size: 40px;
+    filter: grayscale(1);
+    opacity: 0.45;
+  }
+  .badge.ok .em {
+    filter: none;
+    opacity: 1;
   }
   .badge b {
     font-size: 14px;
@@ -51,6 +123,7 @@
   small {
     color: var(--sub);
     font-size: 11px;
+    min-height: 2.6em;
   }
   .date {
     font-size: 11px;
@@ -64,6 +137,15 @@
   @keyframes pop {
     50% {
       transform: scale(1.06);
+    }
+  }
+  @keyframes shine {
+    0%,
+    100% {
+      transform: scale(1) rotate(0);
+    }
+    50% {
+      transform: scale(1.12) rotate(-6deg);
     }
   }
 </style>

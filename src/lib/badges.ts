@@ -143,6 +143,44 @@ export function badgesOf(l: Lang): Badge[] {
   ];
 }
 
+// 実績画面の見出し。id の接頭辞で分ける
+export const BADGE_GROUPS = [
+  'はじめて',
+  'もじ',
+  'きんのほし',
+  'ぎょう マスター',
+  'たんご',
+  'はかせ',
+  'おうかん',
+  'クイズ',
+  'つづけた ひ'
+] as const;
+export type BadgeGroup = (typeof BADGE_GROUPS)[number];
+export function groupOf(id: string): BadgeGroup {
+  const head = id.split('-')[0];
+  const map: Record<string, BadgeGroup> = {
+    first: 'はじめて',
+    chars: 'もじ',
+    gold: 'きんのほし',
+    row: 'ぎょう マスター',
+    words: 'たんご',
+    cat: 'はかせ',
+    crowns: 'おうかん',
+    read: 'クイズ',
+    write: 'クイズ',
+    days: 'つづけた ひ'
+  };
+  return map[head] ?? 'はじめて';
+}
+
+// つぎに近いメダル: 未獲得のうち達成率が最も高いもの（同率なら残りが少ないもの）
+export function nextBadge(badges: Badge[], s: Stats, earned: Record<string, string>): Badge | undefined {
+  return badges
+    .filter((b) => !earned[b.id])
+    .map((b) => ({ b, r: b.need(s) }))
+    .sort((x, y) => y.r[0] / y.r[1] - x.r[0] / x.r[1] || x.r[1] - x.r[0] - (y.r[1] - y.r[0]))[0]?.b;
+}
+
 export const earnedBadges = (l: Lang, s: Stats) =>
   badgesOf(l).filter((b) => {
     const [h, n] = b.need(s);

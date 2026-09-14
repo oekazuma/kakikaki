@@ -3,15 +3,16 @@
   import BackButton from '$lib/components/BackButton.svelte';
   import StatTiles from '$lib/components/trophies/StatTiles.svelte';
   import BadgeGrid from '$lib/components/trophies/BadgeGrid.svelte';
+  import Hero from '$lib/components/trophies/Hero.svelte';
   import { fly } from 'svelte/transition';
-  import { badgesOf } from '$lib/badges';
-  import { earned } from '$lib/progress.svelte';
-  import { lang, info } from '$lib/lang.svelte';
-  import { current } from '$lib/profiles.svelte';
-  import Avatar from '$lib/components/Avatar.svelte';
+  import { checkBadges } from '$lib/progress.svelte';
+  import { info } from '$lib/lang.svelte';
+  import { fx } from '$lib/fx';
 
-  const got = $derived(Object.keys(earned()).length);
-  const all = $derived(badgesOf(lang.v).length);
+  // 条件を満たしているのにまだ確定していないメダルがあれば、ここで確定して紙吹雪
+  $effect(() => {
+    if (checkBadges().length) setTimeout(() => fx.confetti(200), 300);
+  });
 </script>
 
 <svelte:head>
@@ -22,12 +23,9 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1>
-      <Icon name="trophy" /> めだる と きろく
-      <small><Avatar avatar={current().avatar} size={28} /> {current().name} の {info().short}</small>
-    </h1>
-    <span class="count">めだる {got} / {all}</span>
+    <h1><Icon name="trophy" /> めだる と きろく</h1>
   </header>
+  <Hero />
   <StatTiles />
   <BadgeGrid />
 </main>
@@ -53,20 +51,5 @@
   }
   h1 :global(svg) {
     color: #e08a00;
-  }
-  h1 small {
-    font-size: 14px;
-    color: var(--sub);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-left: 6px;
-  }
-  .count {
-    font-weight: bold;
-    color: var(--teal);
-    background: #fff;
-    padding: 8px 14px;
-    border-radius: 14px;
   }
 </style>
