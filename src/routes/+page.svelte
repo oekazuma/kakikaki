@@ -12,6 +12,7 @@
   import { earned, stats } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
   import LangToggle from '$lib/components/LangToggle.svelte';
+  import ProfileButton from '$lib/components/ProfileButton.svelte';
   const s = $derived(stats());
   const total = $derived(TOTAL(lang.v));
   const badgeCount = $derived(badgesOf(lang.v).length);
@@ -39,6 +40,7 @@
         <span class="hira">{info().short}</span>
       </h1>
     {/key}
+    <ProfileButton />
     <LangToggle />
     <nav>
       <a class="card prog" href={resolve('/trophies')}>

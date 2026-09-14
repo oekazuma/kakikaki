@@ -1,5 +1,6 @@
 import { computeStats, earnedBadges, type Badge } from './badges';
-import { lang, lettersOf, type Lang } from './lang.svelte';
+import { lang, lettersOf, setLang, type Lang } from './lang.svelte';
+import { profiles, byId, setCurrent, removeProfile, updateProfile } from './profiles.svelte';
 import type { Word } from './words';
 
 export type Mode = 'trace' | 'free' | 'test';
@@ -14,21 +15,13 @@ type Data = {
 
 const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
 const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
-const key = (l: Lang, name: string) => `kk:${l}:${name}`;
+const key = (l: Lang, name: string) => `kk:${profiles.cur}:${l}:${name}`;
 
 function loadJSON<T>(k: string, fallback: T): T {
   try {
     return JSON.parse(store()?.getItem(k) ?? 'null') ?? fallback;
   } catch {
     return fallback;
-  }
-}
-// 言語分割前のキー (kk:progress など) は ja の記録として引き継ぐ
-for (const name of ['progress', 'earned', 'days']) {
-  const old = store()?.getItem(`kk:${name}`);
-  if (old != null) {
-    if (store()?.getItem(key('ja', name)) == null) store()?.setItem(key('ja', name), old);
-    store()?.removeItem(`kk:${name}`);
   }
 }
 const load = (l: Lang): Data => ({
@@ -41,6 +34,21 @@ const save = (l: Lang, name: keyof Data) => store()?.setItem(key(l, name), JSON.
 
 export const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
 const cur = () => data[lang.v];
+
+// 使う人を切り替える: その人の言語に戻し、記録を読み直す
+export function switchProfile(id: string) {
+  const p = byId(id);
+  if (!p) return;
+  setCurrent(id);
+  setLang(p.lang);
+  for (const l of ['ja', 'kana', 'en'] as const) data[l] = load(l);
+}
+export function deleteProfile(id: string) {
+  const wasCur = profiles.cur === id;
+  if (removeProfile(id) && wasCur) switchProfile(profiles.cur);
+}
+// 言語の切り替えを使っている人に覚えさせる（次にその人を選んだとき同じ言語で開く）
+export const rememberLang = (l: Lang) => updateProfile(profiles.cur, { lang: l });
 
 export const today = () => {
   // 日付文字列を作るだけなので反応性は不要

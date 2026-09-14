@@ -2,6 +2,7 @@
   import { reset } from '$lib/progress.svelte';
   import { info } from '$lib/lang.svelte';
   import { Gate, MAX_FAILS } from '$lib/gate.svelte';
+  import { current } from '$lib/profiles.svelte';
 
   const gate = new Gate();
   let ans = $state('');
@@ -12,7 +13,7 @@
   function doReset() {
     if (
       confirm(
-        `「${info().short}」の練習記録・星・メダル・練習した日をすべて削除します。この操作は取り消せません。よろしいですか？`
+        `「${current().name}」の「${info().short}」の練習記録・星・メダル・練習した日をすべて削除します。この操作は取り消せません。よろしいですか？`
       )
     ) {
       reset();
@@ -24,7 +25,12 @@
 
 <section class="card danger-zone">
   <h2>練習記録の削除</h2>
-  <p>いま選んでいる「{info().short}」の記録をすべて消して最初の状態に戻します。<b>元に戻せません。</b></p>
+  <p>
+    いま使っている「{current().name}」の「{info().short}」の記録をすべて消して最初の状態に戻します。<b
+      >元に戻せません。</b
+    >
+    人ごと削除するときは「だれが つかう？」の鉛筆ボタンから。
+  </p>
   <ul>
     <li>各文字の回数と星</li>
     <li>単語の星と王冠</li>
@@ -32,7 +38,7 @@
     <li>クイズの正解数</li>
   </ul>
   {#if gate.passed}
-    <button class="danger" onclick={doReset}>「{info().short}」の記録を削除する</button>
+    <button class="danger" onclick={doReset}>「{current().name}」の「{info().short}」の記録を削除する</button>
   {:else if gate.locked}
     <p class="lock">本日は {MAX_FAILS} 回間違えたため、削除は明日まで行えません。</p>
   {:else}
