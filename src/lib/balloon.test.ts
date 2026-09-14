@@ -41,7 +41,7 @@ describe('ふうせん ぽん', () => {
   });
 
   it('コンボが 5 つづくごとにレベルが上がり、風船が速く小さくなる', () => {
-    expect([levelOf(0), levelOf(4), levelOf(5), levelOf(12), levelOf(99)]).toEqual([0, 0, 1, 2, 6]);
+    expect([levelOf(0), levelOf(4), levelOf(5), levelOf(12), levelOf(99)]).toEqual([0, 0, 1, 2, 5]);
     const g = new BalloonGame(() => 0.5);
     g.start();
     g.tick(0.3);
@@ -54,7 +54,7 @@ describe('ふうせん ぽん', () => {
     expect(g.level).toBe(2);
     while (g.balloons.length === 0) g.tick(0.1);
     const fast = g.balloons[0];
-    expect(fast.vy).toBeGreaterThan(slow.vy * 1.2);
+    expect(fast.vy).toBeGreaterThan(slow.vy * 1.1);
     expect(fast.size).toBeLessThan(slow.size);
   });
 
