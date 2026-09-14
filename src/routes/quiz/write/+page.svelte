@@ -45,12 +45,17 @@
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
-  <QuizHeader title="かきクイズ" {level} i={w.i} total={w.words.length} />
+  <QuizHeader title="かきクイズ" {level} i={w.i} total={w.qs.length} />
   {#if w.word}
     <div class="left">
       <div class="card pic">
-        <img src={imageUrl(w.word)} alt="" width="210" height="150" loading="eager" />
-        <button class={['hear', { speaking }]} onclick={hear}><Icon name="speaker" size={22} /> きく</button>
+        {#if w.kind === 'listen'}
+          <button class={['hear', 'big', { speaking }]} onclick={hear}><Icon name="speaker" size={40} /> きく</button>
+          <small>きこえた ことばを かこう</small>
+        {:else}
+          <img src={imageUrl(w.word)} alt="" width="210" height="150" loading="eager" />
+          <button class={['hear', { speaking }]} onclick={hear}><Icon name="speaker" size={22} /> きく</button>
+        {/if}
       </div>
       <LetterSlots {w} />
     </div>
@@ -81,7 +86,7 @@
     </div>
   {/if}
   {#if w.done}
-    <QuizResult correct={w.correct} total={w.words.length} onRetry={() => w.start()} />
+    <QuizResult correct={w.correct} total={w.qs.length} onRetry={() => w.start()} />
   {/if}
 </main>
 
@@ -124,6 +129,19 @@
   }
   .hear:active {
     transform: scale(0.94);
+  }
+  /* 聞いて書く: 絵の代わりに大きな きく */
+  .hear.big {
+    height: 150px;
+    width: 100%;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 26px;
+    border-radius: 20px;
+  }
+  .pic small {
+    color: var(--sub);
+    font-weight: bold;
   }
   .hear.speaking {
     background: var(--blue);
