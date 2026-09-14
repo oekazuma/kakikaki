@@ -9,6 +9,21 @@
   const built = Number.isFinite(Number(version)) ? new Date(Number(version)).toLocaleString('ja-JP') : version;
   let updating = $state(false);
 
+  // PWA の状態: ホーム画面から起動しているか / オフライン用の保存ができているか
+  let standalone = $state(false);
+  let swActive = $state(false);
+  let cached = $state(0);
+  $effect(() => {
+    standalone =
+      matchMedia('(display-mode: standalone)').matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    navigator.serviceWorker?.getRegistration().then((r) => (swActive = !!r?.active));
+    caches?.keys().then(async (ks) => {
+      const k = ks.find((k) => k.startsWith('kk-'));
+      cached = k ? (await (await caches.open(k)).keys()).length : 0;
+    });
+  });
+
   // 新しい Service Worker を取りに行き、取り込み（HTTP キャッシュを無視した再取得）が終わってから読み直す
   async function update() {
     if (!navigator.onLine) {
@@ -139,20 +154,25 @@
         </ul>
       </section>
 
-      <section class="card">
-        <h2>タブレットのホーム画面に追加する</h2>
-        <ol>
-          <li>ブラウザでこのアプリの URL を開く</li>
-          <li>iPad（Safari）: <b>共有ボタン</b>（四角から矢印が出たマーク）→ <b>「ホーム画面に追加」</b> → 「追加」</li>
-          <li>
-            Android（Chrome）: 右上の <b>⋮ メニュー</b> → <b>「ホーム画面に追加」</b>（または「アプリをインストール」）
-          </li>
-        </ol>
-        <p>
-          ホーム画面のアイコンから開くと、ブラウザのバーが消えて全画面で使えます。横向きでお使いください。PC
-          のブラウザでも、横 900px × 縦 520px 以上の画面なら同じように使えます。
-        </p>
-      </section>
+      {#if !standalone}
+        <section class="card">
+          <h2>タブレットのホーム画面に追加する</h2>
+          <ol>
+            <li>ブラウザでこのアプリの URL を開く</li>
+            <li>
+              iPad（Safari）: <b>共有ボタン</b>（四角から矢印が出たマーク）→ <b>「ホーム画面に追加」</b> → 「追加」
+            </li>
+            <li>
+              Android（Chrome）: 右上の <b>⋮ メニュー</b> →
+              <b>「ホーム画面に追加」</b>（または「アプリをインストール」）
+            </li>
+          </ol>
+          <p>
+            ホーム画面のアイコンから開くと、ブラウザのバーが消えて全画面で使えます。横向きでお使いください。PC
+            のブラウザでも、横 900px × 縦 520px 以上の画面なら同じように使えます。
+          </p>
+        </section>
+      {/if}
 
       <section class="card">
         <h2>オフラインでも使えます</h2>
@@ -188,6 +208,30 @@
           ><Icon name="redo" size={20} /> {updating ? '更新中…' : '最新版に更新'}</button
         >
         <small>いまのバージョン: {built}</small>
+      </section>
+
+      <section class="card">
+        <h2>アプリの状態</h2>
+        <ul class="status">
+          <li class={standalone ? 'ok' : 'ng'}>
+            <Icon name={standalone ? 'check' : 'close'} size={18} />
+            {standalone
+              ? 'ホーム画面からアプリとして起動しています'
+              : 'ブラウザで開いています（ホーム画面に追加すると全画面で使えます）'}
+          </li>
+          <li class={swActive ? 'ok' : 'ng'}>
+            <Icon name={swActive ? 'check' : 'close'} size={18} />
+            {swActive
+              ? 'オフライン用の保存が有効です'
+              : 'オフライン用の保存がまだ有効ではありません（一度読み込み直してください）'}
+          </li>
+          <li class={cached > 0 ? 'ok' : 'ng'}>
+            <Icon name={cached > 0 ? 'check' : 'close'} size={18} />
+            {cached > 0
+              ? `文字・イラスト・効果音を端末に保存済み（${cached} ファイル）`
+              : 'まだ端末に保存されていません'}
+          </li>
+        </ul>
       </section>
 
       <section class="card danger-zone">
@@ -303,6 +347,32 @@
     margin-top: 8px;
     color: var(--sub);
     text-align: center;
+  }
+  .status {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .status li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .status li :global(svg) {
+    flex: none;
+    margin-top: 3px;
+    border-radius: 50%;
+    padding: 2px;
+    color: #fff;
+  }
+  .status .ok :global(svg) {
+    background: #43a047;
+  }
+  .status .ng :global(svg) {
+    background: #e53935;
   }
   .danger-zone {
     border: 2px solid #f2b8b5;
