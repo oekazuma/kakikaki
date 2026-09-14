@@ -9,14 +9,23 @@
   // mode 'records' はことば 1 つの記録、'person' は人ごと（全ことばの記録とアバター）
   let {
     pid,
-    lang,
+    langs = LANGS,
     mode = 'records',
     onconfirm,
     oncancel
-  }: { pid: string; lang?: Lang; mode?: 'records' | 'person'; onconfirm: () => void; oncancel: () => void } = $props();
+  }: {
+    pid: string;
+    langs?: Lang[];
+    mode?: 'records' | 'person';
+    onconfirm: () => void;
+    oncancel: () => void;
+  } = $props();
   const p = $derived(byId(pid));
-  const langs = $derived(mode === 'person' ? LANGS : [lang!]);
-  const target = $derived(mode === 'person' ? 'すべての記録' : `${info(lang).short} の記録`);
+  const target = $derived(
+    mode === 'person' || langs.length === LANGS.length
+      ? 'すべての記録'
+      : `${langs.map((l) => info(l).short).join('・')} の記録`
+  );
   const sums = $derived(langs.map((l) => summaryOf(pid, l)));
   const total = (k: keyof (typeof sums)[number]) => sums.reduce((a, s) => a + s[k], 0);
   const rows = $derived([

@@ -3,7 +3,6 @@
   import BackButton from '$lib/components/BackButton.svelte';
   import Guide from '$lib/components/about/Guide.svelte';
   import AppStatus from '$lib/components/about/AppStatus.svelte';
-  import ResetPanel from '$lib/components/about/ResetPanel.svelte';
   import { pwaStatus, type PwaStatus } from '$lib/pwa';
 
   let status = $state<PwaStatus>({ standalone: false, swActive: false, cached: false });
@@ -30,7 +29,6 @@
     <div class="left"><Guide standalone={status.standalone} /></div>
     <div class="right">
       <AppStatus {status} />
-      <ResetPanel />
     </div>
   </div>
 </main>
