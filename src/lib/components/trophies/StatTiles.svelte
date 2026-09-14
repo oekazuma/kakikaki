@@ -20,14 +20,14 @@
 
 <section class="tiles">
   {#each tiles as t (t.label)}
-    <div class="card tile">
+    <div class="card tile" style:--c={t.color}>
+      <span class="ic"><Icon name={t.icon} size={22} /></span>
       <div class="tl">
-        <span class="lb" style:color={t.color}><Icon name={t.icon} size={20} /> {t.label}</span><b
-          >{pct(t.have, t.need)}%</b
-        >
+        <span class="lb">{t.label}</span>
+        <b>{t.have}<small>/ {t.need}</small></b>
       </div>
       <Bar have={t.have} need={t.need} color={t.color} />
-      <small>{t.have} / {t.need}</small>
+      <span class="pct">{pct(t.have, t.need)}%</span>
     </div>
   {/each}
 </section>
@@ -61,22 +61,47 @@
     margin-bottom: 12px;
   }
   .tile {
-    padding: 12px 14px;
+    position: relative;
+    padding: 12px 14px 12px 64px;
     display: grid;
     gap: 6px;
+    border-left: 6px solid var(--c);
+  }
+  .ic {
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-content: center;
+    background: var(--c);
+    color: #fff;
   }
   .tl {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
     font-weight: bold;
   }
   .tl b {
-    color: var(--sub);
+    font-size: 24px;
+  }
+  .tl b small {
+    font-size: 12px;
+    margin-left: 3px;
   }
   .lb {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    color: var(--c);
+  }
+  .pct {
+    position: absolute;
+    right: 14px;
+    bottom: 8px;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--sub);
   }
   small {
     color: var(--sub);
