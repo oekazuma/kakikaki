@@ -4,6 +4,7 @@
   import { lang } from '$lib/lang.svelte';
   import { rememberLang } from '$lib/progress.svelte';
   import { updated } from '$app/state';
+  import { vp, watchViewport } from '$lib/viewport.svelte';
   let { children } = $props();
   // ホーム画面のアプリはページ遷移が少なくポーリングも止まりがちなので、前面に戻ったときに新版を確認する（1 分に 1 回まで）
   let lastCheck = 0;
@@ -20,13 +21,13 @@
   // 練習画面（左 240 + 書き取り面 + 右 120）が操作できる最小サイズ。iPad 横向きはすべて満たす
   const MIN_W = 900;
   const MIN_H = 520;
-  let w = $state(0);
-  let h = $state(0);
+  $effect(() => watchViewport());
+  const w = $derived(vp.w);
+  const h = $derived(vp.h);
   const tooSmall = $derived(w > 0 && (w < MIN_W || h < MIN_H));
-  const portrait = $derived(h > w);
+  const portrait = $derived(vp.portrait);
 </script>
 
-<svelte:window bind:innerWidth={w} bind:innerHeight={h} />
 <svelte:document onvisibilitychange={onVisible} />
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
