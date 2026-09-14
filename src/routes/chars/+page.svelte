@@ -4,6 +4,7 @@
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import { SEION, GROUPS, ALPHABET, toKatakana } from '$lib/chars';
+  import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
 </script>
@@ -15,7 +16,7 @@
 
 {#snippet cell(c: string)}
   {#if c}
-    <a class={['card', 'cell', 'kyokasho', { done: charCleared(c) }]} href={practiceUrl(`char-${c}`)}>
+    <a class={['card', 'cell', 'kyokasho', { done: charCleared(c) }]} href={practiceUrl(charWordId(c))}>
       {c}
       {#if charGold(c)}<span class="s gold"><Icon name="crown" size={16} fill /></span>{:else if charCleared(c)}<span
           class="s"><Icon name="star" size={16} fill /></span
@@ -125,7 +126,7 @@
     display: grid;
   }
   .s.gold {
-    color: #e08a00;
+    color: var(--warn);
   }
   .groups {
     display: flex;

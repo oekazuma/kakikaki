@@ -78,14 +78,14 @@
     color: var(--blue);
   }
   .letters .blank {
-    color: #e53935;
-    border-bottom: 4px solid #e53935;
+    color: var(--danger);
+    border-bottom: 4px solid var(--danger);
   }
   .hear {
     width: 48px;
     height: 48px;
     border-radius: 24px;
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--blue);
     display: grid;
     place-content: center;

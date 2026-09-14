@@ -2,6 +2,7 @@
   import { untrack } from 'svelte';
   import Icon from '../Icon.svelte';
   import { cropAvatar } from '$lib/avatar';
+  import { clampOffset, zoomAt, cropRect, type CropState, type Pt } from '$lib/crop';
   // 丸い窓の下で写真を指で動かし、スライダーで拡大して切り抜く
   let { img, onpick, oncancel }: { img: HTMLImageElement; onpick: (url: string) => void; oncancel: () => void } =
     $props();
@@ -14,16 +15,11 @@
   let oy = $state(untrack(() => Math.min(0, (V - img.naturalHeight * base) / 2)));
   const w = $derived(img.naturalWidth * base * zoom);
   const h = $derived(img.naturalHeight * base * zoom);
-  const clamp = (v: number, size: number) => Math.min(0, Math.max(V - size, v));
   const ZOOM_MAX = 4;
-  // (cx, cy) の下にある写真の点を動かさずに拡大縮小する
-  function setZoom(z: number, cx: number, cy: number) {
-    z = Math.min(ZOOM_MAX, Math.max(1, z));
-    const k = z / zoom;
-    zoom = z;
-    ox = clamp(cx - (cx - ox) * k, w);
-    oy = clamp(cy - (cy - oy) * k, h);
-  }
+  const geom = untrack(() => ({ W: img.naturalWidth * base, H: img.naturalHeight * base, V, zoomMax: ZOOM_MAX }));
+  // 指の下 a にあった写真の点が t に来るように拡大縮小する
+  const apply = (from: CropState, z: number, a: Pt, t: Pt) => ({ ox, oy, zoom } = zoomAt(from, z, a, t, geom));
+  const setZoom = (z: number, cx: number, cy: number) => apply({ ox, oy, zoom }, z, { x: cx, y: cy }, { x: cx, y: cy });
 
   // 指の位置。1 本なら移動、2 本ならピンチで拡大縮小（iPad）。描画には使わないので反応性は不要
   // eslint-disable-next-line svelte/prefer-svelte-reactivity
@@ -54,15 +50,15 @@
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     pts.set(e.pointerId, { x: e.clientX - r.left, y: e.clientY - r.top });
     if (pinch && pts.size >= 2) {
-      const z = Math.min(ZOOM_MAX, Math.max(1, (pinch.zoom * dist()) / pinch.d));
-      const k = z / pinch.zoom;
-      const m = mid();
-      zoom = z;
-      ox = clamp(m.x - (pinch.mx - pinch.ox) * k, w);
-      oy = clamp(m.y - (pinch.my - pinch.oy) * k, h);
+      apply(
+        { ox: pinch.ox, oy: pinch.oy, zoom: pinch.zoom },
+        (pinch.zoom * dist()) / pinch.d,
+        { x: pinch.mx, y: pinch.my },
+        mid()
+      );
     } else if (drag) {
-      ox = clamp(drag.ox + e.clientX - drag.x, w);
-      oy = clamp(drag.oy + e.clientY - drag.y, h);
+      ox = clampOffset(drag.ox + e.clientX - drag.x, w, V);
+      oy = clampOffset(drag.oy + e.clientY - drag.y, h, V);
     }
   }
   function up(e: PointerEvent) {
@@ -76,8 +72,8 @@
     }
   }
   function pick() {
-    const k = base * zoom;
-    onpick(cropAvatar(img, -ox / k, -oy / k, V / k));
+    const r = cropRect({ ox, oy, zoom }, base, V);
+    onpick(cropAvatar(img, r.sx, r.sy, r.size));
   }
 </script>
 
@@ -189,7 +185,7 @@
     font-size: 17px;
   }
   .cancel {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--sub);
   }
   .ok {

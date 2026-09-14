@@ -1,13 +1,11 @@
 <script lang="ts">
   import Bar from '../Bar.svelte';
-  import { BADGE_GROUPS, groupOf, type Badge, type Stats } from '$lib/badges';
+  import { BADGE_GROUPS, type Badge, type Stats } from '$lib/badges';
   import { today } from '$lib/progress.svelte';
   // メダルをテーマごとの段に並べる。獲得済みは色つき、未獲得は灰色で進み具合のバー、きょう取ったものは NEW
   let { s, badges, got }: { s: Stats; badges: Badge[]; got: Record<string, string> } = $props();
   const groups = $derived(
-    BADGE_GROUPS.map((g) => ({ name: g, items: badges.filter((b) => groupOf(b.id) === g) })).filter(
-      (g) => g.items.length
-    )
+    BADGE_GROUPS.map((g) => ({ name: g, items: badges.filter((b) => b.group === g) })).filter((g) => g.items.length)
   );
   const isToday = (d: string) => d === today();
 </script>
@@ -99,7 +97,7 @@
     position: absolute;
     top: -8px;
     right: -6px;
-    background: #e53935;
+    background: var(--danger);
     color: #fff;
     font-size: 11px;
     font-weight: bold;
@@ -126,7 +124,7 @@
   }
   .date {
     font-size: 11px;
-    color: #e08a00;
+    color: var(--warn);
     font-weight: bold;
   }
   .rest {

@@ -128,7 +128,7 @@
     width: 40px;
     height: 40px;
     border-radius: 20px;
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--sub);
     display: grid;
     place-content: center;

@@ -32,7 +32,7 @@
     width: 44px;
     height: 44px;
     border-radius: 22px;
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--blue);
     display: grid;
     place-content: center;

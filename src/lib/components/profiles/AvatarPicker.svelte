@@ -128,7 +128,7 @@
     user-select: none;
   }
   .hold {
-    border-color: #e53935;
+    border-color: var(--danger);
   }
   /* 揺らすのは写真だけ。「けす」ボタンは動かさない */
   .hold .face {
@@ -142,7 +142,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    background: #e53935;
+    background: var(--danger);
     color: #fff;
     font-size: 13px;
     font-weight: bold;
@@ -160,7 +160,7 @@
     }
   }
   .file {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--blue);
     font-weight: bold;
     gap: 0;
@@ -180,7 +180,7 @@
     color: var(--sub);
   }
   .err {
-    color: #c62828;
+    color: var(--danger-ink);
     font-weight: bold;
   }
 </style>

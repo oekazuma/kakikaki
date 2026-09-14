@@ -89,9 +89,9 @@
     color: var(--sub);
   }
   .reset {
-    color: #e08a00;
+    color: var(--warn);
   }
   .person {
-    color: #c62828;
+    color: var(--danger-ink);
   }
 </style>

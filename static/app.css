@@ -8,6 +8,11 @@
   --guide: #d9dfe4;
   --star: #f5b400;
   --dark: #2f5b8a;
+  /* 意味色。ことばのテーマでは変えない */
+  --warn: #e08a00;
+  --danger: #e53935;
+  --danger-ink: #c62828;
+  --pill: #eef1f4;
 }
 /* かたかな は緑系、えいご はオレンジ系。切替時は色がにじむように変わる */
 [data-lang='kana'] {

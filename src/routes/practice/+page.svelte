@@ -44,7 +44,7 @@
   // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
   async function hear() {
     speaking = true;
-    await say(lang.v === 'en' ? s.c : readingOf(s.c), info().speech);
+    await say(readingOf(s.c), info().speech);
     speaking = false;
   }
   function goNext() {
@@ -158,7 +158,7 @@
     left: 14px;
     font-size: 13px;
     color: var(--sub);
-    background: #eef1f4;
+    background: var(--pill);
     padding: 4px 10px;
     border-radius: 12px;
   }

@@ -79,7 +79,7 @@
     color: var(--star);
   }
   .tab .s.gold {
-    color: #e08a00;
+    color: var(--warn);
   }
   .tab.on .s {
     color: #fff;
@@ -114,6 +114,6 @@
     color: var(--sub);
   }
   .row.gold :global(.on) {
-    color: #e08a00;
+    color: var(--warn);
   }
 </style>

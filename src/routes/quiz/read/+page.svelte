@@ -64,7 +64,7 @@
     place-content: center;
     font-size: 320px;
     font-weight: bold;
-    color: #e53935;
+    color: var(--danger);
     opacity: 0.6;
     pointer-events: none;
     z-index: 60;

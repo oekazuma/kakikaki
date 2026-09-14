@@ -92,7 +92,7 @@
     text-align: center;
   }
   .state.new {
-    color: #c62828;
+    color: var(--danger-ink);
   }
   .check {
     display: block;
@@ -104,7 +104,7 @@
     background: none;
   }
   .err {
-    color: #c62828;
+    color: var(--danger-ink);
     font-weight: bold;
   }
   .check:disabled {
@@ -115,7 +115,7 @@
     color: var(--sub);
   }
   .update.ready {
-    background: #e53935;
+    background: var(--danger);
     animation: nudge 1.6s ease-in-out infinite;
   }
   @keyframes nudge {
@@ -159,6 +159,6 @@
     background: #43a047;
   }
   .status .bad :global(svg) {
-    background: #e53935;
+    background: var(--danger);
   }
 </style>

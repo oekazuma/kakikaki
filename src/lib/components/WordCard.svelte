@@ -88,7 +88,7 @@
     animation: pop 0.5s;
   }
   .badge.gold {
-    background: #e08a00;
+    background: var(--warn);
   }
   @keyframes pop {
     50% {

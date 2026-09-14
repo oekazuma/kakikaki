@@ -91,7 +91,7 @@
     position: relative;
     height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     overflow: hidden;
-    background: linear-gradient(#dff1ff, #f4f5f0 70%);
+    background: linear-gradient(#dff1ff, var(--bg) 70%);
     -webkit-user-select: none;
     user-select: none;
   }
@@ -123,13 +123,13 @@
     color: var(--sub);
   }
   .combo {
-    color: #e08a00;
+    color: var(--warn);
     font-size: 20px;
     animation: pop 0.3s;
   }
   .level {
     color: #fff;
-    background: #e53935;
+    background: var(--danger);
     padding: 4px 10px;
     border-radius: 10px;
     font-size: 15px;
@@ -138,7 +138,7 @@
   .lives {
     display: flex;
     gap: 2px;
-    color: #e53935;
+    color: var(--danger);
   }
   .lives .lost {
     color: #d5d9de;
@@ -155,7 +155,7 @@
     transform: translate(-50%, -100%);
     font-size: 30px;
     font-weight: bold;
-    color: #e08a00;
+    color: var(--warn);
     pointer-events: none;
     animation: rise 0.6s ease-out forwards;
     z-index: 2;

@@ -13,7 +13,7 @@
     { label: 'もじ', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },
     { label: 'きんのほし', icon: 'star', have: s.gold, need: total.chars, color: 'var(--star)' },
     { label: 'たんご', icon: 'book', have: s.words, need: total.words, color: 'var(--teal)' },
-    { label: 'おうかん', icon: 'crown', have: s.crowns, need: total.words, color: '#e08a00' }
+    { label: 'おうかん', icon: 'crown', have: s.crowns, need: total.words, color: 'var(--warn)' }
   ] as const);
   const pct = (h: number, n: number) => Math.floor((100 * h) / n);
 </script>

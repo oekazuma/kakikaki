@@ -240,7 +240,11 @@ export const WORDS: Word[] = [
 
 export const CATEGORIES = [...new Set(WORDS.map((w) => w.category))];
 
-export const charWord = (c: string): Word => ({ id: `char-${c}`, name: c, en: c, category: 'もじ' });
+// 1 文字だけの練習は `char-<文字>` という id の擬似単語として扱う
+const CHAR_PREFIX = 'char-';
+export const charWordId = (c: string) => CHAR_PREFIX + c;
+export const isCharWord = (w: Word) => w.id.startsWith(CHAR_PREFIX);
+export const charWord = (c: string): Word => ({ id: charWordId(c), name: c, en: c, category: 'もじ' });
 
 export const wordById = (id: string): Word | undefined =>
-  id.startsWith('char-') ? charWord(id.slice(5)) : WORDS.find((w) => w.id === id);
+  id.startsWith(CHAR_PREFIX) ? charWord(id.slice(CHAR_PREFIX.length)) : WORDS.find((w) => w.id === id);

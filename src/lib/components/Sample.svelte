@@ -34,6 +34,6 @@
     color: var(--ink);
   }
   .n {
-    color: #e08a00;
+    color: var(--warn);
   }
 </style>

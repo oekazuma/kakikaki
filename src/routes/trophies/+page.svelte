@@ -56,6 +56,6 @@
     color: var(--ink);
   }
   h1 :global(svg) {
-    color: #e08a00;
+    color: var(--warn);
   }
 </style>

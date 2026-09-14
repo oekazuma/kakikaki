@@ -112,7 +112,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--blue);
     padding: 10px 16px;
     border-radius: 14px;

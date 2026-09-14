@@ -111,7 +111,7 @@
   .lbl {
     font-size: 13px;
     font-weight: bold;
-    color: #e08a00;
+    color: var(--warn);
     margin-top: -6px;
   }
   .next {
@@ -147,6 +147,6 @@
   }
   .all b {
     font-size: 22px;
-    color: #e08a00;
+    color: var(--warn);
   }
 </style>

@@ -3,6 +3,7 @@
   import { resolve } from '$app/paths';
   import { fx } from '$lib/fx';
   import { sfx, unlock } from '$lib/audio';
+  import { COLORS } from '$lib/balloon.svelte';
   // かくしゲームの入口。10 回タップで風船がふくらんで割れ、ゲームへ
   const TAPS = 10;
   let taps = $state(0);
@@ -14,7 +15,7 @@
     sfx.pon();
     if (taps < TAPS) return;
     popping = true;
-    fx.burst(e.clientX, e.clientY, 40, ['#ec407a', '#fdd835', '#1e88e5', '#43a047']);
+    fx.burst(e.clientX, e.clientY, 40, COLORS);
     setTimeout(() => goto(resolve('/balloon')), 350);
   }
 </script>
