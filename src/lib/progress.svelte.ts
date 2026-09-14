@@ -1,10 +1,11 @@
 import { computeStats, earnedBadges, type Badge } from './badges';
-import { lang, lettersOf, setLang, type Lang } from './lang.svelte';
+import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
 import { removeBest } from './balloon.svelte';
 import type { Word } from './words';
 import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 import { today } from './today';
+import { streak } from './streak';
 
 export type Mode = 'trace' | 'free' | 'test';
 // star: じぶんでかく の最高の星（1〜3）、miss: おてほんなし の不合格回数。どちらも任意（古い保存値には無い）
@@ -118,7 +119,13 @@ export function resetRecords(pid: string, langs: Lang[]) {
 // 現在の人・言語の記録だけ消す
 export const reset = () => resetRecords(profiles.cur, [lang.v]);
 
-export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz());
+// 練習した日は 3 ことば をまたいで 1 つに（連続日数とカレンダー用）
+export const allDays = () => {
+  const all = LANGS.flatMap((l) => data[l].days);
+  return all.filter((d, i) => all.indexOf(d) === i);
+};
+export const streakNow = () => streak(allDays(), today());
+export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz(), streakNow());
 
 // にがてな文字: おてほんなし で 2 回以上外したか、じぶんでかく の最高が星 1 のまま。外した回数が多い順
 export function weakOf(pid: string, l: Lang): string[] {

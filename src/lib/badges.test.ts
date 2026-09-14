@@ -63,10 +63,12 @@ describe('badges', () => {
           () => true,
           () => true,
           30,
-          quiz
+          quiz,
+          7
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 48 : 53);
     }
   });
   it('need は [達成数, 必要数]', () => {

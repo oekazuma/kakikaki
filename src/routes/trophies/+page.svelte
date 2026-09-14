@@ -6,7 +6,8 @@
   import Hero from '$lib/components/trophies/Hero.svelte';
   import { fly } from 'svelte/transition';
   import { untrack } from 'svelte';
-  import { checkBadges, earned, stats } from '$lib/progress.svelte';
+  import { checkBadges, earned, stats, allDays, streakNow } from '$lib/progress.svelte';
+  import Calendar from '$lib/components/trophies/Calendar.svelte';
   import { badgesOf } from '$lib/badges';
   import { info, lang } from '$lib/lang.svelte';
   import { fx } from '$lib/fx';
@@ -33,6 +34,7 @@
   </header>
   <Hero {s} {badges} {got} />
   <StatTiles {s} />
+  <Calendar days={allDays()} streak={streakNow()} />
   <BadgeGrid {s} {badges} {got} />
 </main>
 
