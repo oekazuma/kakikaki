@@ -19,6 +19,7 @@ describe('quiz session', () => {
 
   it('levelFromParam は 1〜3 に丸める', () => {
     expect([levelFromParam(null), levelFromParam('2'), levelFromParam('9'), levelFromParam('x')]).toEqual([1, 2, 3, 1]);
+    expect([levelFromParam('2.5'), levelFromParam('1.2')]).toEqual([3, 1]);
   });
 
   it('よみクイズ: 一発正解だけ数え、10 問で終わって記録する', () => {

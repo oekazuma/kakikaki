@@ -17,13 +17,12 @@
   import Hint from '$lib/components/Hint.svelte';
   import Sample from '$lib/components/Sample.svelte';
   import DriveBy from '$lib/components/DriveBy.svelte';
-  import { wordById } from '$lib/words';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
-  import { PracticeSession } from '$lib/practice.svelte';
+  import { PracticeSession, resolveWord } from '$lib/practice.svelte';
   import { say, sfx, readingOf } from '$lib/audio';
   import { fx } from '$lib/fx';
 
-  const word = $derived(wordById(page.url.searchParams.get('w') ?? '') ?? wordById('patocar')!);
+  const word = $derived(resolveWord(page.url.searchParams.get('w'), lang.v));
   const strokes = $derived(strokesOf());
   // 単語が切り替わったときだけセッションを作り直す。コンストラクタが読む進捗ストアには反応させない
   const s = $derived.by(() => {
