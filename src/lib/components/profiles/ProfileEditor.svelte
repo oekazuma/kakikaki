@@ -50,11 +50,12 @@
     background: rgba(0, 0, 0, 0.35);
     z-index: 70;
   }
+  /* 中央寄せに transform を使うと子孫の fixed（削除フローの暗幕と演出）がシート基準になるので、inset + margin で寄せる */
   .sheet {
     position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    inset: 0;
+    margin: auto;
+    height: fit-content;
     width: min(760px, calc(100vw - 60px));
     max-height: calc(100vh - 60px);
     overflow: auto;

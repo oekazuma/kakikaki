@@ -14,10 +14,11 @@
   let langs = $state<Lang[]>([]);
   let step = $state<'pick' | 'confirm' | 'shred'>('pick');
   const target = $derived(langs.length === LANGS.length ? 'すべて' : langs.map((l) => info(l).short).join('・'));
-  function finish() {
+  // 削除は最終確認の「削除する」を押した瞬間に行う。演出は見せるだけで、途中で閉じられても結果は変わらない
+  function commit() {
     if (kind === 'person') deleteProfile(id);
     else resetRecords(id, langs);
-    ondone();
+    step = 'shred';
   }
 </script>
 
@@ -48,11 +49,11 @@
     pid={id}
     mode={kind === 'person' ? 'person' : 'records'}
     {langs}
-    onconfirm={() => (step = 'shred')}
+    onconfirm={commit}
     oncancel={() => (step = 'pick')}
   />
 {:else if step === 'shred'}
-  <Shredder name={p?.name ?? ''} lang={target} onend={finish} />
+  <Shredder name={p?.name ?? ''} lang={target} onend={ondone} />
 {/if}
 
 <style>
