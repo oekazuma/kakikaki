@@ -58,15 +58,6 @@ export const WORDS: Word[] = [
     ['shrimp', 'えび', '🦐', 'shrimp'],
     ['hedgehog', 'はりねずみ', '🦔', 'hedgehog']
   ]),
-  ...W('からだ', [
-    ['eye', 'め', '👁️', 'eye'],
-    ['ear', 'みみ', '👂', 'ear'],
-    ['nose', 'はな', '👃', 'nose'],
-    ['mouth', 'くち', '👄', 'mouth'],
-    ['hand', 'て', '✋', 'hand'],
-    ['foot', 'あし', '🦶', 'foot'],
-    ['tooth', 'は', '🦷', 'tooth']
-  ]),
   ...W('しぜん', [
     ['sun', 'たいよう', '☀️', 'sun'],
     ['moon', 'つき', '🌙', 'moon'],
@@ -133,6 +124,15 @@ export const WORDS: Word[] = [
     ['door', 'どあ', '🚪', 'door'],
     ['window', 'まど', '🪟', 'window'],
     ['gloves', 'てぶくろ', '🧤', 'gloves']
+  ]),
+  ...W('からだ', [
+    ['eye', 'め', '👁️', 'eye'],
+    ['ear', 'みみ', '👂', 'ear'],
+    ['nose', 'はな', '👃', 'nose'],
+    ['mouth', 'くち', '👄', 'mouth'],
+    ['hand', 'て', '✋', 'hand'],
+    ['foot', 'あし', '🦶', 'foot'],
+    ['tooth', 'は', '🦷', 'tooth']
   ]),
   ...W('きもち', [
     ['happy', 'うれしい', '😊', 'happy'],
