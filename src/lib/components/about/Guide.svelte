@@ -85,7 +85,9 @@
     <li>ホーム画面のアイコンを削除すると、記録も一緒に消えます。</li>
     <li>
       書き順データは <a href="https://kanjivg.tagaini.net" target="_blank" rel="noreferrer">KanjiVG</a>（CC BY-SA
-      3.0）、イラストは
+      3.0）、文字のフォントは
+      <a href="https://github.com/fontworks-fonts/Klee" target="_blank" rel="noreferrer">Klee One</a>（SIL OFL
+      1.1、書き順のお手本と同じ教科書体）、イラストは
       <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noreferrer">Twemoji</a>（CC BY
       4.0）を使用しています。
     </li>
