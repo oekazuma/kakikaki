@@ -26,16 +26,16 @@ describe('quiz session', () => {
     const r = new ReadQuiz(1, fx, seeded());
     expect(r.qs.length).toBe(10);
     // 1 問目はわざと外してから当てる
-    const wrong = r.q.choices.find((w) => w.id !== r.q.answer.id)!;
+    const wrong = (r.q.letters ?? r.q.choices.map((w) => w.id)).find((k) => k !== r.q.key)!;
     expect(r.pick(wrong)).toBe('wrong');
-    expect(r.wrong).toEqual([wrong.id]);
-    expect(r.pick(r.q.answer)).toBe('hit');
-    expect(r.pick(r.q.answer)).toBe('ignored');
+    expect(r.wrong).toEqual([wrong]);
+    expect(r.pick(r.q.key)).toBe('hit');
+    expect(r.pick(r.q.key)).toBe('ignored');
     expect(r.correct).toBe(0);
     vi.advanceTimersByTime(900);
     expect([r.i, r.hit, r.wrong]).toEqual([1, null, []]);
     for (let n = 1; n < 10; n++) {
-      r.pick(r.q.answer);
+      r.pick(r.q.key);
       vi.advanceTimersByTime(900);
     }
     expect([r.done, r.correct]).toEqual([true, 9]);

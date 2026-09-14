@@ -1,0 +1,115 @@
+<script lang="ts">
+  import Icon from './Icon.svelte';
+  import { imageUrl } from '$lib/image';
+  import { info, nameOf, lettersOf } from '$lib/lang.svelte';
+  import { say } from '$lib/audio';
+  import type { ReadQ } from '$lib/quiz';
+  // よみクイズの出題部分（形式ごとに見せ方が変わる）
+  let { q }: { q: ReadQ } = $props();
+  let speaking = $state(false);
+  async function hear() {
+    speaking = true;
+    await say(nameOf(q.answer), info().speech);
+    speaking = false;
+  }
+</script>
+
+<div class={['prompt', 'card', q.kind]} data-kind={q.kind}>
+  {#if q.kind === 'word'}
+    <button class={['hear', { speaking }]} onclick={hear} aria-label="きく"><Icon name="speaker" size={26} /></button>
+    <b class="word kyokasho">{nameOf(q.answer)}</b>
+    <span>は どれ？</span>
+  {:else if q.kind === 'listen'}
+    <button class={['hear', 'big', { speaking }]} onclick={hear}><Icon name="speaker" size={40} /> きく</button>
+    <span>きこえた ものは どれ？</span>
+  {:else if q.kind === 'initial'}
+    <b class="word kyokasho">{lettersOf(q.answer)[0]}</b>
+    <span>で はじまる ものは どれ？</span>
+  {:else if q.kind === 'blank'}
+    <img src={imageUrl(q.answer)} alt="" width="200" height="140" loading="eager" />
+    <div class="fill">
+      <span class="letters kyokasho">
+        {#each lettersOf(q.answer) as ch, i (`${i}${ch}`)}
+          <span class={{ blank: i === q.blank }}>{i === q.blank ? '？' : ch}</span>
+        {/each}
+      </span>
+      <span>？ に はいる もじは？</span>
+    </div>
+  {:else}
+    <img src={imageUrl(q.answer)} alt="" width="280" height="200" loading="eager" />
+    <span>これは なに？</span>
+  {/if}
+</div>
+
+<style>
+  .prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 22px;
+    font-size: 30px;
+    font-weight: bold;
+  }
+  .picture {
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+  }
+  .picture img {
+    height: 180px;
+  }
+  .blank img {
+    height: 140px;
+  }
+  .fill {
+    display: grid;
+    gap: 4px;
+    justify-items: center;
+  }
+  .word {
+    font-size: 56px;
+    color: var(--blue);
+  }
+  .letters {
+    display: flex;
+    gap: 6px;
+    font-size: 48px;
+    color: var(--blue);
+  }
+  .letters .blank {
+    color: #e53935;
+    border-bottom: 4px solid #e53935;
+  }
+  .hear {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: #eef1f4;
+    color: var(--blue);
+    display: grid;
+    place-content: center;
+    transition:
+      transform 0.1s,
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .hear.big {
+    width: auto;
+    height: 72px;
+    padding: 0 28px;
+    border-radius: 36px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .hear:active {
+    transform: scale(0.94);
+  }
+  .hear.speaking {
+    background: var(--blue);
+    color: #fff;
+  }
+</style>
