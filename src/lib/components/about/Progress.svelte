@@ -18,7 +18,6 @@
 
 <section class="card">
   <h2>みんなの進み具合</h2>
-  <p>ことばを切り替えずに、全員分を見られます。</p>
   <table>
     <thead>
       <tr>
