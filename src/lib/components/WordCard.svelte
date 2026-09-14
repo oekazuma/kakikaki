@@ -17,7 +17,7 @@
   {#if wordCrown(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span
     >{:else if wordStar(word)}<span class="badge"><Icon name="star" size={18} fill /></span>{/if}
   {#if missing}
-    <span class="initial" style:height="{size * 0.6}px">{word.name[0]}</span>
+    <span class="initial kyokasho" style:height="{size * 0.6}px">{word.name[0]}</span>
   {:else}
     <img
       src={imageUrl(word)}
@@ -29,7 +29,7 @@
       onerror={() => (missing = true)}
     />
   {/if}
-  <span class="name">{nameOf(word)}</span>
+  <span class="name kyokasho">{nameOf(word)}</span>
   {#each subOf(word) as line (line)}<span class="desc">{line}</span>{/each}
 </button>
 

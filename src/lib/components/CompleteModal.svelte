@@ -18,7 +18,7 @@
     loading="eager"
     onerror={(e) => ((e.currentTarget as HTMLImageElement).hidden = true)}
   />
-  <b class="cname">{nameOf(word)}</b>
+  <b class="cname kyokasho">{nameOf(word)}</b>
   <p>ぜんぶ できた！</p>
   {#if wordCrown(word)}<span class="mark gold"><Icon name="crown" size={22} fill /> おうかん</span>{:else}<span
       class="mark"><Icon name="star" size={22} fill /> ほし ゲット</span

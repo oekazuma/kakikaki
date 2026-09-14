@@ -16,7 +16,7 @@
       <button class="hear" onclick={() => say(nameOf(q.answer), info().speech)} aria-label="きく"
         ><Icon name="speaker" size={26} /></button
       >
-      <b class="word">{nameOf(q.answer)}</b>
+      <b class="word kyokasho">{nameOf(q.answer)}</b>
       <span>は どれ？</span>
     </div>
   {:else}
@@ -28,7 +28,12 @@
   <div class="choices">
     {#each q.choices as w (w.id)}
       <button
-        class={['card', 'choice', { text: q.kind === 'picture', hit: r.hit === w.id, wrong: r.wrong.includes(w.id) }]}
+        class={[
+          'card',
+          'choice',
+          'kyokasho',
+          { text: q.kind === 'picture', hit: r.hit === w.id, wrong: r.wrong.includes(w.id) }
+        ]}
         disabled={r.wrong.includes(w.id)}
         onclick={(e) => onpick(w, e)}
       >

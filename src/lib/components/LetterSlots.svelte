@@ -6,7 +6,7 @@
 
 <div class="slots">
   {#each w.letters as ch, n (n + ch)}
-    <span class={['slot', 'card', { on: n === w.k, ok: n < w.k }]}
+    <span class={['slot', 'card', 'kyokasho', { on: n === w.k, ok: n < w.k }]}
       >{n < w.k || (n === w.k && w.mode === 'trace') ? ch : '?'}</span
     >
   {/each}
