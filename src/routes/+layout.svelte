@@ -6,14 +6,30 @@
   $effect(() => {
     document.documentElement.dataset.lang = lang.v;
   });
+
+  // 練習画面（左 240 + 書き取り面 + 右 120）が操作できる最小サイズ。iPad 横向きはすべて満たす
+  const MIN_W = 900;
+  const MIN_H = 520;
+  let w = $state(0);
+  let h = $state(0);
+  const tooSmall = $derived(w > 0 && (w < MIN_W || h < MIN_H));
+  const portrait = $derived(h > w);
 </script>
+
+<svelte:window bind:innerWidth={w} bind:innerHeight={h} />
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
 {@render children()}
-<div class="portrait card">
-  <div class="icon"><Icon name="rotate" size={80} /></div>
-  <p>iPad を よこに してね</p>
-</div>
+{#if tooSmall}
+  <div class="guard card">
+    <div class="icon"><Icon name={portrait ? 'rotate' : 'help'} size={80} /></div>
+    <p>{portrait ? 'よこむきに してね' : 'がめんを もっと おおきく してね'}</p>
+    <small>
+      推奨: 横向きの iPad、または {MIN_W}×{MIN_H}px 以上のブラウザ画面<br />
+      いまの画面: {w}×{h}px
+    </small>
+  </div>
+{/if}
 
 <style>
   .fx {
@@ -24,23 +40,29 @@
     pointer-events: none;
     z-index: 50;
   }
-  .portrait {
-    display: none;
+  .guard {
     position: fixed;
     inset: 0;
     z-index: 100;
+    display: grid;
     place-content: center;
+    gap: 8px;
     text-align: center;
     font-size: 28px;
     font-weight: bold;
     background: var(--bg);
+    padding: 24px;
+  }
+  .guard p {
+    margin: 0;
   }
   .icon {
     color: var(--blue);
   }
-  @media (orientation: portrait) {
-    .portrait {
-      display: grid;
-    }
+  small {
+    font-size: 14px;
+    font-weight: normal;
+    color: var(--sub);
+    line-height: 1.7;
   }
 </style>
