@@ -4,7 +4,7 @@ import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
 import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
 import { pathToPoints, translate } from './geometry';
-import { recognize, passes, TEMPLATES, makeTemplates } from './recognize';
+import { recognize, passes, makeTemplates, templatesFor } from './recognize';
 
 const drawn = (S: Record<string, string[]>, c: string) => S[c].map((d) => pathToPoints(d, 1.5));
 const T_EN = makeTemplates(STROKES_EN);
@@ -39,5 +39,8 @@ describe('recognize', () => {
   it('画数が違う別の字は不合格', () => {
     expect(passes('あ', recognize(drawn(STROKES, 'ー')))).toBe(false);
   });
-  it('TEMPLATES は 81 個', () => expect(TEMPLATES.length).toBe(81));
+  it('ひらがなのテンプレートは 81 個で、文字セットごとに 1 回だけ作られる', () => {
+    expect(templatesFor(STROKES).length).toBe(81);
+    expect(templatesFor(STROKES)).toBe(templatesFor(STROKES));
+  });
 });

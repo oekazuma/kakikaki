@@ -54,7 +54,8 @@ export class Tracer {
   // 指が動いた。なぞるで線から外れたら 'fail'
   move(p: Pt, id = 0): 'moved' | 'fail' | 'idle' {
     if (!this.tracing || id !== this.pointer) return 'idle';
-    this.trail.push(p);
+    // なぞる では軌跡を描かず判定にも使わないので溜めない
+    if (this.mode !== 'trace') this.trail.push(p);
     if (this.mode === 'trace') {
       const c = advance(this.current, this.cursor, p);
       if (c === -1) {

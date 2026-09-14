@@ -1,13 +1,13 @@
 <script lang="ts">
   import Icon from '../Icon.svelte';
   import Bar from '../Bar.svelte';
-  import { CAT_TOTAL, TOTAL } from '$lib/badges';
+  import { CAT_TOTAL, TOTAL, type Stats } from '$lib/badges';
   import { CATEGORIES } from '$lib/words';
-  import { stats, quiz } from '$lib/progress.svelte';
+  import { quiz } from '$lib/progress.svelte';
   import { LEVEL_NAME } from '$lib/quiz';
   import { lang } from '$lib/lang.svelte';
 
-  const s = $derived(stats());
+  let { s }: { s: Stats } = $props();
   const total = $derived(TOTAL(lang.v));
   const tiles = $derived([
     { label: 'もじ', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },

@@ -5,14 +5,20 @@
   import BadgeGrid from '$lib/components/trophies/BadgeGrid.svelte';
   import Hero from '$lib/components/trophies/Hero.svelte';
   import { fly } from 'svelte/transition';
-  import { checkBadges } from '$lib/progress.svelte';
-  import { info } from '$lib/lang.svelte';
+  import { untrack } from 'svelte';
+  import { checkBadges, earned, stats } from '$lib/progress.svelte';
+  import { badgesOf } from '$lib/badges';
+  import { info, lang } from '$lib/lang.svelte';
   import { fx } from '$lib/fx';
 
-  // 条件を満たしているのにまだ確定していないメダルがあれば、ここで確定して紙吹雪
+  // 条件を満たしているのにまだ確定していないメダルがあれば、ここで確定して紙吹雪（earned を書くので効果の依存にしない）
   $effect(() => {
-    if (checkBadges().length) setTimeout(() => fx.confetti(200), 300);
+    if (untrack(checkBadges).length) setTimeout(() => fx.confetti(200), 300);
   });
+  // 集計は重い（210 語 × 文字）ので、ページで 1 回だけ計算して 3 つの部品に渡す
+  const s = $derived(stats());
+  const badges = $derived(badgesOf(lang.v));
+  const got = $derived(earned());
 </script>
 
 <svelte:head>
@@ -25,9 +31,9 @@
     <BackButton />
     <h1><Icon name="trophy" /> めだる と きろく</h1>
   </header>
-  <Hero />
-  <StatTiles />
-  <BadgeGrid />
+  <Hero {s} {badges} {got} />
+  <StatTiles {s} />
+  <BadgeGrid {s} {badges} {got} />
 </main>
 
 <style>

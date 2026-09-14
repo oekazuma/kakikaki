@@ -17,8 +17,6 @@ export function normalize(strokes: Pt[][]): Pt[][] {
 export const makeTemplates = (strokes: Record<string, string[]>): Template[] =>
   Object.entries(strokes).map(([char, ds]) => ({ char, strokes: normalize(ds.map((d) => pathToPoints(d, 1.5))) }));
 
-export const TEMPLATES: Template[] = makeTemplates(STROKES);
-
 // 文字セットごとにテンプレートを 1 回だけ作る
 const cache = new WeakMap<Record<string, string[]>, Template[]>();
 export function templatesFor(strokes: Record<string, string[]>): Template[] {
@@ -42,7 +40,7 @@ function distance(a: Pt[][], b: Pt[][]) {
   return sum / m + Math.abs(a.length - b.length) * RECOG.PENALTY_STROKE;
 }
 
-export function recognize(strokes: Pt[][], templates = TEMPLATES) {
+export function recognize(strokes: Pt[][], templates = templatesFor(STROKES)) {
   const input = normalize(strokes);
   return templates.map((t) => ({ char: t.char, dist: distance(input, t.strokes) })).sort((p, q) => p.dist - q.dist);
 }
