@@ -98,12 +98,15 @@ export const charGold = (c: string) => get(c).test >= 1;
 export const wordStar = (w: Word) => lettersOf(w).every(charCleared);
 export const wordCrown = (w: Word) => lettersOf(w).every(charGold);
 
-// 現在の言語の記録だけ消す
-export function reset() {
-  const l = lang.v;
-  data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
-  for (const name of ['progress', 'earned', 'days', 'quiz'] as const) store()?.removeItem(key(l, name));
+// 任意の人・ことばの記録を消す。使用中の人なら画面の状態も空にする
+export function resetRecords(pid: string, langs: Lang[]) {
+  for (const l of langs) {
+    for (const name of ['progress', 'earned', 'days', 'quiz'] as const) store()?.removeItem(keyOf(pid, l, name));
+    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
+  }
 }
+// 現在の人・言語の記録だけ消す
+export const reset = () => resetRecords(profiles.cur, [lang.v]);
 
 export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz());
 

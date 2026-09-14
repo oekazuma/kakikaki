@@ -61,6 +61,15 @@ describe('profiles', () => {
     expect(m.get('か').free).toBe(0);
     for (const p of [...m.profiles.list].slice(1)) m.deleteProfile(p.id);
     expect(m.removeProfile('p1')).toBe(false);
+    // ことばを選んでリセット: 他のことばと他の人は残る
+    m.setLang('ja');
+    m.record('あ', 'trace');
+    m.setLang('en');
+    m.record('a', 'trace');
+    m.resetRecords('p1', ['ja']);
+    expect([m.get('a').trace, localStorage.getItem('kk:p1:ja:progress')]).toEqual([1, null]);
+    m.setLang('ja');
+    expect(m.get('あ').trace).toBe(0);
     expect(m.updateProfile('p1', { name: 'たろう', avatar: 'bear' })).toBe(true);
     expect(m.current()).toMatchObject({ name: 'たろう', avatar: 'bear' });
   });

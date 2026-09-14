@@ -3,7 +3,7 @@
   import { fade, scale } from 'svelte/transition';
   import AvatarPicker from './AvatarPicker.svelte';
   import Icon from '../Icon.svelte';
-  import DeletePerson from './DeletePerson.svelte';
+  import DangerZone from './DangerZone.svelte';
   import { lang } from '$lib/lang.svelte';
   import { addProfile, byId, profiles, updateProfile, DEFAULT_AVATAR, NAME_MAX } from '$lib/profiles.svelte';
   // id が null なら新しい人を追加
@@ -32,14 +32,14 @@
   <AvatarPicker bind:value={avatar} />
   {#if error}<p class="err">{error}</p>{/if}
   <div class="actions">
-    {#if id && profiles.list.length > 1 && !deleting}
-      <button class="del" onclick={() => (deleting = true)}><Icon name="trash" size={20} /> この人を けす</button>
+    {#if id && !deleting}
+      <button class="del" onclick={() => (deleting = true)}><Icon name="trash" size={20} /> けす・リセット</button>
     {/if}
     <button class="cancel" onclick={onclose}>やめる</button>
     <button class="save" onclick={save} disabled={!name.trim()}><Icon name="check" size={22} /> ほぞん</button>
   </div>
   {#if deleting && id}
-    <DeletePerson {id} ondone={onclose} />
+    <DangerZone {id} canDelete={profiles.list.length > 1} ondone={onclose} />
   {/if}
 </section>
 
