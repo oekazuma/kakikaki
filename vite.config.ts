@@ -33,7 +33,26 @@ export default defineConfig({
       // かくしゲームはどこからもリンクされないので、プリレンダー対象に明示する
       prerender: { entries: ['*', '/balloon'] },
       // pollInterval: 開いている間は 5 分ごとに _app/version.json を見て updated.current を立てる
-      version: { name: `${process.env.KK_BUILD}-${gitHash}`, pollInterval: 300_000 }
+      version: { name: `${process.env.KK_BUILD}-${gitHash}`, pollInterval: 300_000 },
+      // GitHub Pages はヘッダを出せないので <meta http-equiv> で CSP を出す（プリレンダーなので hash）。
+      // 依存パッケージ経由で混入したコードが名前や写真を外に送るのを connect-src で止めるのが目的。
+      // style は Svelte の transition が <style> を差し込み、app.html に style 属性があるので unsafe-inline。
+      // img は写真の data URL（保存済み）と blob:（切り抜き中）を使う
+      csp: {
+        mode: 'hash',
+        directives: {
+          'default-src': ['self'],
+          'script-src': ['self'],
+          'style-src': ['self', 'unsafe-inline'],
+          'img-src': ['self', 'data:', 'blob:'],
+          'font-src': ['self'],
+          'connect-src': ['self'],
+          'worker-src': ['self'],
+          'manifest-src': ['self'],
+          'object-src': ['none'],
+          'base-uri': ['self']
+        }
+      }
     })
   ],
   test: {

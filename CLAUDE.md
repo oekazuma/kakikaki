@@ -30,7 +30,7 @@ svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex な�
 
 `main` に push すると GitHub Actions が GitHub Pages にデプロイする（`BASE_PATH=/<リポジトリ名>` を渡す）。公開先を変えるときは `BASE_PATH=/other pnpm build`（ルート直下なら `BASE_PATH= pnpm build`。`/` で終わる値は SvelteKit が拒む）のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
 
-SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` にある。`version.name` は「ビルド時刻-git 短縮ハッシュ」で、時刻は `KK_BUILD` 環境変数に固定している（SvelteKit が client / server で設定を読み直しても同じ名前になるように。ずれると `__sveltekit_<hash>` が食い違ってページが起動しない）。「アプリについて」はこれを日付とハッシュに分けて表示する。`base` は `BASE_PATH` 環境変数で上書き可。`+layout.ts` で `ssr = false` + `prerender = true` のため、各ルートは HTML シェルとしてプリレンダーされる。
+SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` にある。`version.name` は「ビルド時刻-git 短縮ハッシュ」で、時刻は `KK_BUILD` 環境変数に固定している（SvelteKit が client / server で設定を読み直しても同じ名前になるように。ずれると `__sveltekit_<hash>` が食い違ってページが起動しない）。「アプリについて」はこれを日付とハッシュに分けて表示する。`base` は `BASE_PATH` 環境変数で上書き可。CSP は同じ場所の `csp`（`mode: 'hash'`）で `<meta http-equiv>` として出す（GitHub Pages はヘッダ不可）。外部への通信は `connect-src 'self'` で止め、新しい外部リソースを足すときはここに許可を足す。`+layout.ts` で `ssr = false` + `prerender = true` のため、各ルートは HTML シェルとしてプリレンダーされる。
 
 `scripts/*.ts` は Node 24 の型ストリップで直接実行するため、`src/lib/words.ts` と `chars.ts` は `$app/*` を import してはいけない（`base` が必要な `imageUrl` は `src/lib/image.ts` に分離してある）。
 
