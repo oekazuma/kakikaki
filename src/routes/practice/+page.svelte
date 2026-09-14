@@ -15,6 +15,7 @@
   import CompleteModal from '$lib/components/CompleteModal.svelte';
   import BadgeToast from '$lib/components/BadgeToast.svelte';
   import Hint from '$lib/components/Hint.svelte';
+  import Sample from '$lib/components/Sample.svelte';
   import DriveBy from '$lib/components/DriveBy.svelte';
   import { wordById } from '$lib/words';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
@@ -70,6 +71,9 @@
   <div class="left">
     <WordCard {word} size={240} />
     <CharTabs {s} />
+    {#if s.mode === 'test'}
+      <Sample char={s.c} strokes={total} />
+    {/if}
   </div>
 
   <section class="center">

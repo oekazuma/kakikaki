@@ -1,7 +1,7 @@
 import { dist, nearestDist, type Pt } from './geometry';
 
-// 単位は 109 マスの viewBox。指の太さを考えて緩め。
-export const JUDGE = { R_START: 12, R_TRACE: 10, K: 6, R_FREE: 9, FREE_DONE: 0.9, END_SLACK: 2 };
+// 単位は 109 マスの viewBox。指の太さと子どもの手ぶれを考えて緩め（実機で調整済み: 線から 12、先読み 8 点、終点手前 4 点で可）。
+export const JUDGE = { R_START: 14, R_TRACE: 12, K: 8, R_FREE: 9, FREE_DONE: 0.9, END_SLACK: 4 };
 
 export const canStart = (samples: Pt[], p: Pt) => dist(samples[0], p) <= JUDGE.R_START;
 
