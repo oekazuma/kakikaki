@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PracticeSession, nextMode, nextWordId } from './practice.svelte';
+import { PracticeSession, nextMode, nextWordId, resolveWord } from './practice.svelte';
 import { record, reset, get } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
@@ -86,5 +86,15 @@ describe('PracticeSession', () => {
     expect(nextWordId(bus)).toBe('shinkansen');
     // 1 文字練習: あ の次はまだ終わっていない い
     expect(nextWordId(wordById('char-あ')!)).toBe('char-い');
+  });
+
+  it('resolveWord: その言語に無い文字の単語は既定の単語に戻す', () => {
+    expect(resolveWord('bus', 'ja').id).toBe('bus');
+    expect(resolveWord('bus', 'en').id).toBe('bus');
+    expect(resolveWord('char-あ', 'ja').id).toBe('char-あ');
+    expect(resolveWord('char-あ', 'kana').id).toBe('char-あ'); // カタカナでは ア として書ける
+    expect(resolveWord('char-あ', 'en').id).toBe('patocar');
+    expect(resolveWord('nope', 'ja').id).toBe('patocar');
+    expect(resolveWord(null, 'ja').id).toBe('patocar');
   });
 });

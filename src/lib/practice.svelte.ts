@@ -1,6 +1,6 @@
-import { WORDS, type Word } from './words';
+import { WORDS, wordById, type Word } from './words';
 import { get, record, charCleared, wordStar, checkBadges, type Mode } from './progress.svelte';
-import { lettersOf, charsOf } from './lang.svelte';
+import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
 import type { Badge } from './badges';
 import { stars, praise } from './score';
 import type { Result } from './tracer.svelte';
@@ -37,6 +37,13 @@ export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string
     title: 'おてほんなしで かいてみよう！'
   }
 ];
+
+// URL の w= から練習する単語を決める。その言語に書き順の無い文字を含む（例: 言語が en のときの char-あ）なら既定の単語に戻す
+export function resolveWord(id: string | null, l: Lang): Word {
+  const w = id ? wordById(id) : undefined;
+  const strokes = strokesOf(l);
+  return w && lettersOf(w, l).every((c) => c in strokes) ? w : wordById('patocar')!;
+}
 
 // その文字で次にやるべきモード。全部終わっていれば null
 export function nextMode(ch: string): Mode | null {

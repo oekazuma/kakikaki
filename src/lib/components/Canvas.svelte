@@ -30,6 +30,17 @@
   let bounce = $state(-1);
   let demo = $state(false);
   let idle: ReturnType<typeof setTimeout> | undefined;
+  // 演出と完了通知のタイマー。{#key} で作り直されたあとに古い方が発火して別の文字に記録を付けないよう、破棄時に全部止める。
+  // 描画には使わないので反応性は不要
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  const later = (fn: () => void, ms: number) => {
+    const t = setTimeout(() => {
+      timers.delete(t);
+      fn();
+    }, ms);
+    timers.add(t);
+  };
 
   export function judge() {
     clearTimeout(idle);
@@ -44,7 +55,11 @@
   $effect(() => {
     if (mode === 'trace') playDemo();
     armIdle();
-    return () => clearTimeout(idle);
+    return () => {
+      clearTimeout(idle);
+      for (const t of timers) clearTimeout(t);
+      timers.clear();
+    };
   });
   function armIdle() {
     clearTimeout(idle);
@@ -73,20 +88,20 @@
   }
   function failed() {
     shake = true;
-    setTimeout(() => (shake = false), 300);
+    later(() => (shake = false), 300);
     sfx.buu();
     armIdle();
   }
   function completed(i: number, all: boolean) {
     bounce = i;
-    setTimeout(() => (bounce = -1), 400);
+    later(() => (bounce = -1), 400);
     sfx.pon();
     for (const p of t.samples[i].filter((_, k) => k % 5 === 0)) {
       const q = board!.toScreen(p);
       fx.burst(q.x, q.y, 3);
     }
     onStroke?.(i);
-    if (all) setTimeout(() => onDone(t.result()), 400);
+    if (all) later(() => onDone(t.result()), 400);
     else {
       if (mode === 'trace') playDemo();
       armIdle();

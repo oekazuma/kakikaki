@@ -5,7 +5,8 @@ import type { Word } from './words';
 import type { Result } from './tracer.svelte';
 import type { Effects } from './practice.svelte';
 
-export const levelFromParam = (v: string | null): Level => Math.min(3, Math.max(1, Number(v) || 1)) as Level;
+export const levelFromParam = (v: string | null): Level =>
+  Math.min(3, Math.max(1, Math.round(Number(v) || 1))) as Level;
 
 // 終了時の記録と演出は よみ・かき で共通
 function finish(kind: Kind, level: Level, correct: number, total: number, fx: Effects) {
