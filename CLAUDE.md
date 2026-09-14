@@ -27,7 +27,7 @@ svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex な�
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は lint / check / test / build を並列に回す。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 
-`main` に push すると GitHub Actions が GitHub Pages にデプロイする（`BASE_PATH=/<リポジトリ名>` を渡す）。公開先を変えるときは `BASE_PATH=/ pnpm build` のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
+`main` に push すると GitHub Actions が GitHub Pages にデプロイする（`BASE_PATH=/<リポジトリ名>` を渡す）。公開先を変えるときは `BASE_PATH=/other pnpm build`（ルート直下なら `BASE_PATH= pnpm build`。`/` で終わる値は SvelteKit が拒む）のように base を変え、`static/manifest.webmanifest` の `start_url` と `scope` を合わせる。
 
 SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sveltekit({...})` にある。`version.name` は「ビルド時刻-git 短縮ハッシュ」で、時刻は `KK_BUILD` 環境変数に固定している（SvelteKit が client / server で設定を読み直しても同じ名前になるように。ずれると `__sveltekit_<hash>` が食い違ってページが起動しない）。「アプリについて」はこれを日付とハッシュに分けて表示する。`base` は `BASE_PATH` 環境変数で上書き可。`+layout.ts` で `ssr = false` + `prerender = true` のため、各ルートは HTML シェルとしてプリレンダーされる。
 
@@ -42,10 +42,10 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `geometry.ts`: SVG path（M/L/H/V/C/S/Z）を等間隔の点列にする。`getPointAtLength` は使わず自前で平坦化するので、テストと実行時で同じ点列になる。
 - `judge.ts`: なぞる（`advance` が cursor をサンプル列上で進め、-1 で逸脱）/ じぶんでかく（`coverage` が塗れた割合）。しきい値は `JUDGE`。
 - `score.ts`: 軌跡とお手本の距離と向きから 0〜1 → 星 1〜3。
-- `recognize.ts`: 現在の言語の全文字のお手本を N 点に再サンプリング・重心合わせしたテンプレート（`Canvas` が `templatesFor(strokes)` で文字セットごとに 1 回だけ作る。`TEMPLATES` は ひらがな用の既定値）と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
+- `recognize.ts`: 現在の言語の全文字のお手本を N 点に再サンプリング・重心合わせしたテンプレート（`Canvas` が `templatesFor(strokes)` で文字セットごとに 1 回だけ作る。`TEMPLATES` は ひらがな用の既定値）と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標で距離が `D_MAX` × 2 未満」または「2 位以内かつ 1 位との差が `MARGIN` 未満」。しきい値は `RECOG`。
 - `profiles.svelte.ts`: 使う人（最大 10 人）。`kk:profiles` に `{ list: Profile[], cur }` を保存し、`Profile` は `id`（`p1`, `p2`…）・`name`・`avatar`（`avatar.ts` の候補 id か写真の data URL）・`lang`。初回起動時に旧キー（`kk:progress` → `kk:<lang>:*`）を `p1` の記録へ移行する。人の切り替えと削除は `progress.svelte.ts` の `switchProfile` / `deleteProfile`（記録の読み直しと言語の復元を伴うため）。写真は `AvatarCrop` で範囲（移動・ピンチ拡大）を選び、`cropAvatar` で 160px の JPEG にしてから保存し、保存失敗（容量超過）は呼び出し側に返す。切り抜いた写真は `photos.svelte.ts`（`kk:photos`、最大 20 枚、使う人をまたいで共有）にも残り、候補一覧で選び直せる・長押しで消せる。プロフィール側は data URL のコピーを持つので、一覧から消しても使っている人には影響しない。
 - `progress.svelte.ts`: `localStorage` 直結の `$state`。キーは人と言語ごとに `kk:<pid>:<lang>:progress`（文字ごとの回数）、`kk:<pid>:<lang>:earned`（メダル id → 獲得日）、`kk:<pid>:<lang>:days`（練習した日付）、`kk:<pid>:<lang>:quiz`。関数は現在の言語の記録を対象にし、`wordStar` / `wordCrown` は `Word` を受け取る。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
-- `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja/kana が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の進み具合バーと「あと n」に使う）。`groupOf(id)` が id の接頭辞から実績画面の段（`BADGE_GROUPS`）を決め、`nextBadge` が達成率最大の未獲得メダルを返す（Hero の「つぎの めだる」）。実績画面は開いたときに `checkBadges()` を呼び、条件を満たしているのに未確定のメダルがあれば確定して紙吹雪、当日獲得分には NEW! を付ける。
+- `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja/kana が五十音の行、en は 13 文字の行を 7+6 に割った 8 グループ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の進み具合バーと「あと n」に使う）。`groupOf(id)` が id の接頭辞から実績画面の段（`BADGE_GROUPS`）を決め、`nextBadge` が達成率最大の未獲得メダルを返す（Hero の「つぎの めだる」）。実績画面は開いたときに `checkBadges()` を呼び、条件を満たしているのに未確定のメダルがあれば確定して紙吹雪、当日獲得分には NEW! を付ける。
 - `tracer.svelte.ts` / `Canvas.svelte` / `Board.svelte`: `Tracer` が 3 モード（`trace` / `free` / `test`）のポインタ入力を判定して状態（現在の画・cursor・軌跡）を持ち、`Canvas` がタイマー・効果音・演出と `onDone` の `Result` を担当、`Board` が SVG 描画と座標変換だけを行う。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。
 - `practice.svelte.ts`: 練習画面の状態機械 `PracticeSession`（文字の解放・モード遷移・記録・メダルのトースト）。ページは `$derived.by` + `untrack` で単語ごとに 1 つ作る（コンストラクタが進捗ストアを読むため、`$derived` に直接書くと記録のたびに作り直されて壊れる）。UI は `components/` の WordWithHear（単語カード + 単語全体を読むスピーカー）/ ModeBar / CharTabs / ActionButton（右の きく は 1 文字だけ読む）/ Hint / Sample / CompleteModal / BadgeToast / DriveBy。
 - `quiz-session.svelte.ts`: `ReadQuiz` / `WriteQuiz`（出題は `quiz.ts`、終了時の記録と演出は共通）。クイズ画面はこれを `$derived.by` + `untrack` で級ごとに作り、QuizHeader / ReadQuestion / LetterSlots で描画する。
