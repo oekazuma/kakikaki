@@ -24,29 +24,40 @@
   <div class="guard card">
     {#if portrait}
       <!-- タブレットが縦から横へ回るアニメーション -->
-      <svg class="tablet" viewBox="0 0 120 120" width="140" height="140" aria-hidden="true">
+      <svg class="tablet" viewBox="0 0 140 140" width="160" height="160" aria-hidden="true">
         <g class="spin">
-          <rect x="35" y="15" width="50" height="90" rx="8" fill="#fff" stroke="var(--blue)" stroke-width="5" />
-          <rect x="41" y="25" width="38" height="66" rx="3" fill="#dfe7f0" />
-          <circle cx="60" cy="99" r="2.5" fill="var(--blue)" />
+          <rect x="38" y="22" width="64" height="96" rx="7" fill="#fff" stroke="var(--blue)" stroke-width="5" />
+          <rect x="44" y="30" width="52" height="80" rx="2" fill="#dfe7f0" />
+          <circle cx="70" cy="26.5" r="1.6" fill="var(--blue)" />
         </g>
-        <path
+        <!-- 反時計回りの矢印 -->
+        <g
           class="arrow"
-          d="M96 40 A40 40 0 0 1 96 80"
-          fill="none"
-          stroke="var(--star)"
-          stroke-width="5"
-          stroke-linecap="round"
-        />
-        <path
-          class="arrow"
-          d="M90 74 L97 82 L105 75"
           fill="none"
           stroke="var(--star)"
           stroke-width="5"
           stroke-linecap="round"
           stroke-linejoin="round"
-        />
+        >
+          <path d="M24 46 A48 48 0 0 0 24 94" />
+          <path d="M31 87 L23 95 L15 87" />
+        </g>
+        <!-- 縦: ✕ / 横: ✓ -->
+        <g class="ng">
+          <circle cx="116" cy="24" r="15" fill="#e53935" />
+          <path d="M110 18 L122 30 M122 18 L110 30" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+        </g>
+        <g class="ok">
+          <circle cx="116" cy="24" r="15" fill="#43a047" />
+          <path
+            d="M108 24 L114 30 L125 18"
+            fill="none"
+            stroke="#fff"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </g>
       </svg>
       <p>タブレットを よこむきに してね</p>
     {:else}
@@ -99,6 +110,12 @@
   .arrow {
     animation: blink 2.4s ease-in-out infinite;
   }
+  .ng {
+    animation: blink 2.4s ease-in-out infinite;
+  }
+  .ok {
+    animation: blink 2.4s ease-in-out infinite reverse;
+  }
   @keyframes turn {
     0%,
     25% {
@@ -106,7 +123,7 @@
     }
     55%,
     85% {
-      transform: rotate(90deg);
+      transform: rotate(-90deg);
     }
     100% {
       transform: rotate(0deg);
@@ -118,8 +135,11 @@
       opacity: 1;
     }
     55%,
-    100% {
+    85% {
       opacity: 0;
+    }
+    100% {
+      opacity: 1;
     }
   }
   small {
