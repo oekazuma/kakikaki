@@ -227,9 +227,7 @@
           </li>
           <li class={cached > 0 ? 'good' : 'bad'}>
             <Icon name={cached > 0 ? 'check' : 'close'} size={18} />
-            {cached > 0
-              ? `文字・イラスト・効果音を端末に保存済み（${cached} ファイル）`
-              : 'まだ端末に保存されていません'}
+            {cached > 0 ? '文字・イラスト・効果音を端末に保存済みです' : 'まだ端末に保存されていません'}
           </li>
         </ul>
       </section>
