@@ -159,8 +159,8 @@
     gap: 10px;
     padding: 6px 0 10px;
   }
-  /* iPad Pro 12.9（1366）でも 1 行に収める。進捗バーは実績画面にもあるので省略 */
-  @media (max-width: 1440px) {
+  /* iPad Pro 12.9（1366）や名前 6 文字でも 1 行に収める。進捗バーは実績画面にもあるので省略 */
+  @media (max-width: 1500px) {
     .pl {
       display: none;
     }

@@ -56,8 +56,8 @@
       transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1),
       background-color 0.4s;
   }
-  /* 幅 1024 の iPad ではトグルを文字だけにする */
-  @media (max-width: 1130px) {
+  /* iPad（〜1240）ではトグルを文字だけにして、名前（6 文字）に幅を譲る */
+  @media (max-width: 1240px) {
     .toggle {
       --step: 56px;
     }
