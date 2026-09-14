@@ -23,7 +23,7 @@ pnpm images                   # words.ts の emoji から Twemoji SVG を static
 pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
-svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。200 行超えのコンポーネント 7 件は `svelte-vitals-suppressions.json` に記録済みで、新たな超過だけが検出される。Vite プラグインは `ssr = false` の殻 HTML を見て title/h1/main を誤検出するため、`vite.config.ts` のプラグイン側 overrides でそれらを外している（CLI のソース解析では検査される）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
+svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。200 行超えのコンポーネント 7 件は `svelte-vitals-suppressions.json` に記録済みで、新たな超過だけが検出される。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は lint / check / test / build を並列に回す。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 
