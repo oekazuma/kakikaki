@@ -6,7 +6,13 @@ import { stars, praise } from './score';
 import type { Result } from './tracer.svelte';
 
 // 演出は差し替え可能にしておく（テストでは何もしない）
-export type Effects = { buu?: () => void; kira?: () => void; fanfare?: () => void; confetti?: (n: number) => void };
+export type Effects = {
+  buu?: () => void;
+  pon?: () => void;
+  kira?: () => void;
+  fanfare?: () => void;
+  confetti?: (n: number) => void;
+};
 
 export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string; hint: string; title: string }[] = [
   {
