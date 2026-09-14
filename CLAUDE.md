@@ -23,7 +23,7 @@ pnpm images                   # words.ts の emoji から Twemoji SVG を static
 pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
-svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。200 行超えのコンポーネント 7 件は `svelte-vitals-suppressions.json` に記録済みで、新たな超過だけが検出される。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
+svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。コンポーネントは 200 行未満に保つ（`architecture/component-size`、抑制ファイルは使っていない）。画面の状態遷移はクラス（`tracer.svelte.ts` / `practice.svelte.ts` / `quiz-session.svelte.ts` / `gate.svelte.ts`）に寄せて vitest で検証し、`.svelte` は描画とイベント配線だけにする。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は lint / check / test / build を並列に回す。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 
@@ -45,8 +45,11 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `recognize.ts`: 現在の言語の全文字のお手本を N 点に再サンプリング・重心合わせしたテンプレート（`Canvas` が `templatesFor(strokes)` で文字セットごとに 1 回だけ作る。`TEMPLATES` は ひらがな用の既定値）と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
 - `progress.svelte.ts`: `localStorage` 直結の `$state`。キーは言語ごとに `kk:<lang>:progress`（文字ごとの回数）、`kk:<lang>:earned`（メダル id → 獲得日）、`kk:<lang>:days`（練習した日付）。旧キー `kk:progress` 等は起動時に `ja` へ移行する。関数は現在の言語の記録を対象にし、`wordStar` / `wordCrown` は `Word` を受け取る。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
 - `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja/kana が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
-- `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
-- `quiz.ts`: クイズの出題（純粋関数）。`levelOf` が文字数で かんたん/ふつう/むずかしい（Level 1〜3）を決め（ja: 〜2 / 3 / 4〜、en: 〜4 / 5〜6 / 7〜）、`makeReadQuiz` は word→picture と picture→word を交互に、選択肢は同カテゴリ（Level 3 は同文字数）優先で 3 つ。正解数は `progress.svelte.ts` の `recordQuiz` で `kk:<lang>:quiz` の `read1` などに積む（初回正答のみ、かきクイズはお手本を使わなかった単語のみ）。`routes/quiz/write` は `Canvas` を test モードで使い、2 回不正解で trace モードに切り替える。
+- `tracer.svelte.ts` / `Canvas.svelte` / `Board.svelte`: `Tracer` が 3 モード（`trace` / `free` / `test`）のポインタ入力を判定して状態（現在の画・cursor・軌跡）を持ち、`Canvas` がタイマー・効果音・演出と `onDone` の `Result` を担当、`Board` が SVG 描画と座標変換だけを行う。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。
+- `practice.svelte.ts`: 練習画面の状態機械 `PracticeSession`（文字の解放・モード遷移・記録・メダルのトースト）。ページは `$derived.by` + `untrack` で単語ごとに 1 つ作る（コンストラクタが進捗ストアを読むため、`$derived` に直接書くと記録のたびに作り直されて壊れる）。UI は `components/` の ModeBar / CharTabs / ActionButton / Hint / CompleteModal / BadgeToast / DriveBy。
+- `quiz-session.svelte.ts`: `ReadQuiz` / `WriteQuiz`（出題は `quiz.ts`、終了時の記録と演出は共通）。クイズ画面はこれを `$derived.by` + `untrack` で級ごとに作り、QuizHeader / ReadQuestion / LetterSlots で描画する。
+- `gate.svelte.ts` / `pwa.ts`: 保護者ゲート（掛け算、1 日 3 回でロック、`kk:gate`）と PWA の状態取得・更新。`/about` はこれらを `components/about/*`（Guide / AppStatus / ResetPanel）で表示するだけ。トロフィー画面は `components/trophies/*`、ホームの言語切替は `LangToggle`。
+- `quiz.ts`: クイズの出題（純粋関数）。`levelOf` が文字数で かんたん/ふつう/むずかしい（Level 1〜3）を決め（ja: 〜2 / 3 / 4〜、en: 〜4 / 5〜6 / 7〜）、`makeReadQuiz` は word→picture と picture→word を交互に、選択肢は同カテゴリ（Level 3 は同文字数）優先で 3 つ。正解数は `progress.svelte.ts` の `recordQuiz` で `kk:<lang>:quiz` の `read1` などに積む（初回正答のみ、かきクイズはお手本を使わなかった単語のみ）。`WriteQuiz` は `Canvas` を test モードで使い、2 回不正解で trace モードに切り替える。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
 
 ## 単語を増やす
