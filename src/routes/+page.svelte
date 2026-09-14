@@ -13,6 +13,7 @@
   import { lang, info } from '$lib/lang.svelte';
   import LangToggle from '$lib/components/LangToggle.svelte';
   import ProfileButton from '$lib/components/ProfileButton.svelte';
+  import { update } from '$lib/update.svelte';
   const s = $derived(stats());
   const total = $derived(TOTAL(lang.v));
   const badgeCount = $derived(badgesOf(lang.v).length);
@@ -52,7 +53,14 @@
       </a>
       <a class="card btn quiz" href={resolve('/quiz')}><Icon name="bulb" size={22} /> クイズ</a>
       <a class="card btn" href={resolve('/chars')}>もじから えらぶ</a>
-      <a class="card btn" href={resolve('/about')} aria-label="アプリについて"><Icon name="help" size={22} /></a>
+      <a
+        class="card btn help"
+        href={resolve('/about')}
+        aria-label={update.ready ? 'アプリについて（あたらしい バージョンが あります）' : 'アプリについて'}
+      >
+        <Icon name="help" size={22} />
+        {#if update.ready}<span class="dot"></span>{/if}
+      </a>
     </nav>
   </header>
   {#key lang.v}
@@ -152,6 +160,26 @@
     font-weight: bold;
     text-decoration: none;
     color: var(--teal);
+  }
+  .help {
+    position: relative;
+  }
+  /* 新しいバージョンがあるときの赤丸 */
+  .dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e53935;
+    border: 3px solid var(--bg);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    50% {
+      transform: scale(1.25);
+    }
   }
   .row {
     display: flex;

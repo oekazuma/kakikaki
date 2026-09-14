@@ -3,7 +3,9 @@
   import Icon from '$lib/components/Icon.svelte';
   import { lang } from '$lib/lang.svelte';
   import { rememberLang } from '$lib/progress.svelte';
+  import { watchUpdates } from '$lib/update.svelte';
   let { children } = $props();
+  $effect(() => watchUpdates());
   $effect(() => {
     document.documentElement.dataset.lang = lang.v;
     rememberLang(lang.v);
