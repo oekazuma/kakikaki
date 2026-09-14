@@ -5,11 +5,9 @@ on:
     branches:
       - main
     paths-ignore:
-      - '.vscode/**'
       - '**/*.md'
   pull_request:
     paths-ignore:
-      - '.vscode/**'
       - '**/*.md'
 
 concurrency:
