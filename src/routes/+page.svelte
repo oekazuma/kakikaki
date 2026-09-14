@@ -149,8 +149,6 @@
     color: #e08a00;
   }
   .btn.quiz {
-    background: var(--blue);
-    color: #fff;
     gap: 6px;
   }
   .btn {
