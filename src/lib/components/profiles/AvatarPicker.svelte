@@ -23,8 +23,13 @@
       error = 'この画像は読み込めませんでした';
     }
   }
-  function picked(url: string) {
+  // 切り抜きが終わったら元画像の object URL を返す（表示中は revoke できない）
+  function closeCrop() {
+    if (cropping) URL.revokeObjectURL(cropping.src);
     cropping = null;
+  }
+  function picked(url: string) {
+    closeCrop();
     value = url;
     if (!addPhoto(url)) error = 'しゃしんの いちらんが いっぱいです（この人には つかえます）';
   }
@@ -47,7 +52,7 @@
 </script>
 
 {#if cropping}
-  <AvatarCrop img={cropping} onpick={picked} oncancel={() => (cropping = null)} />
+  <AvatarCrop img={cropping} onpick={picked} oncancel={closeCrop} />
 {:else}
   <div class="picker">
     <div class="preview"><Avatar avatar={value} size={120} /></div>

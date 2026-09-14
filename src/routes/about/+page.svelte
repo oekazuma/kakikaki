@@ -7,7 +7,9 @@
 
   let status = $state<PwaStatus>({ standalone: false, swActive: false, cached: false });
   $effect(() => {
-    pwaStatus().then((s) => (status = s));
+    pwaStatus()
+      .then((s) => (status = s))
+      .catch(() => {});
   });
 </script>
 

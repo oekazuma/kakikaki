@@ -10,10 +10,18 @@ export function measure() {
   vp.portrait = mq.media !== 'not all' ? mq.matches : vp.h > vp.w;
 }
 
-// 起動・回転・前面復帰のあと、少し遅れて確定する値を拾うために数回測り直す
+// 起動・回転・前面復帰のあと、少し遅れて確定する値を拾うために数回測り直す。タイマーの集合は描画に使わないので反応性は不要
+// eslint-disable-next-line svelte/prefer-svelte-reactivity
+const timers = new Set<ReturnType<typeof setTimeout>>();
 const settle = () => {
   measure();
-  for (const ms of [100, 400, 1200]) setTimeout(measure, ms);
+  for (const ms of [100, 400, 1200]) {
+    const t = setTimeout(() => {
+      timers.delete(t);
+      measure();
+    }, ms);
+    timers.add(t);
+  }
 };
 
 export function watchViewport() {
@@ -27,9 +35,13 @@ export function watchViewport() {
   ];
   for (const [t, e] of events) t.addEventListener(e, settle);
   visualViewport?.addEventListener('resize', measure);
-  matchMedia('(orientation: portrait)').addEventListener('change', settle);
+  const mq = matchMedia('(orientation: portrait)');
+  mq.addEventListener('change', settle);
   return () => {
     for (const [t, e] of events) t.removeEventListener(e, settle);
     visualViewport?.removeEventListener('resize', measure);
+    mq.removeEventListener('change', settle);
+    for (const t of timers) clearTimeout(t);
+    timers.clear();
   };
 }
