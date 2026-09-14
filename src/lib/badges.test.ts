@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { badgesOf, ROWS, computeStats, earnedBadges, groupOf, nextBadge, BADGE_GROUPS } from './badges';
+import { badgesOf, ROWS, computeStats, earnedBadges, nextBadge, BADGE_GROUPS } from './badges';
 import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
 
 describe('badges', () => {
@@ -89,7 +89,7 @@ describe('badges', () => {
 
   it('メダルは全部どこかのグループに入り、つぎのメダルは達成率が最も高い未獲得', () => {
     const badges = badgesOf('ja');
-    for (const b of badges) expect(BADGE_GROUPS).toContain(groupOf(b.id));
+    for (const b of badges) expect(BADGE_GROUPS).toContain(b.group);
     const s = computeStats(
       'ja',
       (c) => 'あいうえおかきくけ'.includes(c),

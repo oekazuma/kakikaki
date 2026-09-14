@@ -1,4 +1,4 @@
-import { today } from './progress.svelte';
+import { today } from './today';
 
 const KEY = 'kk:gate';
 export const MAX_FAILS = 3;

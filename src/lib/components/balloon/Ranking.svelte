@@ -61,7 +61,7 @@
   }
   .score b {
     font-size: 56px;
-    color: #e08a00;
+    color: var(--warn);
   }
   .score small {
     display: block;
@@ -70,7 +70,7 @@
   }
   .best {
     margin: 0;
-    color: #e08a00;
+    color: var(--warn);
     font-weight: bold;
     display: flex;
     justify-content: center;
@@ -124,7 +124,7 @@
     font-size: 18px;
   }
   .back {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--sub);
   }
   .retry {

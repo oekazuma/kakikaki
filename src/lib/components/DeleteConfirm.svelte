@@ -101,14 +101,14 @@
     display: grid;
     gap: 14px;
     z-index: 71;
-    border: 3px solid #e53935;
+    border: 3px solid var(--danger);
     font-size: 15px;
     line-height: 1.6;
   }
   h2 {
     margin: 0;
     font-size: 20px;
-    color: #c62828;
+    color: var(--danger-ink);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -175,11 +175,11 @@
     font-size: 17px;
   }
   .cancel {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--sub);
   }
   .go {
-    background: #e53935;
+    background: var(--danger);
     color: #fff;
   }
   .go:disabled {

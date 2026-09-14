@@ -68,7 +68,7 @@
     color: #fff;
   }
   .home {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--ink);
   }
 </style>

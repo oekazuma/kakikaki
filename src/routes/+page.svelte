@@ -146,7 +146,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #e08a00;
+    color: var(--warn);
   }
   .btn.quiz {
     gap: 6px;
@@ -170,7 +170,7 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #e53935;
+    background: var(--danger);
     border: 3px solid var(--bg);
     animation: pulse 1.6s ease-in-out infinite;
   }

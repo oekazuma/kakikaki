@@ -39,7 +39,7 @@
     font-size: 16px;
   }
   .lg.on {
-    border-color: #e08a00;
+    border-color: var(--warn);
     background: #fff5e0;
   }
   .box {
@@ -52,8 +52,8 @@
     background: #fff;
   }
   .lg.on .box {
-    background: #e08a00;
-    border-color: #e08a00;
+    background: var(--warn);
+    border-color: var(--warn);
     color: #fff;
   }
   .glyph {

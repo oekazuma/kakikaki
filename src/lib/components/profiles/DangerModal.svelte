@@ -80,12 +80,12 @@
     display: grid;
     gap: 16px;
     z-index: 71;
-    border: 3px solid #e08a00;
+    border: 3px solid var(--warn);
     font-size: 15px;
     line-height: 1.6;
   }
   .modal.person {
-    border-color: #e53935;
+    border-color: var(--danger);
   }
   h2 {
     margin: 0;
@@ -93,10 +93,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #e08a00;
+    color: var(--warn);
   }
   .person h2 {
-    color: #c62828;
+    color: var(--danger-ink);
   }
   .who {
     display: grid;
@@ -132,7 +132,7 @@
   }
   .warn,
   .lock {
-    color: #c62828;
+    color: var(--danger-ink);
     font-weight: bold;
     margin: 0;
   }
@@ -151,7 +151,7 @@
     font-size: 17px;
   }
   .cancel {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--sub);
   }
   .next {

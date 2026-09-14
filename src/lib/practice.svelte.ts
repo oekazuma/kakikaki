@@ -1,4 +1,4 @@
-import { WORDS, wordById, type Word } from './words';
+import { WORDS, wordById, charWordId, isCharWord, type Word } from './words';
 import { get, record, charCleared, wordStar, checkBadges, type Mode } from './progress.svelte';
 import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
 import type { Badge } from './badges';
@@ -55,12 +55,12 @@ const wordDone = (w: Word) => lettersOf(w).every((ch) => nextMode(ch) === null);
 
 // まだ終わっていない次の単語（同じ並び順で後ろから探し、末尾なら先頭へ）。全部終わっていれば null
 export function nextWordId(word: Word): string | null {
-  if (word.id.startsWith('char-')) {
+  if (isCharWord(word)) {
     const list = charsOf();
     const k = list.indexOf(word.name);
     for (let n = 1; n < list.length; n++) {
       const ch = list[(k + n) % list.length];
-      if (nextMode(ch) !== null) return `char-${ch}`;
+      if (nextMode(ch) !== null) return charWordId(ch);
     }
     return null;
   }

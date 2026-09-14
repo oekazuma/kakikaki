@@ -77,7 +77,7 @@
     white-space: nowrap;
   }
   .len.max {
-    color: #c62828;
+    color: var(--danger-ink);
   }
   .name input {
     flex: 1;
@@ -103,11 +103,11 @@
   }
   .del {
     margin-right: auto;
-    color: #c62828;
+    color: var(--danger-ink);
     background: #fdecea;
   }
   .cancel {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--sub);
   }
   .save {
@@ -118,7 +118,7 @@
     opacity: 0.4;
   }
   .err {
-    color: #c62828;
+    color: var(--danger-ink);
     font-weight: bold;
     margin: 0;
   }

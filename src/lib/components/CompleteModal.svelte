@@ -5,7 +5,7 @@
   import { imageUrl } from '$lib/image';
   import { nameOf } from '$lib/lang.svelte';
   import { wordCrown } from '$lib/progress.svelte';
-  import type { Word } from '$lib/words';
+  import { isCharWord, type Word } from '$lib/words';
   let { word, onnext, onreplay }: { word: Word; onnext: () => void; onreplay: () => void } = $props();
 </script>
 
@@ -24,7 +24,7 @@
       class="mark"><Icon name="star" size={22} fill /> ほし ゲット</span
     >{/if}
   <div class="btns">
-    <button class="next" onclick={onnext}>{word.id.startsWith('char-') ? 'つぎの もじ' : 'つぎの たんご'}</button>
+    <button class="next" onclick={onnext}>{isCharWord(word) ? 'つぎの もじ' : 'つぎの たんご'}</button>
     <a class="home" href={resolve('/')}>ホームへ</a>
     <button class="again" onclick={onreplay}>もういちど</button>
   </div>
@@ -64,7 +64,7 @@
     font-weight: bold;
   }
   .mark.gold {
-    color: #e08a00;
+    color: var(--warn);
   }
   .btns {
     display: flex;
@@ -84,7 +84,7 @@
   }
   .home,
   .again {
-    background: #eef1f4;
+    background: var(--pill);
     color: var(--ink);
   }
 </style>

@@ -73,7 +73,7 @@
     gap: 8px;
   }
   h1 :global(svg) {
-    color: #e08a00;
+    color: var(--warn);
   }
   h1 small {
     font-size: 14px;

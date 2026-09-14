@@ -28,7 +28,7 @@
   }
   small {
     display: block;
-    color: #e08a00;
+    color: var(--warn);
     font-weight: bold;
     font-size: 12px;
   }

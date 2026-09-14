@@ -4,6 +4,7 @@ import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_N
 import { removeBest } from './balloon.svelte';
 import type { Word } from './words';
 import { isObject, loadJSON, saveJSON, removeKey } from './storage';
+import { today } from './today';
 
 export type Mode = 'trace' | 'free' | 'test';
 export type CharProgress = { trace: number; free: number; test: number };
@@ -48,28 +49,27 @@ export function deleteProfile(id: string) {
 // 言語の切り替えを使っている人に覚えさせる（次にその人を選んだとき同じ言語で開く）
 export const rememberLang = (l: Lang) => updateProfile(profiles.cur, { lang: l });
 
-export const today = () => {
-  // 日付文字列を作るだけなので反応性は不要
-  // eslint-disable-next-line svelte/prefer-svelte-reactivity
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
+export { today };
 
 export const get = (c: string): CharProgress => cur().progress[c] ?? { trace: 0, free: 0, test: 0 };
 export const earned = () => cur().earned;
 export const days = () => cur().days;
 export const quiz = () => cur().quiz;
 
+// 練習した日付に今日を足す（1 日 1 回）
+function markToday(l: Lang) {
+  const t = today();
+  if (data[l].days.includes(t)) return;
+  data[l].days.push(t);
+  save(l, 'days');
+}
+
 export function recordQuiz(kind: 'read' | 'write', level: number, correct: number) {
   const l = lang.v,
     k = `${kind}${level}`;
   data[l].quiz[k] = (data[l].quiz[k] ?? 0) + correct;
   save(l, 'quiz');
-  const t = today();
-  if (!data[l].days.includes(t)) {
-    data[l].days.push(t);
-    save(l, 'days');
-  }
+  markToday(l);
 }
 
 export function record(c: string, mode: Mode) {
@@ -78,11 +78,7 @@ export function record(c: string, mode: Mode) {
   p[mode] = Math.min(CAP[mode], p[mode] + 1);
   data[l].progress[c] = p;
   save(l, 'progress');
-  const t = today();
-  if (!data[l].days.includes(t)) {
-    data[l].days.push(t);
-    save(l, 'days');
-  }
+  markToday(l);
 }
 
 export function earn(id: string) {
@@ -90,8 +86,11 @@ export function earn(id: string) {
   save(lang.v, 'earned');
 }
 
-export const charCleared = (c: string) => get(c).trace >= 2 && get(c).free >= 1;
-export const charGold = (c: string) => get(c).test >= 1;
+// 文字クリア = なぞる 2 + じぶんでかく 1、金の星 = おてほんなし 1（CAP と同じ数）
+export const clearedIn = (p: CharProgress) => p.trace >= CAP.trace && p.free >= CAP.free;
+export const goldIn = (p: CharProgress) => p.test >= CAP.test;
+export const charCleared = (c: string) => clearedIn(get(c));
+export const charGold = (c: string) => goldIn(get(c));
 export const wordStar = (w: Word) => lettersOf(w).every(charCleared);
 export const wordCrown = (w: Word) => lettersOf(w).every(charGold);
 
@@ -122,8 +121,8 @@ export function summaryOf(pid: string, l: Lang): Summary {
   const g = (c: string) => progress[c] ?? { trace: 0, free: 0, test: 0 };
   const st = computeStats(
     l,
-    (c) => g(c).trace >= 2 && g(c).free >= 1,
-    (c) => g(c).test >= 1,
+    (c) => clearedIn(g(c)),
+    (c) => goldIn(g(c)),
     loadJSON<string[]>(keyOf(pid, l, 'days'), [], isDays).length,
     loadJSON<Record<string, number>>(keyOf(pid, l, 'quiz'), {}, isObject)
   );
