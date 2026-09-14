@@ -49,8 +49,12 @@ describe('quiz', () => {
   it('1 文字の語は穴埋めにせず、英語の穴埋めは大文字小文字を合わせる', () => {
     for (const q of makeReadQuiz('ja', 1, 20, seeded(5)))
       if (q.kind === 'blank') expect(lettersOf(q.answer, 'ja').length).toBeGreaterThan(1);
-    for (const q of makeReadQuiz('en', 2, 20, seeded(7)))
-      if (q.kind === 'blank') for (const c of q.letters!) expect(c).toBe(c.toLowerCase());
+    for (const q of makeReadQuiz('en', 2, 40, seeded(7)))
+      if (q.kind === 'blank') {
+        // 穴が先頭なら大文字の候補、それ以外なら小文字の候補
+        const upper = q.blank === 0;
+        for (const c of q.letters!) expect(c === c.toUpperCase(), `${q.answer.en}:${c}`).toBe(upper);
+      }
   });
   it('むずかしい の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
     const answer = wordById('hamburger')!; // はんばーがー 6 文字。たべもの には同じ 6 文字の語が 4 つある

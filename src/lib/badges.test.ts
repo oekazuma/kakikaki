@@ -50,7 +50,8 @@ describe('badges', () => {
     ).map((b) => b.id);
     expect(ids).toContain('row-ABCDEFG');
     expect(ids).toContain('row-abcdefg');
-    expect(ids).toContain('words-100'); // 小文字だけで書ける単語が 100 以上
+    expect(ids).toContain('words-10'); // A〜G で始まる単語（Dog, Cat, …）に星がつく
+    expect(ids).not.toContain('row-HIJKLM');
   });
   it('全部クリアで全メダル', () => {
     for (const l of ['ja', 'kana', 'en'] as const) {
