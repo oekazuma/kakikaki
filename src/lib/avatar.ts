@@ -26,7 +26,7 @@ export const AVATARS = [
   'star',
   'sunflower'
 ] as const;
-export const AVATAR_PX = 160;
+const AVATAR_PX = 160;
 
 // 選んだ画像ファイルを <img> として読み込む（切り抜き画面で使う）
 export function loadImage(file: File): Promise<HTMLImageElement> {

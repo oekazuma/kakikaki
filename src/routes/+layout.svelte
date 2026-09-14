@@ -22,10 +22,7 @@
   const MIN_W = 900;
   const MIN_H = 520;
   $effect(() => watchViewport());
-  const w = $derived(vp.w);
-  const h = $derived(vp.h);
-  const tooSmall = $derived(w > 0 && (w < MIN_W || h < MIN_H));
-  const portrait = $derived(vp.portrait);
+  const tooSmall = $derived(vp.w > 0 && (vp.w < MIN_W || vp.h < MIN_H));
 </script>
 
 <svelte:document onvisibilitychange={onVisible} />
@@ -34,7 +31,7 @@
 {@render children()}
 {#if tooSmall}
   <div class="guard card">
-    {#if portrait}
+    {#if vp.portrait}
       <!-- タブレットが縦から横へ回るアニメーション -->
       <svg class="tablet" viewBox="0 0 140 160" width="150" height="171" aria-hidden="true">
         <g class="spin">
@@ -78,7 +75,7 @@
     {/if}
     <small>
       推奨: 横向きのタブレット、または {MIN_W}×{MIN_H}px 以上のブラウザ画面<br />
-      いまの画面: {w}×{h}px
+      いまの画面: {vp.w}×{vp.h}px
     </small>
   </div>
 {/if}

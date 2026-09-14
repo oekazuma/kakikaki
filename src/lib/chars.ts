@@ -29,7 +29,7 @@ export const GROUPS: { name: string; cols: string[][] }[] = [
   { name: 'ちいさいもじ', cols: KOGAKI },
   { name: 'のばすおと', cols: CHOON }
 ];
-export const GOJUON = [...SEION, ...DAKUON, ...HANDAKUON, ...KOGAKI, ...CHOON];
+const GOJUON = [...SEION, ...DAKUON, ...HANDAKUON, ...KOGAKI, ...CHOON];
 export const CHARS = GOJUON.flat().filter(Boolean);
 
 // ひらがな → カタカナ（ー はそのまま）

@@ -1,4 +1,4 @@
-import { CHARS, ALPHABET, CHARS_EN, CHARS_KANA, toKatakana } from './chars';
+import { CHARS, CHARS_EN, CHARS_KANA, toKatakana } from './chars';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
@@ -18,13 +18,20 @@ export function setLang(v: Lang) {
   setRaw(KEY, v);
 }
 
-export const LANG_INFO: Record<
+const LANG_INFO: Record<
   Lang,
-  { title: string; short: string; speech: string; strokes: Record<string, string[]>; chars: string[] }
+  { title: string; short: string; glyph: string; speech: string; strokes: Record<string, string[]>; chars: string[] }
 > = {
-  ja: { title: 'かきかき ひらがな', short: 'ひらがな', speech: 'ja-JP', strokes: STROKES, chars: CHARS },
-  kana: { title: 'かきかき かたかな', short: 'かたかな', speech: 'ja-JP', strokes: STROKES_KANA, chars: CHARS_KANA },
-  en: { title: 'かきかき えいご', short: 'えいご', speech: 'en-US', strokes: STROKES_EN, chars: CHARS_EN }
+  ja: { title: 'かきかき ひらがな', short: 'ひらがな', glyph: 'あ', speech: 'ja-JP', strokes: STROKES, chars: CHARS },
+  kana: {
+    title: 'かきかき かたかな',
+    short: 'かたかな',
+    glyph: 'ア',
+    speech: 'ja-JP',
+    strokes: STROKES_KANA,
+    chars: CHARS_KANA
+  },
+  en: { title: 'かきかき えいご', short: 'えいご', glyph: 'A', speech: 'en-US', strokes: STROKES_EN, chars: CHARS_EN }
 };
 
 export const info = (l: Lang = lang.v) => LANG_INFO[l];
@@ -32,11 +39,10 @@ export const strokesOf = (l: Lang = lang.v) => LANG_INFO[l].strokes;
 export const charsOf = (l: Lang = lang.v) => LANG_INFO[l].chars;
 
 // 英語名は Dog のように先頭だけ大文字で見せる（大文字が単語の 1 文字目として練習に入る。1 文字練習はそのまま）
-export const enName = (w: Word) => (isCharWord(w) ? w.en : w.en.charAt(0).toUpperCase() + w.en.slice(1));
+const enName = (w: Word) => (isCharWord(w) ? w.en : w.en.charAt(0).toUpperCase() + w.en.slice(1));
 // 表示名。カタカナはひらがな名から変換、英語は先頭だけ大文字
 export const nameOf = (w: Word, l: Lang = lang.v) =>
   l === 'ja' ? w.name : l === 'kana' ? toKatakana(w.name) : enName(w);
-export { toKatakana };
 // 補助行（常に 2 行）: 表示していない残り 2 つの表記
 export const subOf = (w: Word, l: Lang = lang.v): string[] =>
   w.name === w.en
@@ -49,5 +55,3 @@ export const subOf = (w: Word, l: Lang = lang.v): string[] =>
 
 // 書く対象の文字。スペースやハイフンは飛ばす
 export const lettersOf = (w: Word, l: Lang = lang.v) => [...nameOf(w, l)].filter((c) => c !== ' ' && c !== '-');
-
-export { ALPHABET };

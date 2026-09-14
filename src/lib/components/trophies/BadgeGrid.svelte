@@ -1,7 +1,7 @@
 <script lang="ts">
   import Bar from '../Bar.svelte';
   import { BADGE_GROUPS, type Badge, type Stats } from '$lib/badges';
-  import { today } from '$lib/progress.svelte';
+  import { today } from '$lib/today';
   // メダルをテーマごとの段に並べる。獲得済みは色つき、未獲得は灰色で進み具合のバー、きょう取ったものは NEW
   let { s, badges, got }: { s: Stats; badges: Badge[]; got: Record<string, string> } = $props();
   const groups = $derived(

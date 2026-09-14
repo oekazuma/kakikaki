@@ -1,13 +1,12 @@
-import { STROKES } from './strokes';
-import { centroid, dist, pathToPoints, resampleN, translate, type Pt } from './geometry';
+import { centroid, clamp, dist, pathToPoints, resampleN, translate, type Pt } from './geometry';
 
 // 調整ノブ。iPad で実際に子どもが書いた結果を見て変える。
 export const RECOG = { N: 32, PENALTY_STROKE: 40, MARGIN: 8, D_MAX: 30 };
 
-export type Template = { char: string; strokes: Pt[][] };
+type Template = { char: string; strokes: Pt[][] };
 
 // 各画を N 点にそろえ、全体の重心をマスの中央へ寄せる（拡大縮小はしない）
-export function normalize(strokes: Pt[][]): Pt[][] {
+function normalize(strokes: Pt[][]): Pt[][] {
   const rs = strokes.filter((s) => s.length > 0).map((s) => resampleN(s, RECOG.N));
   if (rs.length === 0) return [];
   const c = centroid(rs.flat());
@@ -40,7 +39,7 @@ function distance(a: Pt[][], b: Pt[][]) {
   return sum / m + Math.abs(a.length - b.length) * RECOG.PENALTY_STROKE;
 }
 
-export function recognize(strokes: Pt[][], templates = templatesFor(STROKES)) {
+export function recognize(strokes: Pt[][], templates: Template[]) {
   const input = normalize(strokes);
   return templates.map((t) => ({ char: t.char, dist: distance(input, t.strokes) })).sort((p, q) => p.dist - q.dist);
 }
@@ -51,4 +50,4 @@ export function passes(target: string, results: { char: string; dist: number }[]
   return i === 1 && results[1].dist - results[0].dist < RECOG.MARGIN;
 }
 
-export const testScore = (d: number) => 1 - Math.min(1, Math.max(0, d / RECOG.D_MAX));
+export const testScore = (d: number) => 1 - clamp(d / RECOG.D_MAX, 0, 1);

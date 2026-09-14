@@ -96,6 +96,7 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 - おてほんなし の見本カードを左上に移し、字は「みる」を押したときだけ 2 秒見せる（右上は右手で隠れる。「おてほんなし」と表示の食い違いを解消）。
 - カレンダーの印を固定サイズの丸・テーマ色に、「つづけて n にち」を星アイコンのピルに。
 - 「みんなの進み具合」の説明文を削除。
+- 過剰設計の監査（ponytail-audit）で挙がった 20 件を適用: `app.d.ts`・未使用アイコン・再エクスポート・使われていない `export` の削除、`Gate` の store 注入と `viewport` のタイマー集合の撤去、`backup` / `streak` / `allDays` の標準 API 化、`clamp` / `Pt` / `dist` / 言語の頭文字 / `.dim` 暗幕の一本化、`fx.ts` をクラスから関数に。`make-icon.ts` の手描き `A` は公開中のロゴが変わるので残した。
 
 ## Findings considered and rejected
 

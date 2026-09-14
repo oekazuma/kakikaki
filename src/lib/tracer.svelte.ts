@@ -6,7 +6,7 @@ import type { Mode } from './progress.svelte';
 
 export type Result = { mode: Mode; score: number; ok: boolean; top: string };
 // up() の結果: 画が完成 / 文字が完成 / 逸脱でやり直し / まだ途中（じぶんでかく）/ 1 画ぶん描いた（おてほんなし）
-export type UpEvent = 'stroke' | 'done' | 'fail' | 'pending' | 'drawn' | 'idle';
+type UpEvent = 'stroke' | 'done' | 'fail' | 'pending' | 'drawn' | 'idle';
 
 // 1 文字ぶんの書き取りの状態機械。座標は 109 マスの viewBox 単位。描画・演出・タイマーは Canvas.svelte が持つ
 export class Tracer {

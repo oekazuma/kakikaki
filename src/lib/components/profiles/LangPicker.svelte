@@ -3,7 +3,6 @@
   import { LANGS, info, type Lang } from '$lib/lang.svelte';
   // 消すことばをチェックで選ぶ
   let { langs = $bindable() }: { langs: Lang[] } = $props();
-  const GLYPH: Record<Lang, string> = { ja: 'あ', kana: 'ア', en: 'A' };
   const all = $derived(langs.length === LANGS.length);
   const toggle = (l: Lang) => (langs = LANGS.filter((x) => (x === l ? !langs.includes(l) : langs.includes(x))));
 </script>
@@ -14,7 +13,7 @@
       <span class="box"
         >{#if langs.includes(l)}<Icon name="check" size={18} />{/if}</span
       >
-      <span class="glyph">{GLYPH[l]}</span>
+      <span class="glyph">{info(l).glyph}</span>
       {info(l).short}
     </button>
   {/each}

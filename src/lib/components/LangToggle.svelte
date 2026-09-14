@@ -1,13 +1,12 @@
 <script lang="ts">
   import { lang, setLang, info, LANGS } from '$lib/lang.svelte';
-  const GLYPH = { ja: 'あ', kana: 'ア', en: 'A' } as const;
 </script>
 
 <div class="toggle card" role="tablist" aria-label="ことばを えらぶ">
   <span class="knob" style:--i={LANGS.indexOf(lang.v)}></span>
   {#each LANGS as l (l)}
     <button role="tab" aria-selected={lang.v === l} class={{ on: lang.v === l }} onclick={() => setLang(l)}>
-      {GLYPH[l]} <small>{info(l).short}</small>
+      {info(l).glyph} <small>{info(l).short}</small>
     </button>
   {/each}
 </div>

@@ -6,7 +6,7 @@
   import Ranking from '$lib/components/balloon/Ranking.svelte';
   import { BalloonGame, MISS_MAX, saveScore, loadBests, type Balloon } from '$lib/balloon.svelte';
   import { profiles } from '$lib/profiles.svelte';
-  import { today } from '$lib/progress.svelte';
+  import { today } from '$lib/today';
   import { info } from '$lib/lang.svelte';
   import { fx } from '$lib/fx';
   import { sfx, unlock } from '$lib/audio';

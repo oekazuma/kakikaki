@@ -3,7 +3,7 @@
   import Bar from '../Bar.svelte';
   import { LANGS, info } from '$lib/lang.svelte';
   import { profiles } from '$lib/profiles.svelte';
-  import { summaryOf, weakOf } from '$lib/progress.svelte';
+  import { summaryOf, weakOf, type Summary } from '$lib/progress.svelte';
   import { TOTAL } from '$lib/badges';
   // 保護者向け: 全員 × 3 ことば の進み具合を、ことばを切り替えずに一覧する（記録は保存値から直接読む）
   const rows = $derived(
@@ -12,8 +12,7 @@
       cells: LANGS.map((l) => ({ l, s: summaryOf(p.id, l), total: TOTAL(l), weak: weakOf(p.id, l).slice(0, 5) }))
     }))
   );
-  const empty = (s: { chars: number; words: number; medals: number; days: number; quiz: number }) =>
-    s.chars + s.words + s.medals + s.days + s.quiz === 0;
+  const empty = (s: Summary) => s.chars + s.words + s.medals + s.days + s.quiz === 0;
 </script>
 
 <section class="card">

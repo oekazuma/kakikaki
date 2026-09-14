@@ -44,12 +44,6 @@
 </section>
 
 <style>
-  .dim {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.35);
-    z-index: 70;
-  }
   /* 中央寄せに transform を使うと子孫の fixed（削除フローの暗幕と演出）がシート基準になるので、inset + margin で寄せる */
   .sheet {
     position: fixed;

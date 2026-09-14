@@ -64,12 +64,6 @@
 </section>
 
 <style>
-  .dim {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 70;
-  }
   .modal {
     position: fixed;
     left: 50%;

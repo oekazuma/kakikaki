@@ -17,7 +17,7 @@ export const wordsOf = (l: Lang, level: Level) => WORDS.filter((w) => levelOf(w,
 // よみクイズの出題形式
 //   word: 文字を見てイラストを選ぶ / picture: イラストを見て文字を選ぶ / listen: 聞いてイラストを選ぶ
 //   initial: 「り」で はじまる のは？ → イラスト / blank: り？ご の ？ に入る文字を選ぶ（letters が選択肢、key が正解）
-export type ReadKind = 'word' | 'picture' | 'listen' | 'initial' | 'blank';
+type ReadKind = 'word' | 'picture' | 'listen' | 'initial' | 'blank';
 export const READ_KINDS: ReadKind[] = ['word', 'picture', 'listen', 'initial', 'blank'];
 export type ReadQ = { kind: ReadKind; answer: Word; choices: Word[]; key: string; letters?: string[]; blank?: number };
 
@@ -101,7 +101,7 @@ export function makeReadQuiz(l: Lang, level: Level, n = QUESTIONS.read, rnd = Ma
 }
 
 // かきクイズの出題形式。picture: イラストを見て書く / listen: 聞いて書く（絵なし）。交互に出す
-export type WriteKind = 'picture' | 'listen';
+type WriteKind = 'picture' | 'listen';
 export type WriteQ = { word: Word; kind: WriteKind };
 export const makeWriteQuiz = (l: Lang, level: Level, n = QUESTIONS.write, rnd = Math.random): WriteQ[] =>
   shuffle(wordsOf(l, level), rnd)
