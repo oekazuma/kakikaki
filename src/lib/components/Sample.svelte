@@ -5,7 +5,7 @@
 
 <div class="card sample">
   <small>この もじを かこう</small>
-  <b>{char}</b>
+  <b class="kyokasho">{char}</b>
   <small class="n">{strokes} かく</small>
 </div>
 

@@ -27,7 +27,8 @@ main * {
     color 0.4s,
     border-color 0.4s;
 }
-/* 教科書体（Klee One、SIL OFL）。書き順のお手本（KanjiVG）と同じ字形で り・き・さ を見せるため、ひらがな・カタカナ・英字を自前で持つ */
+/* 教科書体（Klee One、SIL OFL）。書き順のお手本（KanjiVG）と同じ字形で り・き・さ を見せるため、ひらがな・カタカナ・英字を自前で持つ。
+   説明文までこの書体だと読みづらいので、UI は丸ゴシックのまま、書く対象の文字・単語だけ .kyokasho で使う */
 @font-face {
   font-family: 'Klee One';
   font-weight: 400;
@@ -43,13 +44,16 @@ main * {
 * {
   box-sizing: border-box;
 }
+.kyokasho {
+  font-family: 'Klee One', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', sans-serif;
+}
 html,
 body {
   margin: 0;
   height: 100%;
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Klee One', 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Hiragino Sans', sans-serif;
+  font-family: 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Hiragino Sans', sans-serif;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;

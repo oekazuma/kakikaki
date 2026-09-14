@@ -16,7 +16,7 @@
       onclick={() => s.tapTab(n)}
       onanimationend={() => s.shaken()}
     >
-      <span class="ch">{ch}</span>
+      <span class="ch kyokasho">{ch}</span>
       <span class={['s', { gold: get(ch).test > 0 }]}>
         {#if lock}<Icon name="lock" size={14} />{:else if get(ch).test > 0}<Icon
             name="crown"

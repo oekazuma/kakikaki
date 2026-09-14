@@ -35,7 +35,7 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 
 ## アーキテクチャ
 
-ひらがな（`ja`）・カタカナ（`kana`）・英語（`en`）の 3 言語を `lang.svelte.ts` の `lang.v` で切り替える。カタカナの単語名・文字セット・行グループはひらがなから `toKatakana` で導出し、専用データは書き順（`strokes-kana.ts`）だけ。文字セット・書き順・読み上げ言語・表示名は `LANG_INFO` / `strokesOf` / `nameOf` / `lettersOf` 経由で取り、各画面や `Canvas` は言語を直接知らない。テーマ色は `<html data-lang>` に応じて `app.css` の CSS 変数が変わる。文字のフォントは教科書体の Klee One（`static/fonts/`、SIL OFL）を自前で配信する。端末のフォントだと り・き・さ が一筆につながり、KanjiVG のお手本（分かれた字形）と違って子どもが混乱するため。ひらがな・カタカナ・英字・記号だけに絞った woff2 で、再生成は `pyftsubset KleeOne-Regular.ttf --unicodes="U+0020-007E,U+00A0-00FF,U+2010-2027,U+3000-303F,U+3040-309F,U+30A0-30FF,U+FF01-FF5E,U+2190-2193,U+2605-2606,U+25CB,U+25EF,U+00D7" --flavor=woff2 --layout-features='*'`（fonttools + brotli）。
+ひらがな（`ja`）・カタカナ（`kana`）・英語（`en`）の 3 言語を `lang.svelte.ts` の `lang.v` で切り替える。カタカナの単語名・文字セット・行グループはひらがなから `toKatakana` で導出し、専用データは書き順（`strokes-kana.ts`）だけ。文字セット・書き順・読み上げ言語・表示名は `LANG_INFO` / `strokesOf` / `nameOf` / `lettersOf` 経由で取り、各画面や `Canvas` は言語を直接知らない。テーマ色は `<html data-lang>` に応じて `app.css` の CSS 変数が変わる。書く対象の文字・単語（WordCard の名前、CharTabs、LetterSlots、chars のセル、Sample、よみクイズの語と選択肢、完了モーダル）だけ `.kyokasho` クラスで教科書体の Klee One（`static/fonts/`、SIL OFL）を使い、説明文などの UI は丸ゴシックのまま。端末のフォントだと り・き・さ が一筆につながり、KanjiVG のお手本（分かれた字形）と違って子どもが混乱する一方、教科書体を全体に使うと読みづらいと言われたため。ひらがな・カタカナ・英字・記号だけに絞った woff2 で、再生成は `pyftsubset KleeOne-Regular.ttf --unicodes="U+0020-007E,U+00A0-00FF,U+2010-2027,U+3000-303F,U+3040-309F,U+30A0-30FF,U+FF01-FF5E,U+2190-2193,U+2605-2606,U+25CB,U+25EF,U+00D7" --flavor=woff2 --layout-features='*'`（fonttools + brotli）。
 
 座標系はすべて KanjiVG の 109×109 viewBox（アルファベットも同じ枠に合わせて自作）。`Canvas.svelte` が `getScreenCTM()` でポインタ座標を viewBox 単位に変換し、判定・採点・認識はその単位で行う純粋関数に委ねる。
 

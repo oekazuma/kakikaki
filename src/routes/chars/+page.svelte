@@ -15,7 +15,7 @@
 
 {#snippet cell(c: string)}
   {#if c}
-    <a class={['card', 'cell', { done: charCleared(c) }]} href={practiceUrl(`char-${c}`)}>
+    <a class={['card', 'cell', 'kyokasho', { done: charCleared(c) }]} href={practiceUrl(`char-${c}`)}>
       {c}
       {#if charGold(c)}<span class="s gold"><Icon name="crown" size={16} fill /></span>{:else if charCleared(c)}<span
           class="s"><Icon name="star" size={16} fill /></span
