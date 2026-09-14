@@ -51,7 +51,7 @@ describe('PracticeSession', () => {
     expect(s.unlocked(1)).toBe(true);
     s.done({ mode: 'test', score: 0.5, ok: false, top: 'は' });
     expect(s.msg).toContain('「は」に みえるよ');
-    expect(get('ば').test).toBe(0);
+    expect([get('ば').test, get('ば').miss, get('ば').star]).toEqual([0, 1, 3]);
     s.done(ok('test', 0.8));
     vi.advanceTimersByTime(1200 + 2600); // はじめての きんのほし
     expect([s.i, s.c, s.mode]).toEqual([1, 'す', 'trace']);

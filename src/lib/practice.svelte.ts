@@ -1,5 +1,5 @@
 import { WORDS, wordById, charWordId, isCharWord, type Word } from './words';
-import { get, record, charCleared, wordStar, checkBadges, type Mode } from './progress.svelte';
+import { get, record, recordStar, recordMiss, charCleared, wordStar, checkBadges, type Mode } from './progress.svelte';
 import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
 import type { Badge } from './badges';
 import { stars, praise } from './score';
@@ -150,6 +150,7 @@ export class PracticeSession {
   done(r: Result) {
     if (this.busy) return;
     if (r.mode === 'test' && !r.ok) {
+      recordMiss(this.c);
       this.msg = `おしい！ 「${r.top}」に みえるよ。もういちど！`;
       this.fx.buu?.();
       return;
@@ -160,6 +161,7 @@ export class PracticeSession {
       wasW = wordStar(this.word);
     record(c, r.mode);
     const st = r.mode === 'trace' ? 3 : stars(r.score);
+    if (r.mode === 'free') recordStar(c, st);
     this.msg = r.mode === 'trace' ? 'できた！' : `${'★'.repeat(st)} ${praise(st)}`;
     this.fx.kira?.();
     if (!wasC && charCleared(c)) {

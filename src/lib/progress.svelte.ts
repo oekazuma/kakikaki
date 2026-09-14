@@ -7,7 +7,8 @@ import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 import { today } from './today';
 
 export type Mode = 'trace' | 'free' | 'test';
-export type CharProgress = { trace: number; free: number; test: number };
+// star: じぶんでかく の最高の星（1〜3）、miss: おてほんなし の不合格回数。どちらも任意（古い保存値には無い）
+export type CharProgress = { trace: number; free: number; test: number; star?: number; miss?: number };
 // quiz のキーは `${kind}${level}`（read1 など）→ 正解数
 type Data = {
   progress: Record<string, CharProgress>;
@@ -72,6 +73,19 @@ export function recordQuiz(kind: 'read' | 'write', level: number, correct: numbe
   markToday(l);
 }
 
+// じぶんでかく の星は最高値だけ残す（お祝い向き）
+export function recordStar(c: string, n: number) {
+  const l = lang.v;
+  data[l].progress[c] = { ...get(c), star: Math.max(get(c).star ?? 0, n) };
+  save(l, 'progress');
+}
+// おてほんなし の不合格は累計（保護者向けの「にがて」に使う。子どもの画面には出さない）
+export function recordMiss(c: string) {
+  const l = lang.v;
+  data[l].progress[c] = { ...get(c), miss: (get(c).miss ?? 0) + 1 };
+  save(l, 'progress');
+}
+
 export function record(c: string, mode: Mode) {
   const l = lang.v;
   const p = { ...get(c) };
@@ -105,6 +119,15 @@ export function resetRecords(pid: string, langs: Lang[]) {
 export const reset = () => resetRecords(profiles.cur, [lang.v]);
 
 export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz());
+
+// にがてな文字: おてほんなし で 2 回以上外したか、じぶんでかく の最高が星 1 のまま。外した回数が多い順
+export function weakOf(pid: string, l: Lang): string[] {
+  const progress = loadJSON<Record<string, CharProgress>>(keyOf(pid, l, 'progress'), {}, isObject);
+  return Object.entries(progress)
+    .filter(([, p]) => (p.miss ?? 0) >= 2 || p.star === 1)
+    .sort((a, b) => (b[1].miss ?? 0) - (a[1].miss ?? 0))
+    .map(([c]) => c);
+}
 
 // 削除の最終確認用: 任意の人・ことばの記録の件数（保存値を直接読む）
 export type Summary = {

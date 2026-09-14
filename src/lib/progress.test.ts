@@ -9,7 +9,10 @@ import {
   wordCrown,
   reset,
   switchProfile,
-  days
+  days,
+  recordStar,
+  recordMiss,
+  weakOf
 } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
@@ -60,6 +63,20 @@ describe('progress', () => {
     setLang('ja');
     expect(wordStar(bus)).toBe(false);
     expect(get('あ').trace).toBe(1);
+  });
+  it('星は最高値、不合格は累計で残り、にがてな文字は外した回数の多い順', () => {
+    recordStar('あ', 2);
+    recordStar('あ', 1);
+    recordMiss('あ');
+    recordMiss('い');
+    recordMiss('い');
+    recordMiss('う');
+    recordMiss('う');
+    recordMiss('う');
+    recordStar('え', 1);
+    expect([get('あ').star, get('あ').miss, get('い').miss]).toEqual([2, 1, 2]);
+    expect(weakOf('p1', 'ja')).toEqual(['う', 'い', 'え']);
+    expect(get('あ')).toMatchObject({ trace: 0, free: 0, test: 0 });
   });
   it('練習した日付は 1 日に 1 つだけ増え、翌日のクイズでも増える', () => {
     vi.useFakeTimers();
