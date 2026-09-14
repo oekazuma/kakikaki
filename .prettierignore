@@ -5,5 +5,5 @@ yarn.lock
 
 # 生成物
 src/lib/strokes.ts
-src/lib/strokes-en.ts
+src/lib/strokes-*.ts
 static/img/
