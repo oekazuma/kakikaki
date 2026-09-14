@@ -72,6 +72,7 @@ export const WORDS: Word[] = [
     ['cloud', 'くも', '☁️', 'cloud'],
     ['thunder', 'かみなり', '⚡', 'thunder'],
     ['sunflower', 'ひまわり', '🌻', 'sunflower'],
+    ['dandelion', 'たんぽぽ', '🌼', 'dandelion'],
     ['tulip', 'ちゅーりっぷ', '🌷', 'tulip'],
     ['leaf', 'はっぱ', '🍃', 'leaf'],
     ['fire', 'ひ', '🔥', 'fire'],
@@ -99,6 +100,7 @@ export const WORDS: Word[] = [
   ...W('みのまわり', [
     ['clock', 'とけい', '⏰', 'clock'],
     ['umbrella', 'かさ', '☂️', 'umbrella'],
+    ['postbox', 'ぽすと', '📮', 'postbox'],
     ['hat', 'ぼうし', '🧢', 'hat'],
     ['shoes', 'くつ', '👟', 'shoes'],
     ['glasses', 'めがね', '👓', 'glasses'],
@@ -150,6 +152,7 @@ export const WORDS: Word[] = [
   ...W('たべもの', [
     ['bread', 'ぱん', '🍞', 'bread'],
     ['rice-ball', 'おにぎり', '🍙', 'rice ball'],
+    ['french-fries', 'ぽてと', '🍟', 'french fries'],
     ['ramen', 'らーめん', '🍜', 'ramen'],
     ['curry', 'かれー', '🍛', 'curry'],
     ['cake', 'けーき', '🍰', 'cake'],
@@ -234,7 +237,8 @@ export const WORDS: Word[] = [
     ['tractor', 'とらくたー', '🚜', 'tractor'],
     ['ufo', 'ゆーふぉー', '🛸', 'ufo'],
     ['steam-train', 'きかんしゃ', '🚂', 'steam train'],
-    ['yacht', 'よっと', '⛵', 'yacht']
+    ['yacht', 'よっと', '⛵', 'yacht'],
+    ['sled', 'そり', '🛷', 'sled']
   ])
 ];
 

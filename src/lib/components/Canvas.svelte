@@ -47,7 +47,8 @@
     const r = t.judge();
     if (r) onDone(r);
   }
-  function playDemo() {
+  // 書き順の再生。なぞる では自動で、他のモードでは右の「みる」から
+  export function playDemo() {
     demo = false;
     requestAnimationFrame(() => (demo = true));
   }
