@@ -4,6 +4,7 @@
   import Guide from '$lib/components/about/Guide.svelte';
   import AppStatus from '$lib/components/about/AppStatus.svelte';
   import Backup from '$lib/components/about/Backup.svelte';
+  import Progress from '$lib/components/about/Progress.svelte';
   import { pwaStatus, type PwaStatus } from '$lib/pwa';
 
   let status = $state<PwaStatus>({ standalone: false, swActive: false, cached: false });
@@ -29,7 +30,10 @@
   </header>
 
   <div class="cols">
-    <div class="left"><Guide standalone={status.standalone} /></div>
+    <div class="left">
+      <Progress />
+      <Guide standalone={status.standalone} />
+    </div>
     <div class="right">
       <AppStatus {status} />
       <Backup />
