@@ -57,6 +57,21 @@ describe('PracticeSession', () => {
     expect([s.i, s.c, s.mode]).toEqual([1, 'す', 'trace']);
   });
 
+  it('おてほんなし の「みる」は字を 2 秒だけ見せ、文字を変えると隠れる', () => {
+    const s = new PracticeSession(bus);
+    s.peekSample();
+    expect(s.peek).toBe(true);
+    vi.advanceTimersByTime(1500);
+    s.peekSample();
+    vi.advanceTimersByTime(1500);
+    expect(s.peek).toBe(true); // 押し直すと延びる
+    vi.advanceTimersByTime(600);
+    expect(s.peek).toBe(false);
+    s.peekSample();
+    s.select(0, 'free');
+    expect(s.peek).toBe(false);
+  });
+
   it('途中まで済んだ単語は残りの文字から再開し、最後を終えると完了になる', () => {
     clear('ば');
     record('ば', 'test');
