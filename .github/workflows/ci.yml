@@ -25,6 +25,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Node.js and dependencies
         uses: ./.github/workflows/setup-node
       - name: Run Prettier check & ESLint
@@ -35,6 +37,8 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Node.js and dependencies
         uses: ./.github/workflows/setup-node
       - name: Run svelte-check
@@ -45,6 +49,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Node.js and dependencies
         uses: ./.github/workflows/setup-node
       - name: Run Vitest
@@ -55,6 +61,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Node.js and dependencies
         uses: ./.github/workflows/setup-node
       - name: Run Build
