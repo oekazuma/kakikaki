@@ -1,5 +1,11 @@
-// アバターの候補は単語のイラスト（static/img/<id>.svg）を流用する。顔が円に収まるものだけ
+// アバターの候補（static/img/<id>.svg）。人は Twemoji の顔（person-*）、ほかは単語のイラストを流用する
 export const AVATARS = [
+  'person-boy',
+  'person-girl',
+  'person-man',
+  'person-woman',
+  'person-grandpa',
+  'person-grandma',
   'cat',
   'dog',
   'rabbit',
