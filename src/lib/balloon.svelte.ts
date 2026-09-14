@@ -1,4 +1,5 @@
 import type { Profile } from './profiles.svelte';
+import { isObject, loadJSON, saveJSON } from './storage';
 
 // かくしゲーム「ふうせん ぽん」: 下から上がる風船をタップして割る。3 回見逃すと終わり
 export type Balloon = { id: number; x: number; y: number; size: number; color: string; vy: number };
@@ -84,20 +85,13 @@ export class BalloonGame {
 // ランキングは使う人をまたいで 1 つ（kk:balloon = { pid: { score, date } }）
 export type Best = { score: number; date: string };
 const KEY = 'kk:balloon';
-const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
-export function loadBests(): Record<string, Best> {
-  try {
-    return JSON.parse(store()?.getItem(KEY) ?? 'null') ?? {};
-  } catch {
-    return {};
-  }
-}
+export const loadBests = () => loadJSON<Record<string, Best>>(KEY, {}, isObject);
 // 自己ベストを更新したら true
 export function saveScore(pid: string, score: number, date: string): boolean {
   const all = loadBests();
   if ((all[pid]?.score ?? 0) >= score) return false;
   all[pid] = { score, date };
-  store()?.setItem(KEY, JSON.stringify(all));
+  saveJSON(KEY, all);
   return true;
 }
 export function ranking(list: Profile[]): (Profile & Best)[] {

@@ -73,4 +73,17 @@ describe('profiles', () => {
     expect(m.updateProfile('p1', { name: 'たろう', avatar: 'bear' })).toBe(true);
     expect(m.current()).toMatchObject({ name: 'たろう', avatar: 'bear' });
   });
+
+  it('壊れた kk:profiles は作り直し、cur が一覧に無ければ先頭の人にする', async () => {
+    localStorage.setItem('kk:profiles', JSON.stringify({ list: 'nope', cur: 'p1' }));
+    expect((await fresh()).profiles.list.map((p) => p.id)).toEqual(['p1']);
+    localStorage.setItem(
+      'kk:profiles',
+      JSON.stringify({ list: [{ id: 'p3', name: 'A', avatar: 'cat', lang: 'ja' }, { id: 'x' }], cur: 'p9' })
+    );
+    const m = await fresh();
+    expect([m.profiles.cur, m.profiles.list.length]).toEqual(['p3', 1]);
+    m.record('あ', 'trace');
+    expect(localStorage.getItem('kk:p3:ja:progress')).toContain('"trace":1');
+  });
 });

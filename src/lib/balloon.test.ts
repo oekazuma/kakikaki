@@ -77,4 +77,11 @@ describe('ふうせん ぽん', () => {
     ]);
     expect(loadBests().p1.date).toBe('2026-09-14');
   });
+
+  it('壊れた kk:balloon は空として読む', () => {
+    localStorage.setItem('kk:balloon', '[]');
+    expect(loadBests()).toEqual({});
+    localStorage.setItem('kk:balloon', '{');
+    expect(loadBests()).toEqual({});
+  });
 });

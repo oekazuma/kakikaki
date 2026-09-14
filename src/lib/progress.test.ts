@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { get, record, charCleared, charGold, wordStar, wordCrown, reset } from './progress.svelte';
+import { get, record, charCleared, charGold, wordStar, wordCrown, reset, switchProfile, days } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 
@@ -49,5 +49,13 @@ describe('progress', () => {
     setLang('ja');
     expect(wordStar(bus)).toBe(false);
     expect(get('あ').trace).toBe(1);
+  });
+  it('壊れた記録の保存値は空として読む', () => {
+    localStorage.setItem('kk:p1:ja:days', '"x"');
+    localStorage.setItem('kk:p1:ja:progress', '[1,2]');
+    switchProfile('p1');
+    expect([days(), get('あ')]).toEqual([[], { trace: 0, free: 0, test: 0 }]);
+    record('あ', 'trace');
+    expect(days().length).toBe(1);
   });
 });
