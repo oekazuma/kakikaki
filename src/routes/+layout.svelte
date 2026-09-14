@@ -2,9 +2,11 @@
   import { fx } from '$lib/fx';
   import Icon from '$lib/components/Icon.svelte';
   import { lang } from '$lib/lang.svelte';
+  import { rememberLang } from '$lib/progress.svelte';
   let { children } = $props();
   $effect(() => {
     document.documentElement.dataset.lang = lang.v;
+    rememberLang(lang.v);
   });
 
   // 練習画面（左 240 + 書き取り面 + 右 120）が操作できる最小サイズ。iPad 横向きはすべて満たす

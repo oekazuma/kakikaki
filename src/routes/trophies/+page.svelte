@@ -7,6 +7,8 @@
   import { badgesOf } from '$lib/badges';
   import { earned } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
+  import { current } from '$lib/profiles.svelte';
+  import Avatar from '$lib/components/Avatar.svelte';
 
   const got = $derived(Object.keys(earned()).length);
   const all = $derived(badgesOf(lang.v).length);
@@ -20,7 +22,10 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1><Icon name="trophy" /> めだる と きろく <small>（{info().short}）</small></h1>
+    <h1>
+      <Icon name="trophy" /> めだる と きろく
+      <small><Avatar avatar={current().avatar} size={28} /> {current().name} の {info().short}</small>
+    </h1>
     <span class="count">めだる {got} / {all}</span>
   </header>
   <StatTiles />
@@ -52,6 +57,10 @@
   h1 small {
     font-size: 14px;
     color: var(--sub);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 6px;
   }
   .count {
     font-weight: bold;
