@@ -6,7 +6,7 @@
   import { fly } from 'svelte/transition';
   import { practiceUrl } from '$lib/nav';
   import Canvas from '$lib/components/Canvas.svelte';
-  import WordCard from '$lib/components/WordCard.svelte';
+  import WordWithHear from '$lib/components/WordWithHear.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import BackButton from '$lib/components/BackButton.svelte';
   import ModeBar from '$lib/components/ModeBar.svelte';
@@ -42,9 +42,10 @@
   let speaking = $state(false);
   const total = $derived(strokes[s.c].length);
 
+  // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
   async function hear() {
     speaking = true;
-    await say([lang.v === 'en' ? s.c : readingOf(s.c), ...(s.chars.length > 1 ? [nameOf(word)] : [])], info().speech);
+    await say(lang.v === 'en' ? s.c : readingOf(s.c), info().speech);
     speaking = false;
   }
   function goNext() {
@@ -69,7 +70,7 @@
   </header>
 
   <div class="left">
-    <WordCard {word} size={240} />
+    <WordWithHear {word} />
     <CharTabs {s} />
     {#if s.mode === 'test'}
       <Sample char={s.c} strokes={total} />
