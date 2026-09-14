@@ -17,6 +17,8 @@ export class Tracer {
   tracing = $state(false);
   readonly samples: Pt[][];
   private scores: number[] = [];
+  // いま追っている指。2 本目の指や手のひらは無視する（1 本目の画を壊さない）
+  private pointer: number | null = null;
 
   constructor(
     readonly char: string,
@@ -37,20 +39,21 @@ export class Tracer {
   }
 
   // 指を置いた。なぞるでは始点の近くでないと無視する
-  down(p: Pt): boolean {
-    if (this.finished) return false;
+  down(p: Pt, id = 0): boolean {
+    if (this.finished || this.pointer !== null) return false;
     if (this.mode === 'trace') {
       if (!canStart(this.current, p)) return false;
       this.cursor = 0;
     }
+    this.pointer = id;
     this.tracing = true;
     this.trail = [p];
     return true;
   }
 
   // 指が動いた。なぞるで線から外れたら 'fail'
-  move(p: Pt): 'moved' | 'fail' | 'idle' {
-    if (!this.tracing) return 'idle';
+  move(p: Pt, id = 0): 'moved' | 'fail' | 'idle' {
+    if (!this.tracing || id !== this.pointer) return 'idle';
     this.trail.push(p);
     if (this.mode === 'trace') {
       const c = advance(this.current, this.cursor, p);
@@ -63,8 +66,9 @@ export class Tracer {
     return 'moved';
   }
 
-  up(): UpEvent {
-    if (!this.tracing) return 'idle';
+  up(id = 0): UpEvent {
+    if (!this.tracing || id !== this.pointer) return 'idle';
+    this.pointer = null;
     this.tracing = false;
     if (this.mode === 'trace') {
       if (traceDone(this.current, this.cursor)) return this.complete(1);
@@ -82,6 +86,7 @@ export class Tracer {
   }
 
   private fail() {
+    this.pointer = null;
     this.tracing = false;
     this.cursor = 0;
     this.trail = [];
