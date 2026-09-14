@@ -14,11 +14,13 @@
   // かくしゲーム。プロフィール画面の風船を 10 回タップすると来る
   const g = untrack(() => new BalloonGame());
   let isBest = $state(false);
+  let settled = false; // 終了処理は 1 回だけ（自己ベスト未更新でも毎フレーム走らせない）
   let floater = $state<{ x: number; y: number; pts: number; id: number } | null>(null);
   let best = $state(loadBests()[profiles.cur]?.score ?? 0);
 
   function start() {
     isBest = false;
+    settled = false;
     g.start();
   }
   $effect(() => {
@@ -28,13 +30,14 @@
     const loop = (t: number) => {
       g.tick(Math.min(0.05, (t - last) / 1000));
       last = t;
-      if (g.over && !isBest && floater === null) finish();
+      if (g.over && !settled) finish();
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   });
   function finish() {
+    settled = true;
     isBest = saveScore(profiles.cur, g.score, today());
     if (isBest) {
       best = g.score;

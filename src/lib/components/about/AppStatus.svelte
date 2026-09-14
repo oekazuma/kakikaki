@@ -11,16 +11,24 @@
   let updating = $state(false);
   let checking = $state(false);
   let checked = $state(false);
+  let failed = $state(false);
   async function check() {
     checking = true;
-    await updated.check();
-    checking = false;
-    checked = true;
+    try {
+      await updated.check();
+    } finally {
+      checking = false;
+      checked = true;
+    }
   }
   function update() {
     if (!navigator.onLine) return alert('インターネットに接続してから押してください');
     updating = true;
-    updateApp();
+    failed = false;
+    updateApp().catch(() => {
+      updating = false;
+      failed = true;
+    });
   }
   const items = $derived([
     [
@@ -45,6 +53,7 @@
   <button class={['update', { ready: updated.current }]} onclick={update} disabled={updating || !updated.current}
     ><Icon name="redo" size={20} /> {updating ? '更新中…' : '最新版に更新'}</button
   >
+  {#if failed}<small class="err">更新できませんでした。しばらくしてからもう一度押してください</small>{/if}
   <small>いまのバージョン: {built}<br /><code>{hash || version}</code></small>
   {#if !updated.current}
     <button class="check" onclick={check} disabled={checking}>
@@ -93,6 +102,10 @@
     font-weight: bold;
     text-decoration: underline;
     background: none;
+  }
+  .err {
+    color: #c62828;
+    font-weight: bold;
   }
   .check:disabled {
     opacity: 0.6;

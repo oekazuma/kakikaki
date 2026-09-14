@@ -44,8 +44,12 @@ const toHira = (s: string) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode
 export const readingOf = (c: string) => SPECIAL[toHira(c)] ?? c;
 
 // 複数渡すと順番に読む（文字 → 単語 など）。読み終わり（または中断）で resolve
+// 新しい say() が古い方を cancel すると古い utterance の onerror が来るが、古い Promise は解決しない
+// （呼び出し側の「読んでいる」表示が新しい音声より先に消えないように）
+let gen = 0;
 export function say(text: string | string[], locale = 'ja-JP'): Promise<void> {
   if (!('speechSynthesis' in window)) return Promise.resolve();
+  const me = ++gen;
   speechSynthesis.cancel();
   const v = speechSynthesis.getVoices().find((v) => v.lang.replace('_', '-').startsWith(locale.slice(0, 2)));
   const list = [text].flat();
@@ -58,7 +62,7 @@ export function say(text: string | string[], locale = 'ja-JP'): Promise<void> {
       if (v) u.voice = v;
       const finish = () => {
         clearTimeout(timer);
-        done();
+        if (me === gen) done();
       };
       if (k === list.length - 1) u.onend = finish;
       u.onerror = finish; // cancel による中断も含む
