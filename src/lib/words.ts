@@ -203,7 +203,7 @@ export const WORDS: Word[] = [
     ['ferris-wheel', 'かんらんしゃ', '🎡', 'ferris wheel'],
     ['yoyo', 'よーよー', '🪀', 'yoyo'],
     ['violin', 'ばいおりん', '🎻', 'violin'],
-    ['quiz', 'くいず', '❓', 'quiz']
+    ['queen', 'じょおう', '👸', 'queen']
   ]),
   ...W('やさい', [
     ['carrot', 'にんじん', '🥕', 'carrot'],
