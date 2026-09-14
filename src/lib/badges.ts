@@ -12,6 +12,7 @@ export type Stats = {
   rows: Record<string, number>; // 行グループ名 → クリア数
   cats: Record<string, number>; // カテゴリ → 星のついた単語数
   days: number; // 練習した日数
+  streak: number; // 連続で練習した日数（3 ことば をまたいで数える）
   quiz: Record<string, number>; // read1 など → 正解数
 };
 
@@ -37,7 +38,8 @@ export function computeStats(
   charCleared: (c: string) => boolean,
   charGold: (c: string) => boolean,
   dayCount: number,
-  quiz: Record<string, number> = {}
+  quiz: Record<string, number> = {},
+  streak = 0
 ): Stats {
   const wordStar = (w: Word) => lettersOf(w, l).every(charCleared);
   const wordCrown = (w: Word) => lettersOf(w, l).every(charGold);
@@ -49,7 +51,8 @@ export function computeStats(
     rows: Object.fromEntries(ROWS[l].map((r) => [r.name, r.chars.filter(charCleared).length])),
     cats: Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c && wordStar(w)).length])),
     days: dayCount,
-    quiz
+    quiz,
+    streak
   };
 }
 
@@ -180,7 +183,9 @@ export function badgesOf(l: Lang): Badge[] {
     }),
     count('days-3', 'つづけた ひ', '📅', '3にち れんしゅう', '3にち れんしゅうした', (s) => [s.days, 3]),
     count('days-7', 'つづけた ひ', '🗓️', '7にち れんしゅう', '7にち れんしゅうした', (s) => [s.days, 7]),
-    count('days-30', 'つづけた ひ', '🎂', '30にち れんしゅう', '30にち れんしゅうした', (s) => [s.days, 30])
+    count('days-30', 'つづけた ひ', '🎂', '30にち れんしゅう', '30にち れんしゅうした', (s) => [s.days, 30]),
+    count('streak-3', 'つづけた ひ', '🔥', '3にち つづけた', '3にち つづけて れんしゅうした', (s) => [s.streak, 3]),
+    count('streak-7', 'つづけた ひ', '🏅', '7にち つづけた', '7にち つづけて れんしゅうした', (s) => [s.streak, 7])
   ];
 }
 
