@@ -1,6 +1,6 @@
 // 新しいバージョンの検知。Service Worker は skipWaiting で即座に入れ替わるが、開いているページは古い JS のまま
 // なので、「新しい SW が入った／制御を取った」= 読み直せば新しくなる、として知らせる
-export const update = $state({ ready: false });
+export const update = $state({ ready: false, checking: false, checkedAt: 0 });
 
 let watching = false;
 let lastCheck = 0;
@@ -29,4 +29,20 @@ export function watchUpdates(container: ServiceWorkerContainer | undefined = nav
     document.addEventListener('visibilitychange', check);
     check();
   });
+}
+
+// 「確認する」ボタン用。新しい SW を探しに行き、数秒待って見つかったかを返す
+export async function checkForUpdate(container: ServiceWorkerContainer | undefined = navigator.serviceWorker) {
+  update.checking = true;
+  try {
+    const reg = await container?.getRegistration();
+    await reg?.update();
+    lastCheck = Date.now();
+    for (let i = 0; i < 20 && !update.ready; i++) await new Promise((r) => setTimeout(r, 150));
+  } catch {
+    /* オフラインなど。ready は変えない */
+  }
+  update.checking = false;
+  update.checkedAt = Date.now();
+  return update.ready;
 }
