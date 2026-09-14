@@ -24,11 +24,11 @@
   <div class="guard card">
     {#if portrait}
       <!-- タブレットが縦から横へ回るアニメーション -->
-      <svg class="tablet" viewBox="0 0 140 140" width="160" height="160" aria-hidden="true">
+      <svg class="tablet" viewBox="0 0 140 160" width="150" height="171" aria-hidden="true">
         <g class="spin">
-          <rect x="38" y="22" width="64" height="96" rx="7" fill="#fff" stroke="var(--blue)" stroke-width="5" />
-          <rect x="44" y="30" width="52" height="80" rx="2" fill="#dfe7f0" />
-          <circle cx="70" cy="26.5" r="1.6" fill="var(--blue)" />
+          <rect x="38" y="42" width="64" height="96" rx="7" fill="#fff" stroke="var(--blue)" stroke-width="5" />
+          <rect x="44" y="50" width="52" height="80" rx="2" fill="#dfe7f0" />
+          <circle cx="70" cy="46.5" r="1.6" fill="var(--blue)" />
         </g>
         <!-- 反時計回りの矢印 -->
         <g
@@ -39,18 +39,18 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M24 46 A48 48 0 0 0 24 94" />
-          <path d="M31 87 L23 95 L15 87" />
+          <path d="M24 66 A48 48 0 0 0 24 114" />
+          <path d="M31 107 L23 115 L15 107" />
         </g>
-        <!-- 縦: ✕ / 横: ✓ -->
+        <!-- タブレットの真上: 縦は ✕、横は ✓ -->
         <g class="ng">
-          <circle cx="116" cy="24" r="15" fill="#e53935" />
-          <path d="M110 18 L122 30 M122 18 L110 30" stroke="#fff" stroke-width="4" stroke-linecap="round" />
+          <circle cx="70" cy="18" r="15" fill="#e53935" />
+          <path d="M64 12 L76 24 M76 12 L64 24" stroke="#fff" stroke-width="4" stroke-linecap="round" />
         </g>
         <g class="ok">
-          <circle cx="116" cy="24" r="15" fill="#43a047" />
+          <circle cx="70" cy="18" r="15" fill="#43a047" />
           <path
-            d="M108 24 L114 30 L125 18"
+            d="M62 18 L68 24 L79 12"
             fill="none"
             stroke="#fff"
             stroke-width="4"
@@ -105,16 +105,16 @@
   .spin {
     transform-box: fill-box;
     transform-origin: center;
-    animation: turn 2.4s ease-in-out infinite;
+    animation: turn 4.5s ease-in-out infinite;
   }
   .arrow {
-    animation: blink 2.4s ease-in-out infinite;
+    animation: blink 4.5s ease-in-out infinite;
   }
   .ng {
-    animation: blink 2.4s ease-in-out infinite;
+    animation: blink 4.5s ease-in-out infinite;
   }
   .ok {
-    animation: blink 2.4s ease-in-out infinite reverse;
+    animation: blink 4.5s ease-in-out infinite reverse;
   }
   @keyframes turn {
     0%,
