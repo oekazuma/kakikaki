@@ -65,6 +65,7 @@
     <div class="hud">
       <span class="score">{g.score} <small>てん</small></span>
       {#if g.combo >= 2}<span class="combo">{g.combo} コンボ！</span>{/if}
+      {#if g.level > 0}{#key g.level}<span class="level">レベル {g.level}</span>{/key}{/if}
       <span class="lives" role="img" aria-label="のこり {MISS_MAX - g.misses}">
         {#each Array.from({ length: MISS_MAX }, (_, i) => i) as i (i)}
           <span class={{ lost: i < g.misses }}><Icon name="heart" size={26} fill /></span>
@@ -122,6 +123,14 @@
     color: #e08a00;
     font-size: 20px;
     animation: pop 0.3s;
+  }
+  .level {
+    color: #fff;
+    background: #e53935;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 15px;
+    animation: pop 0.4s;
   }
   .lives {
     display: flex;
