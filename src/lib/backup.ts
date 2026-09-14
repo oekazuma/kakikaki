@@ -6,14 +6,7 @@ import { today } from './today';
 export type Backup = { app: 'kakikaki'; version: string; at: string; data: Record<string, string> };
 const PREFIX = 'kk:';
 
-function keys(): string[] {
-  const out: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k?.startsWith(PREFIX)) out.push(k);
-  }
-  return out;
-}
+const keys = () => Object.keys(localStorage).filter((k) => k.startsWith(PREFIX));
 
 export function exportAll(version: string): string {
   const data: Record<string, string> = {};

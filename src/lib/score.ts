@@ -1,6 +1,4 @@
-import { dist, nearestDist, type Pt } from './geometry';
-
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+import { clamp, dist, nearestDist, type Pt } from './geometry';
 
 export function strokeScore(trail: Pt[], samples: Pt[]): number {
   if (trail.length === 0) return 0;

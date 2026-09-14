@@ -9,7 +9,7 @@ export const MISS_MAX = 3;
 export const points = (combo: number) => 10 + Math.min(10, combo - 1) * 5; // 10, 15, … 60
 // コンボ 5 ごとにレベルが上がり、風船が少しずつ速く・小さく・多くなる（見逃してコンボが切れると戻る）。
 // 1 段階あたり 速さ +8% / 大きさ -4px / 間隔 -6%、最大 5 段階。急に難しくなりすぎない程度
-export const LEVEL_STEP = 5;
+const LEVEL_STEP = 5;
 export const levelOf = (combo: number) => Math.min(5, Math.floor(combo / LEVEL_STEP));
 
 export class BalloonGame {
@@ -83,7 +83,7 @@ export class BalloonGame {
 }
 
 // ランキングは使う人をまたいで 1 つ（kk:balloon = { pid: { score, date } }）
-export type Best = { score: number; date: string };
+type Best = { score: number; date: string };
 const KEY = 'kk:balloon';
 export const loadBests = () => loadJSON<Record<string, Best>>(KEY, {}, isObject);
 // 自己ベストを更新したら true

@@ -29,7 +29,7 @@ const ROWS_EN: Row[] = ALPHABET.flatMap((row) => [row.slice(0, 7), row.slice(7)]
 }));
 const ROWS_KANA: Row[] = ROWS_JA.map((r) => ({ name: toKatakana(r.name), chars: r.chars.map(toKatakana) }));
 export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, en: ROWS_EN };
-export const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, kana: CHARS_KANA, en: CHARS_EN };
+const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, kana: CHARS_KANA, en: CHARS_EN };
 export const CAT_TOTAL = Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c).length]));
 export const TOTAL = (l: Lang) => ({ chars: ALL_CHARS[l].length, words: WORDS.length });
 
@@ -92,21 +92,8 @@ export type Badge = {
   need: (s: Stats) => [have: number, need: number];
 };
 
-const count = (
-  id: string,
-  group: BadgeGroup,
-  emoji: string,
-  name: string,
-  desc: string,
-  need: (s: Stats) => [number, number]
-): Badge => ({
-  id,
-  group,
-  emoji,
-  name,
-  desc,
-  need
-});
+type Count = (id: string, group: BadgeGroup, emoji: string, name: string, desc: string, need: Badge['need']) => Badge;
+const count: Count = (id, group, emoji, name, desc, need) => ({ id, group, emoji, name, desc, need });
 
 export function badgesOf(l: Lang): Badge[] {
   const T = TOTAL(l);

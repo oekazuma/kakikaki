@@ -3,7 +3,8 @@ import { WORDS, charWord, wordById } from './words';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
-import { lettersOf, nameOf, toKatakana } from './lang.svelte';
+import { lettersOf, nameOf } from './lang.svelte';
+import { toKatakana } from './chars';
 
 describe('words', () => {
   it('全単語の全文字に書き順がある（日本語・英語）', () => {

@@ -1,6 +1,7 @@
 export type Pt = { x: number; y: number };
 
 export const dist = (a: Pt, b: Pt) => Math.hypot(a.x - b.x, a.y - b.y);
+export const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const lerp = (a: Pt, b: Pt, t: number): Pt => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
 
 export function length(pts: Pt[]) {
@@ -95,7 +96,7 @@ export function pathToPoints(d: string, step = 1.5): Pt[] {
 }
 
 // 折れ線を弧長 step ごとの点に打ち直す（始点・終点を含む）
-export function resample(pts: Pt[], step: number): Pt[] {
+function resample(pts: Pt[], step: number): Pt[] {
   if (pts.length === 0) return [];
   const out = [pts[0]];
   let acc = 0;

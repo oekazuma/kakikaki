@@ -31,7 +31,7 @@ const load = (l: Lang): Data => ({
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
 const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
 
-export const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
+const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
 const cur = () => data[lang.v];
 
 // 使う人を切り替える: その人の言語に戻し、記録を読み直す
@@ -40,7 +40,7 @@ export function switchProfile(id: string) {
   if (!p) return;
   setCurrent(id);
   setLang(p.lang);
-  for (const l of ['ja', 'kana', 'en'] as const) data[l] = load(l);
+  for (const l of LANGS) data[l] = load(l);
 }
 export function deleteProfile(id: string) {
   const wasCur = profiles.cur === id;
@@ -50,8 +50,6 @@ export function deleteProfile(id: string) {
 }
 // 言語の切り替えを使っている人に覚えさせる（次にその人を選んだとき同じ言語で開く）
 export const rememberLang = (l: Lang) => updateProfile(profiles.cur, { lang: l });
-
-export { today };
 
 export const get = (c: string): CharProgress => cur().progress[c] ?? { trace: 0, free: 0, test: 0 };
 export const earned = () => cur().earned;
@@ -96,14 +94,14 @@ export function record(c: string, mode: Mode) {
   markToday(l);
 }
 
-export function earn(id: string) {
+function earn(id: string) {
   data[lang.v].earned[id] = today();
   save(lang.v, 'earned');
 }
 
 // 文字クリア = なぞる 2 + じぶんでかく 1、金の星 = おてほんなし 1（CAP と同じ数）
-export const clearedIn = (p: CharProgress) => p.trace >= CAP.trace && p.free >= CAP.free;
-export const goldIn = (p: CharProgress) => p.test >= CAP.test;
+const clearedIn = (p: CharProgress) => p.trace >= CAP.trace && p.free >= CAP.free;
+const goldIn = (p: CharProgress) => p.test >= CAP.test;
 export const charCleared = (c: string) => clearedIn(get(c));
 export const charGold = (c: string) => goldIn(get(c));
 export const wordStar = (w: Word) => lettersOf(w).every(charCleared);
@@ -119,11 +117,9 @@ export function resetRecords(pid: string, langs: Lang[]) {
 // 現在の人・言語の記録だけ消す
 export const reset = () => resetRecords(profiles.cur, [lang.v]);
 
-// 練習した日は 3 ことば をまたいで 1 つに（連続日数とカレンダー用）
-export const allDays = () => {
-  const all = LANGS.flatMap((l) => data[l].days);
-  return all.filter((d, i) => all.indexOf(d) === i);
-};
+// 練習した日は 3 ことば をまたいで 1 つに（連続日数とカレンダー用）。Set は重複除去に使うだけで描画には持ち出さない
+// eslint-disable-next-line svelte/prefer-svelte-reactivity
+export const allDays = () => [...new Set(LANGS.flatMap((l) => data[l].days))];
 export const streakNow = () => streak(allDays(), today());
 export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz(), streakNow());
 

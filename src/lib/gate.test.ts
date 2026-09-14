@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { Gate, MAX_FAILS } from './gate.svelte';
-import { today } from './progress.svelte';
+import { today } from './today';
 
 describe('Gate', () => {
   beforeEach(() => localStorage.clear());

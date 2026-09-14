@@ -7,12 +7,13 @@ import { pathToPoints, translate } from './geometry';
 import { recognize, passes, makeTemplates, templatesFor } from './recognize';
 
 const drawn = (S: Record<string, string[]>, c: string) => S[c].map((d) => pathToPoints(d, 1.5));
+const T_JA = templatesFor(STROKES);
 const T_EN = makeTemplates(STROKES_EN);
 const T_KANA = makeTemplates(STROKES_KANA);
 
 describe('recognize', () => {
   it('お手本そのものは 81 文字すべて 1 位が自分', () => {
-    for (const c of CHARS) expect(recognize(drawn(STROKES, c))[0].char, c).toBe(c);
+    for (const c of CHARS) expect(recognize(drawn(STROKES, c), T_JA)[0].char, c).toBe(c);
   });
   it('英語: お手本そのものは 52 文字すべて合格（I と l のように同形の字は 2 位でも可）', () => {
     for (const c of CHARS_EN) expect(passes(c, recognize(drawn(STROKES_EN, c), T_EN)), c).toBe(true);
@@ -27,7 +28,7 @@ describe('recognize', () => {
       const strokes = drawn(STROKES, c).map((s) =>
         translate(s, 6, -4).map((p) => ({ x: p.x + rnd(), y: p.y + rnd() }))
       );
-      expect(passes(c, recognize(strokes)), c).toBe(true);
+      expect(passes(c, recognize(strokes, T_JA)), c).toBe(true);
     }
     for (const c of ['A', 'g', 'S', 'w']) {
       const strokes = drawn(STROKES_EN, c).map((s) =>
@@ -37,7 +38,7 @@ describe('recognize', () => {
     }
   });
   it('画数が違う別の字は不合格', () => {
-    expect(passes('あ', recognize(drawn(STROKES, 'ー')))).toBe(false);
+    expect(passes('あ', recognize(drawn(STROKES, 'ー'), T_JA))).toBe(false);
   });
   it('ひらがなのテンプレートは 81 個で、文字セットごとに 1 回だけ作られる', () => {
     expect(templatesFor(STROKES).length).toBe(81);

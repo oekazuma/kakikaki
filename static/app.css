@@ -86,3 +86,10 @@ button {
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
+/* モーダルの後ろの暗幕（プロフィール編集・削除の確認） */
+.dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 70;
+}

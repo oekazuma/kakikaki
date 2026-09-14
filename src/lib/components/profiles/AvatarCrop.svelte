@@ -2,7 +2,8 @@
   import { untrack } from 'svelte';
   import Icon from '../Icon.svelte';
   import { cropAvatar } from '$lib/avatar';
-  import { clampOffset, zoomAt, cropRect, type CropState, type Pt } from '$lib/crop';
+  import { clampOffset, zoomAt, cropRect, type CropState } from '$lib/crop';
+  import { dist, type Pt } from '$lib/geometry';
   // 丸い窓の下で写真を指で動かし、スライダーで拡大して切り抜く
   let { img, onpick, oncancel }: { img: HTMLImageElement; onpick: (url: string) => void; oncancel: () => void } =
     $props();
@@ -23,15 +24,13 @@
 
   // 指の位置。1 本なら移動、2 本ならピンチで拡大縮小（iPad）。描画には使わないので反応性は不要
   // eslint-disable-next-line svelte/prefer-svelte-reactivity
-  const pts = new Map<number, { x: number; y: number }>();
+  const pts = new Map<number, Pt>();
   let drag: { x: number; y: number; ox: number; oy: number } | null = null;
   let pinch: { d: number; zoom: number; mx: number; my: number; ox: number; oy: number } | null = null;
-  const dist = () => {
-    const [a, b] = [...pts.values()];
-    return Math.hypot(a.x - b.x, a.y - b.y);
-  };
+  const two = () => [...pts.values()] as [Pt, Pt];
+  const span = () => dist(...two());
   const mid = () => {
-    const [a, b] = [...pts.values()];
+    const [a, b] = two();
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   };
   function down(e: PointerEvent) {
@@ -42,7 +41,7 @@
     if (pts.size === 2) {
       drag = null;
       const m = mid();
-      pinch = { d: dist(), zoom, mx: m.x, my: m.y, ox, oy };
+      pinch = { d: span(), zoom, mx: m.x, my: m.y, ox, oy };
     } else if (pts.size === 1) drag = { x: e.clientX, y: e.clientY, ox, oy };
   }
   function move(e: PointerEvent) {
@@ -52,7 +51,7 @@
     if (pinch && pts.size >= 2) {
       apply(
         { ox: pinch.ox, oy: pinch.oy, zoom: pinch.zoom },
-        (pinch.zoom * dist()) / pinch.d,
+        (pinch.zoom * span()) / pinch.d,
         { x: pinch.mx, y: pinch.my },
         mid()
       );

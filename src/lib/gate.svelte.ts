@@ -1,3 +1,4 @@
+import { isObject, loadJSON, saveJSON } from './storage';
 import { today } from './today';
 
 const KEY = 'kk:gate';
@@ -11,18 +12,11 @@ export class Gate {
   readonly a: number;
   readonly b: number;
 
-  constructor(
-    rnd = Math.random,
-    private store: Pick<Storage, 'getItem' | 'setItem'> = localStorage
-  ) {
+  constructor(rnd = Math.random) {
     this.a = Math.floor(rnd() * 7) + 3;
     this.b = Math.floor(rnd() * 7) + 3;
-    try {
-      const g = JSON.parse(store.getItem(KEY) ?? 'null');
-      if (g?.date === today() && Number.isInteger(g.fails) && g.fails >= 0) this.fails = g.fails;
-    } catch {
-      /* 壊れた保存値は 0 回扱い */
-    }
+    const g = loadJSON<{ date?: unknown; fails?: unknown }>(KEY, {}, isObject);
+    if (g.date === today() && Number.isInteger(g.fails) && (g.fails as number) >= 0) this.fails = g.fails as number;
   }
   get locked() {
     return this.fails >= MAX_FAILS;
@@ -38,7 +32,7 @@ export class Gate {
     }
     this.fails++;
     this.wrong = true;
-    this.store.setItem(KEY, JSON.stringify({ date: today(), fails: this.fails }));
+    saveJSON(KEY, { date: today(), fails: this.fails });
     return false;
   }
 }
