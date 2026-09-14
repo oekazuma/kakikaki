@@ -1,4 +1,4 @@
-import { CHARS, CHARS_EN, SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET } from './chars';
+import { CHARS, CHARS_EN, CHARS_KANA, SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, toKatakana } from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
 import { LEVEL_NAME } from './quiz';
@@ -26,8 +26,9 @@ const ROWS_EN: Row[] = ALPHABET.flatMap((row) => [row.slice(0, 7), row.slice(7)]
   name: chars.join(''),
   chars
 }));
-export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, en: ROWS_EN };
-export const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, en: CHARS_EN };
+const ROWS_KANA: Row[] = ROWS_JA.map((r) => ({ name: toKatakana(r.name), chars: r.chars.map(toKatakana) }));
+export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, en: ROWS_EN };
+export const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, kana: CHARS_KANA, en: CHARS_EN };
 export const CAT_TOTAL = Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c).length]));
 export const TOTAL = (l: Lang) => ({ chars: ALL_CHARS[l].length, words: WORDS.length });
 
@@ -83,7 +84,7 @@ const count = (id: string, emoji: string, name: string, desc: string, need: (s: 
 
 export function badgesOf(l: Lang): Badge[] {
   const T = TOTAL(l);
-  const all = l === 'ja' ? 'ひらがな' : 'あるふぁべっと';
+  const all = l === 'ja' ? 'ひらがな' : l === 'kana' ? 'かたかな' : 'あるふぁべっと';
   return [
     count('first-char', '🌱', 'はじめの いっぽ', 'もじを 1つ クリア', (s) => [s.chars, 1]),
     count('first-word', '🎈', 'はじめての たんご', 'たんごに はじめて ほしが ついた', (s) => [s.words, 1]),

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 概要
 
-iPad 横画面用の子ども向けひらがな書き練習 PWA。SvelteKit（Svelte 5 runes、TypeScript）+ adapter-static で、`main` への push で GitHub Pages（`/kakikaki/`）へ自動デプロイされる。UI 文言は子ども向けのひらがな中心、保護者向け画面（`/about`）だけ漢字可。追加ランタイム依存はゼロで、パーティクル・効果音・手書き認識はすべて自前実装。
+iPad 横画面用の子ども向け ひらがな・カタカナ・アルファベット 書き練習 PWA。SvelteKit（Svelte 5 runes、TypeScript）+ adapter-static で、`main` への push で GitHub Pages（`/kakikaki/`）へ自動デプロイされる。UI 文言は子ども向けのひらがな中心、保護者向け画面（`/about`）だけ漢字可。追加ランタイム依存はゼロで、パーティクル・効果音・手書き認識はすべて自前実装。
 
 ## コマンド
 
@@ -16,7 +16,7 @@ pnpm lint                     # prettier --check と eslint（CI と同じ）
 pnpm format                   # prettier --write
 pnpm check                    # svelte-check
 pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
-pnpm strokes                  # KanjiVG から src/lib/strokes.ts を再生成
+pnpm strokes                  # KanjiVG から src/lib/strokes.ts（ひらがな）と strokes-kana.ts（カタカナ）を再生成
 pnpm strokes:en               # アルファベット 52 文字の書き順を線分・円弧の DSL から生成（src/lib/strokes-en.ts）
 pnpm images                   # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
 pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
@@ -32,7 +32,7 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 
 ## アーキテクチャ
 
-ひらがな（`ja`）と英語（`en`）の 2 言語を `lang.svelte.ts` の `lang.v` で切り替える。文字セット・書き順・読み上げ言語・表示名は `LANG_INFO` / `strokesOf` / `nameOf` / `lettersOf` 経由で取り、各画面や `Canvas` は言語を直接知らない。テーマ色は `<html data-lang>` に応じて `app.css` の CSS 変数が変わる。
+ひらがな（`ja`）・カタカナ（`kana`）・英語（`en`）の 3 言語を `lang.svelte.ts` の `lang.v` で切り替える。カタカナの単語名・文字セット・行グループはひらがなから `toKatakana` で導出し、専用データは書き順（`strokes-kana.ts`）だけ。文字セット・書き順・読み上げ言語・表示名は `LANG_INFO` / `strokesOf` / `nameOf` / `lettersOf` 経由で取り、各画面や `Canvas` は言語を直接知らない。テーマ色は `<html data-lang>` に応じて `app.css` の CSS 変数が変わる。
 
 座標系はすべて KanjiVG の 109×109 viewBox（アルファベットも同じ枠に合わせて自作）。`Canvas.svelte` が `getScreenCTM()` でポインタ座標を viewBox 単位に変換し、判定・採点・認識はその単位で行う純粋関数に委ねる。
 
@@ -41,7 +41,7 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `score.ts`: 軌跡とお手本の距離と向きから 0〜1 → 星 1〜3。
 - `recognize.ts`: 全 81 文字のお手本を N 点に再サンプリング・重心合わせした `TEMPLATES` と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
 - `progress.svelte.ts`: `localStorage` 直結の `$state`。キーは言語ごとに `kk:<lang>:progress`（文字ごとの回数）、`kk:<lang>:earned`（メダル id → 獲得日）、`kk:<lang>:days`（練習した日付）。旧キー `kk:progress` 等は起動時に `ja` へ移行する。関数は現在の言語の記録を対象にし、`wordStar` / `wordCrown` は `Word` を受け取る。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
-- `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
+- `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja/kana が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
 - `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
 - `quiz.ts`: クイズの出題（純粋関数）。`levelOf` が文字数で かんたん/ふつう/むずかしい（Level 1〜3）を決め（ja: 〜2 / 3 / 4〜、en: 〜4 / 5〜6 / 7〜）、`makeReadQuiz` は word→picture と picture→word を交互に、選択肢は同カテゴリ（Level 3 は同文字数）優先で 3 つ。正解数は `progress.svelte.ts` の `recordQuiz` で `kk:<lang>:quiz` の `read1` などに積む（初回正答のみ、かきクイズはお手本を使わなかった単語のみ）。`routes/quiz/write` は `Canvas` を test モードで使い、2 回不正解で trace モードに切り替える。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。

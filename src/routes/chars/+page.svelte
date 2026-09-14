@@ -3,7 +3,7 @@
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
-  import { SEION, GROUPS, ALPHABET } from '$lib/chars';
+  import { SEION, GROUPS, ALPHABET, toKatakana } from '$lib/chars';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
 </script>
@@ -39,14 +39,15 @@
     <BackButton />
     <h1>もじから えらぶ</h1>
   </header>
-  {#if lang.v === 'ja'}
+  {#if lang.v !== 'en'}
+    {@const k = lang.v === 'kana' ? toKatakana : (s: string) => s}
     <div class="ja">
-      {@render table(SEION)}
+      {@render table(SEION.map((col) => col.map(k)))}
       <div class="groups">
         {#each GROUPS as g (g.name)}
           <section class="card group">
             <h2>{g.name}</h2>
-            {@render table(g.cols)}
+            {@render table(g.cols.map((col) => col.map(k)))}
           </section>
         {/each}
       </div>

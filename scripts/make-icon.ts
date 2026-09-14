@@ -1,12 +1,14 @@
 // 実行: node scripts/make-icon.ts [文字] [地の色] [影の色]
 // 例(えいご版): node scripts/make-icon.ts A "#e8734a" "#b8502c"
+// 例(かたかな版): node scripts/make-icon.ts ア "#3a9d5d" "#2b7a46"
 // 文字がひらがなのときは KanjiVG の書き順、それ以外は下の GLYPHS から太線を描く。
 import { writeFileSync } from 'node:fs';
 import { STROKES } from '../src/lib/strokes.ts';
+import { STROKES_KANA } from '../src/lib/strokes-kana.ts';
 
 const [glyph = 'あ', main = '#4f7cae', dark = '#2f5b8a'] = process.argv.slice(2);
 const GLYPHS: Record<string, string[]> = { A: ['M18 92 L54.5 14 L91 92', 'M31 66 H78'] };
-const ds = STROKES[glyph] ?? GLYPHS[glyph];
+const ds = STROKES[glyph] ?? STROKES_KANA[glyph] ?? GLYPHS[glyph];
 if (!ds) throw new Error(`no strokes for ${glyph}`);
 const paths = ds.map((d) => `<path d="${d}"/>`).join('\n      ');
 const star = (cx: number, cy: number, r: number, fill: string, extra = '') => {

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 220">
+  <g transform="translate(10 10) scale(.39)">
+  <rect width="512" height="512" rx="112" fill="#3a9d5d"/>
+  <g stroke="#dfe9f5" stroke-width="3" stroke-dasharray="10 10" opacity=".45"><line x1="256" y1="70" x2="256" y2="442"/><line x1="70" y1="256" x2="442" y2="256"/></g>
+  <g transform="translate(78 84) scale(3.3)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="#2b7a46" stroke-width="15" transform="translate(2.5 3)">
+      <path d="M23.5,26.25c2.41,1.56,3.98,1.44,8.51,0.75c11.4-1.75,37.77-5.5,48.28-6.78c5.23-0.64,7.99,2.06,2.62,6.04c-6.75,5-13.12,9.5-23.25,16"/>
+      <path d="M53.12,41.12c0.79,1.5,1.02,3.24,0.58,5.28c-4.04,18.48-9.92,31.85-19.92,45.48"/>
+    </g>
+    <g stroke="#fff" stroke-width="15">
+      <path d="M23.5,26.25c2.41,1.56,3.98,1.44,8.51,0.75c11.4-1.75,37.77-5.5,48.28-6.78c5.23-0.64,7.99,2.06,2.62,6.04c-6.75,5-13.12,9.5-23.25,16"/>
+      <path d="M53.12,41.12c0.79,1.5,1.02,3.24,0.58,5.28c-4.04,18.48-9.92,31.85-19.92,45.48"/>
+    </g>
+  </g>
+  <polygon points="410.0,58.0 422.2,87.3 453.7,89.8 429.7,110.4 437.0,141.2 410.0,124.7 383.0,141.2 390.3,110.4 366.3,89.8 397.8,87.3" fill="#f5b400"/>
+  <polygon points="410.0,58.0 422.2,87.3 453.7,89.8 429.7,110.4 437.0,141.2 410.0,124.7 383.0,141.2 390.3,110.4 366.3,89.8 397.8,87.3" fill="#ffd766" transform="translate(-4 -4) scale(.82)" transform-origin="410 104"/>
+
+</g>
+  <text x="250" y="140" font-family="Hiragino Maru Gothic ProN, Rounded Mplus 1c, Hiragino Sans, sans-serif" font-weight="bold" font-size="92" fill="#3a9d5d">かきかき<tspan fill="#2f8a6a"> かたかな</tspan></text>
+</svg>

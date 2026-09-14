@@ -39,7 +39,9 @@ const SPECIAL: Record<string, string> = {
   ょ: 'ちいさい よ',
   っ: 'ちいさい つ'
 };
-export const readingOf = (c: string) => SPECIAL[c] ?? c;
+// カタカナは同じ読み方（ァ → ちいさい あ）
+const toHira = (s: string) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+export const readingOf = (c: string) => SPECIAL[toHira(c)] ?? c;
 
 // 複数渡すと順番に読む（文字 → 単語 など）。読み終わり（または中断）で resolve
 export function say(text: string | string[], locale = 'ja-JP'): Promise<void> {

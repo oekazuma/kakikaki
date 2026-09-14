@@ -11,7 +11,7 @@ const seeded =
 
 describe('quiz', () => {
   it('級ごとに 50 語以上あり、全単語がどれかの級に入る', () => {
-    for (const l of ['ja', 'en'] as const) {
+    for (const l of ['ja', 'kana', 'en'] as const) {
       const sizes = [1, 2, 3].map((lv) => wordsOf(l, lv as 1 | 2 | 3).length);
       expect(sizes.reduce((a, b) => a + b, 0)).toBe(WORDS.length);
       for (const s of sizes) expect(s).toBeGreaterThanOrEqual(50);

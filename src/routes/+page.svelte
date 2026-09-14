@@ -10,11 +10,11 @@
   import Icon from '$lib/components/Icon.svelte';
   import { badgesOf, TOTAL } from '$lib/badges';
   import { earned, stats } from '$lib/progress.svelte';
-  import { lang, setLang, info, type Lang } from '$lib/lang.svelte';
+  import { lang, setLang, info, LANGS } from '$lib/lang.svelte';
   const s = $derived(stats());
   const total = $derived(TOTAL(lang.v));
   const badgeCount = $derived(badgesOf(lang.v).length);
-  const LANGS: Lang[] = ['ja', 'en'];
+  const GLYPH = { ja: 'あ', kana: 'ア', en: 'A' } as const;
 </script>
 
 <svelte:head>
@@ -29,15 +29,15 @@
   <header>
     {#key lang.v}
       <h1 in:fly={{ y: -16, duration: 300 }}>
-        <img src="{base}/logo-mark{lang.v === 'en' ? '-en' : ''}.svg" alt="" /><span class="kaki">かきかき</span>
+        <img src="{base}/logo-mark{lang.v === 'ja' ? '' : `-${lang.v}`}.svg" alt="" /><span class="kaki">かきかき</span>
         <span class="hira">{info().short}</span>
       </h1>
     {/key}
     <div class="toggle card" role="tablist" aria-label="ことばを えらぶ">
-      <span class="knob" class:en={lang.v === 'en'}></span>
+      <span class="knob" style:--i={LANGS.indexOf(lang.v)}></span>
       {#each LANGS as l (l)}
         <button role="tab" aria-selected={lang.v === l} class={{ on: lang.v === l }} onclick={() => setLang(l)}>
-          {l === 'ja' ? 'あ' : 'A'} <small>{l === 'ja' ? 'ひらがな' : 'えいご'}</small>
+          {GLYPH[l]} <small>{info(l).short}</small>
         </button>
       {/each}
     </div>
@@ -55,7 +55,7 @@
     </nav>
   </header>
   {#key lang.v}
-    <div class="words" in:fly={{ x: lang.v === 'en' ? 80 : -80, duration: 350 }}>
+    <div class="words" in:fly={{ x: 80, duration: 350 }}>
       {#each CATEGORIES as cat (cat)}
         <h2>{cat}</h2>
         <div class="row">
@@ -92,11 +92,12 @@
     padding: 4px;
     border-radius: 30px;
     margin-left: auto;
+    --step: 88px;
   }
   .toggle button {
     position: relative;
     z-index: 1;
-    width: 96px;
+    width: var(--step);
     height: 48px;
     border-radius: 26px;
     font-size: 22px;
@@ -118,16 +119,14 @@
     position: absolute;
     top: 4px;
     left: 4px;
-    width: 96px;
+    width: var(--step);
     height: 48px;
     border-radius: 26px;
     background: var(--blue);
+    transform: translateX(calc(var(--i) * var(--step)));
     transition:
       transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1),
       background-color 0.4s;
-  }
-  .knob.en {
-    transform: translateX(96px);
   }
   h1 {
     font-size: 26px;
@@ -203,6 +202,15 @@
   /* 幅 1024 の iPad でも 1 行に収める。進捗バーは実績画面にもあるので省略 */
   @media (max-width: 1240px) {
     .pl {
+      display: none;
+    }
+  }
+  /* 幅 1024 の iPad ではトグルを文字だけにする */
+  @media (max-width: 1130px) {
+    .toggle {
+      --step: 56px;
+    }
+    .toggle button small {
       display: none;
     }
   }

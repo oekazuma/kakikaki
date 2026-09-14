@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { WORDS, charWord, wordById } from './words';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
+import { STROKES_KANA } from './strokes-kana';
 import { lettersOf, toKatakana } from './lang.svelte';
 
 describe('words', () => {
@@ -9,6 +10,7 @@ describe('words', () => {
     for (const w of WORDS) {
       for (const c of w.name) expect(STROKES[c], `${w.name}:${c}`).toBeDefined();
       for (const c of lettersOf(w, 'en')) expect(STROKES_EN[c], `${w.en}:${c}`).toBeDefined();
+      for (const c of lettersOf(w, 'kana')) expect(STROKES_KANA[c], `${w.name}:${c}`).toBeDefined();
     }
   });
   it('id は一意', () => {

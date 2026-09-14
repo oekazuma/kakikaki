@@ -9,7 +9,7 @@ export const QUESTIONS: Record<Kind, number> = { read: 10, write: 5 };
 // 文字数で級を決める。分布が各級 60 語前後になる境目
 export function levelOf(w: Word, l: Lang): Level {
   const n = lettersOf(w, l).length;
-  if (l === 'ja') return n <= 2 ? 1 : n === 3 ? 2 : 3;
+  if (l !== 'en') return n <= 2 ? 1 : n === 3 ? 2 : 3;
   return n <= 4 ? 1 : n <= 6 ? 2 : 3;
 }
 export const wordsOf = (l: Lang, level: Level) => WORDS.filter((w) => levelOf(w, l) === level);

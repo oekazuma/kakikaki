@@ -61,7 +61,7 @@
   let speaking = $state(false);
   async function hear() {
     speaking = true;
-    await say([lang.v === 'ja' ? readingOf(c) : c, ...(chars.length > 1 ? [nameOf(word)] : [])], info().speech);
+    await say([lang.v === 'en' ? c : readingOf(c), ...(chars.length > 1 ? [nameOf(word)] : [])], info().speech);
     speaking = false;
   }
 

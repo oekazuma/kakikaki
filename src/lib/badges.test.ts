@@ -1,13 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { badgesOf, ROWS, computeStats, earnedBadges } from './badges';
-import { CHARS, CHARS_EN } from './chars';
+import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
 
 describe('badges', () => {
   it('id は一意で、行グループは全文字を過不足なく分ける', () => {
-    for (const l of ['ja', 'en'] as const) {
+    for (const l of ['ja', 'kana', 'en'] as const) {
       const B = badgesOf(l);
       expect(new Set(B.map((b) => b.id)).size).toBe(B.length);
-      expect(ROWS[l].flatMap((r) => r.chars).sort()).toEqual([...(l === 'ja' ? CHARS : CHARS_EN)].sort());
+      const all = l === 'ja' ? CHARS : l === 'kana' ? CHARS_KANA : CHARS_EN;
+      expect(ROWS[l].flatMap((r) => r.chars).sort()).toEqual([...all].sort());
     }
   });
   it('何もしていなければメダルなし', () => {
@@ -52,7 +53,7 @@ describe('badges', () => {
     expect(ids).toContain('words-100'); // 小文字だけで書ける単語が 100 以上
   });
   it('全部クリアで全メダル', () => {
-    for (const l of ['ja', 'en'] as const) {
+    for (const l of ['ja', 'kana', 'en'] as const) {
       const quiz = { read1: 10, read2: 10, read3: 10, write1: 10, write2: 10, write3: 10 };
       const ids = earnedBadges(
         l,

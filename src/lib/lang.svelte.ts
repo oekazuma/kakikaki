@@ -1,14 +1,17 @@
-import { CHARS, ALPHABET, CHARS_EN } from './chars';
+import { CHARS, ALPHABET, CHARS_EN, CHARS_KANA, toKatakana } from './chars';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
+import { STROKES_KANA } from './strokes-kana';
 import type { Word } from './words';
 
-export type Lang = 'ja' | 'en';
+export type Lang = 'ja' | 'kana' | 'en';
+export const LANGS: Lang[] = ['ja', 'kana', 'en'];
 const KEY = 'kk:lang';
 const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
 
 // 現在の言語。ホームのトグルで切り替え、全画面が参照する
-export const lang = $state<{ v: Lang }>({ v: store()?.getItem(KEY) === 'en' ? 'en' : 'ja' });
+const saved = store()?.getItem(KEY);
+export const lang = $state<{ v: Lang }>({ v: saved === 'en' || saved === 'kana' ? saved : 'ja' });
 
 export function setLang(v: Lang) {
   lang.v = v;
@@ -20,20 +23,26 @@ export const LANG_INFO: Record<
   { title: string; short: string; speech: string; strokes: Record<string, string[]>; chars: string[] }
 > = {
   ja: { title: 'かきかき ひらがな', short: 'ひらがな', speech: 'ja-JP', strokes: STROKES, chars: CHARS },
+  kana: { title: 'かきかき かたかな', short: 'かたかな', speech: 'ja-JP', strokes: STROKES_KANA, chars: CHARS_KANA },
   en: { title: 'かきかき えいご', short: 'えいご', speech: 'en-US', strokes: STROKES_EN, chars: CHARS_EN }
 };
 
-export const info = () => LANG_INFO[lang.v];
+export const info = (l: Lang = lang.v) => LANG_INFO[l];
 export const strokesOf = (l: Lang = lang.v) => LANG_INFO[l].strokes;
 export const charsOf = (l: Lang = lang.v) => LANG_INFO[l].chars;
 
-// 表示名。英語は単語そのもの
-export const nameOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.name : w.en);
-// ひらがな → カタカナ（ー はそのまま）
-export const toKatakana = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
-// 補助行（常に 2 行）: ひらがな のときは「カタカナ / 英語」、えいご のときは「カタカナ / ひらがな」
+// 表示名。カタカナはひらがな名から変換、英語は単語そのもの
+export const nameOf = (w: Word, l: Lang = lang.v) => (l === 'ja' ? w.name : l === 'kana' ? toKatakana(w.name) : w.en);
+export { toKatakana };
+// 補助行（常に 2 行）: 表示していない残り 2 つの表記
 export const subOf = (w: Word, l: Lang = lang.v): string[] =>
-  w.name === w.en ? [] : l === 'ja' ? [toKatakana(w.name), w.en] : [toKatakana(w.name), w.name];
+  w.name === w.en
+    ? []
+    : l === 'ja'
+      ? [toKatakana(w.name), w.en]
+      : l === 'kana'
+        ? [w.name, w.en]
+        : [toKatakana(w.name), w.name];
 
 // 書く対象の文字。スペースやハイフンは飛ばす
 export const lettersOf = (w: Word, l: Lang = lang.v) => [...nameOf(w, l)].filter((c) => c !== ' ' && c !== '-');

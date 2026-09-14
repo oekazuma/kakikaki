@@ -11,6 +11,8 @@ describe('progress', () => {
     reset();
     setLang('en');
     reset();
+    setLang('kana');
+    reset();
     setLang('ja');
   });
   it('なぞる 2 + じぶんでかく 1 でクリア', () => {

@@ -39,7 +39,7 @@ const load = (l: Lang): Data => ({
 });
 const save = (l: Lang, name: keyof Data) => store()?.setItem(key(l, name), JSON.stringify(data[l][name]));
 
-export const data = $state<Record<Lang, Data>>({ ja: load('ja'), en: load('en') });
+export const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
 const cur = () => data[lang.v];
 
 export const today = () => {

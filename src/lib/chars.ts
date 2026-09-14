@@ -32,6 +32,10 @@ export const GROUPS: { name: string; cols: string[][] }[] = [
 export const GOJUON = [...SEION, ...DAKUON, ...HANDAKUON, ...KOGAKI, ...CHOON];
 export const CHARS = GOJUON.flat().filter(Boolean);
 
+// ひらがな → カタカナ（ー はそのまま）
+export const toKatakana = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
+export const CHARS_KANA = CHARS.map(toKatakana);
+
 const AZ = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 export const ALPHABET: string[][] = [
   [...AZ.slice(0, 13)],
