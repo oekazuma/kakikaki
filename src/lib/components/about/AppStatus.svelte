@@ -2,11 +2,12 @@
   import { version } from '$app/environment';
   import Icon from '../Icon.svelte';
   import { updateApp, type PwaStatus } from '$lib/pwa';
-  import { update as upd } from '$lib/update.svelte';
+  import { update as upd, checkForUpdate } from '$lib/update.svelte';
   let { status }: { status: PwaStatus } = $props();
 
-  // kit.version.name の既定はビルド時刻（ミリ秒）
-  const built = Number.isFinite(Number(version)) ? new Date(Number(version)).toLocaleString('ja-JP') : version;
+  // version は「ビルド時刻(ms)-gitハッシュ」（vite.config.ts）
+  const [stamp, hash = ''] = version.split('-');
+  const built = Number.isFinite(Number(stamp)) ? new Date(Number(stamp)).toLocaleString('ja-JP') : stamp;
   let updating = $state(false);
   function update() {
     if (!navigator.onLine) return alert('インターネットに接続してから押してください');
@@ -30,11 +31,18 @@
 
 <section class="card">
   <h2>更新</h2>
-  {#if upd.ready}<p class="new">あたらしい バージョンが あります</p>{/if}
-  <button class={['update', { ready: upd.ready }]} onclick={update} disabled={updating}
+  <p class={['state', { new: upd.ready }]}>
+    {upd.ready ? 'あたらしい バージョンが あります' : upd.checking ? '確認しています…' : '最新版です'}
+  </p>
+  <button class={['update', { ready: upd.ready }]} onclick={update} disabled={updating || !upd.ready}
     ><Icon name="redo" size={20} /> {updating ? '更新中…' : '最新版に更新'}</button
   >
-  <small>いまのバージョン: {built}</small>
+  <small>いまのバージョン: {built}<br /><code>{hash || version}</code></small>
+  {#if !upd.ready}
+    <button class="check" onclick={() => checkForUpdate()} disabled={upd.checking}>
+      {upd.checkedAt && !upd.checking ? '確認しました（最新版です）' : 'あたらしい バージョンが ないか 確認する'}
+    </button>
+  {/if}
 </section>
 
 <section class="card">
@@ -60,11 +68,30 @@
     font-weight: bold;
     font-size: 16px;
   }
-  .new {
+  .state {
     margin: 0 0 8px;
-    color: #c62828;
+    color: #2e7d32;
     font-weight: bold;
     text-align: center;
+  }
+  .state.new {
+    color: #c62828;
+  }
+  .check {
+    display: block;
+    margin: 10px auto 0;
+    color: var(--blue);
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: underline;
+    background: none;
+  }
+  .check:disabled {
+    opacity: 0.6;
+  }
+  code {
+    font-size: 12px;
+    color: var(--sub);
   }
   .update.ready {
     background: #e53935;
@@ -76,7 +103,9 @@
     }
   }
   .update:disabled {
-    opacity: 0.6;
+    background: #cfd6dd;
+    color: #fff;
+    animation: none;
   }
   small {
     display: block;
