@@ -23,7 +23,7 @@ pnpm images                   # words.ts の emoji から Twemoji SVG を static
 pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
-svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。200 行超えのコンポーネント 7 件は `svelte-vitals-suppressions.json` に記録済みで、新たな超過だけが検出される。Vite プラグインは `ssr = false` の殻 HTML を見て title/h1/main を誤検出するため、`vite.config.ts` のプラグイン側 overrides でそれらを外している（CLI のソース解析では検査される。svelte-vitals#682 を参照）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
+svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。200 行超えのコンポーネント 7 件は `svelte-vitals-suppressions.json` に記録済みで、新たな超過だけが検出される。Vite プラグインは `ssr = false` の殻 HTML を見て title/h1/main を誤検出するため、`vite.config.ts` のプラグイン側 overrides でそれらを外している（CLI のソース解析では検査される）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は lint / check / test / build を並列に回す。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 
@@ -42,7 +42,7 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `geometry.ts`: SVG path（M/L/H/V/C/S/Z）を等間隔の点列にする。`getPointAtLength` は使わず自前で平坦化するので、テストと実行時で同じ点列になる。
 - `judge.ts`: なぞる（`advance` が cursor をサンプル列上で進め、-1 で逸脱）/ じぶんでかく（`coverage` が塗れた割合）。しきい値は `JUDGE`。
 - `score.ts`: 軌跡とお手本の距離と向きから 0〜1 → 星 1〜3。
-- `recognize.ts`: 全 81 文字のお手本を N 点に再サンプリング・重心合わせした `TEMPLATES` と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
+- `recognize.ts`: 現在の言語の全文字のお手本を N 点に再サンプリング・重心合わせしたテンプレート（`Canvas` が `templatesFor(strokes)` で文字セットごとに 1 回だけ作る。`TEMPLATES` は ひらがな用の既定値）と、書いた画列を画ごとに対応させて距離を取る。`passes` は「1 位が目標」または「2 位以内かつ差が MARGIN 未満」。しきい値は `RECOG`。
 - `progress.svelte.ts`: `localStorage` 直結の `$state`。キーは言語ごとに `kk:<lang>:progress`（文字ごとの回数）、`kk:<lang>:earned`（メダル id → 獲得日）、`kk:<lang>:days`（練習した日付）。旧キー `kk:progress` 等は起動時に `ja` へ移行する。関数は現在の言語の記録を対象にし、`wordStar` / `wordCrown` は `Word` を受け取る。文字クリア = trace 2 + free 1、金星 = test 1、単語の星/王冠は全文字の集計。`checkBadges()` が新規獲得メダルを確定して返し、練習画面がトーストを出す。
 - `badges.ts`: `badgesOf(lang)` と `computeStats(lang, …)`。行グループは ja/kana が五十音の行、en が 7 文字ずつ。ストアに依存せず集計値 `Stats` だけを受け取る純粋関数で、`need(s)` は `[達成数, 必要数]` を返す（未獲得時の「あと n」表示に使う）。
 - `Canvas.svelte`: 3 モード（`trace` / `free` / `test`）の入力処理と描画。文字やモードの切替は親が `{#key}` で再マウントする前提で、内部で props 変化を監視していない。`onDone` に `Result` を返し、進捗の記録や演出は `routes/practice/+page.svelte` 側で行う。
@@ -51,7 +51,7 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 
 ## 単語を増やす
 
-`src/lib/words.ts` のカテゴリ配列に `['id', 'ひらがな', '絵文字', 'english']` を追加し（カードの補助行のカタカナはひらがなから自動変換）、`node scripts/fetch-images.ts` で Twemoji の SVG を `static/img/<id>.svg` に取得する。自前のイラストを使うときは同じパスに置く（画像が無い単語は頭文字のカードで表示される）。全文字が `strokes.ts` に存在する必要があり、`words.test.ts` がそれを検証する。
+`src/lib/words.ts` のカテゴリ配列に `['id', 'ひらがな', '絵文字', 'english']` を追加し（カードの補助行のカタカナはひらがなから自動変換）、`node scripts/fetch-images.ts` で Twemoji の SVG を `static/img/<id>.svg` に取得する。自前のイラストを使うときは同じパスに置く（画像が無い単語は頭文字のカードで表示される）。ひらがな・カタカナ・英語名の全文字が `strokes.ts` / `strokes-kana.ts` / `strokes-en.ts` に存在する必要があり、`words.test.ts` がそれを検証する。
 
 ## 実機で調整する前提の値
 
