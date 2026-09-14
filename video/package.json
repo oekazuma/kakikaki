@@ -1,0 +1,24 @@
+{
+  "name": "kakikaki-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bgm": "node scripts/make-bgm.ts",
+    "dev": "pnpm bgm && remotion studio --no-open",
+    "render": "pnpm bgm && remotion render Intro ../docs/intro.mp4 && ffmpeg -y -v error -i ../docs/intro.mp4 -filter_complex \"[0:v]fps=12,scale=720:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=none:diff_mode=rectangle\" ../docs/intro.gif",
+    "check": "tsc"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.524",
+    "@remotion/fonts": "4.0.524",
+    "@remotion/transitions": "4.0.524",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.524"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "typescript": "5.9.3"
+  }
+}

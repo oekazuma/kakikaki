@@ -34,6 +34,11 @@
     {
       "groupName": "Svelte",
       "matchPackageNames": ["@sveltejs/{/,}**", "svelte{/,}**"]
+    },
+    {
+      "description": "video/（README の紹介動画を作る Remotion プロジェクト）は CI が検査しないので更新 PR を出さない",
+      "matchFileNames": ["video/**"],
+      "enabled": false
     }
   ]
 }
