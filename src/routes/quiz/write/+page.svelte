@@ -4,7 +4,8 @@
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
   import QuizResult from '$lib/components/QuizResult.svelte';
-  import Canvas, { type Result } from '$lib/components/Canvas.svelte';
+  import Canvas from '$lib/components/Canvas.svelte';
+  import type { Result } from '$lib/tracer.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import { imageUrl } from '$lib/image';
   import { info, nameOf, lettersOf, strokesOf, lang } from '$lib/lang.svelte';

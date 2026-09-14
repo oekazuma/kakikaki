@@ -4,7 +4,8 @@
   import { practiceUrl } from '$lib/nav';
   import { untrack } from 'svelte';
   import { fly } from 'svelte/transition';
-  import Canvas, { type Result } from '$lib/components/Canvas.svelte';
+  import Canvas from '$lib/components/Canvas.svelte';
+  import type { Result } from '$lib/tracer.svelte';
   import WordCard from '$lib/components/WordCard.svelte';
   import Stars from '$lib/components/Stars.svelte';
   import Icon from '$lib/components/Icon.svelte';
