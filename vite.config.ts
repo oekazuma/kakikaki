@@ -28,7 +28,7 @@ export default defineConfig({
         runes: ({ filename }) => (filename.split(/[/\\]/).includes('node_modules') ? undefined : true)
       },
       adapter: adapter(),
-      paths: { base: (process.env.BASE_PATH ?? '/kakikaki') as `/${string}` },
+      paths: { base: (process.env.BASE_PATH ?? '/kakikaki') as '' | `/${string}` },
       serviceWorker: { register: true },
       // かくしゲームはどこからもリンクされないので、プリレンダー対象に明示する
       prerender: { entries: ['*', '/balloon'] },
