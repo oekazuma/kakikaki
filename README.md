@@ -13,6 +13,11 @@
   <a href="https://oekazuma.github.io/kakikaki/">https://oekazuma.github.io/kakikaki/</a>
 </p>
 
+<p align="center">
+  <img src="docs/intro.gif" alt="なぞる・じぶんで かく・おてほんなし の 3 モード、ひらがな・カタカナ・英語の切り替え、クイズ・メダル・使う人・かくしゲームを 50 秒で紹介する動画" width="720"><br>
+  <a href="docs/intro.mp4">音つきの動画（MP4）を見る</a>
+</p>
+
 ---
 
 ## 特徴
