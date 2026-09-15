@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { badgesOf, ROWS, computeStats, earnedBadges, nextBadge, BADGE_GROUPS } from './badges';
 import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
+import { wordById } from './words';
+import { lettersOf, type Lang } from './lang.svelte';
+
+// テストでは「全文字クリア = 単語も練習済み」とみなす
+const byChars = (l: Lang, cleared: (c: string) => boolean) => (id: string) =>
+  lettersOf(wordById(id)!, l).every(cleared);
 
 describe('badges', () => {
   it('id は一意で、行グループは全文字を過不足なく分ける', () => {
@@ -19,6 +25,7 @@ describe('badges', () => {
           'ja',
           () => false,
           () => false,
+          byChars('ja', () => false),
           0
         )
       )
@@ -32,6 +39,7 @@ describe('badges', () => {
         'ja',
         (c) => done.has(c),
         () => false,
+        byChars('ja', (c) => done.has(c)),
         1
       )
     ).map((b) => b.id);
@@ -45,6 +53,7 @@ describe('badges', () => {
         'en',
         (c) => done.has(c),
         () => false,
+        byChars('en', (c) => done.has(c)),
         1
       )
     ).map((b) => b.id);
@@ -62,6 +71,7 @@ describe('badges', () => {
           l,
           () => true,
           () => true,
+          byChars(l, () => true),
           30,
           quiz,
           7,
@@ -77,6 +87,7 @@ describe('badges', () => {
       'ja',
       (c) => 'あいう'.includes(c),
       () => false,
+      byChars('ja', (c) => 'あいう'.includes(c)),
       2
     );
     expect(
@@ -98,6 +109,7 @@ describe('badges', () => {
       'ja',
       (c) => 'あいうえおかきくけ'.includes(c),
       () => false,
+      byChars('ja', (c) => 'あいうえおかきくけ'.includes(c)),
       2,
       {}
     );
@@ -114,6 +126,7 @@ describe('badges', () => {
       'ja',
       () => false,
       () => false,
+      byChars('ja', () => false),
       0,
       {},
       0
@@ -123,6 +136,7 @@ describe('badges', () => {
       'ja',
       () => false,
       () => false,
+      byChars('ja', () => false),
       0,
       {},
       0,

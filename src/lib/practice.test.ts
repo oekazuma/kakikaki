@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PracticeSession, nextMode, nextWordId, nextOpenWord, resolveWord } from './practice.svelte';
-import { record, reset, get, wordCrown, rememberWord, lastWord } from './progress.svelte';
+import { record, reset, get, wordCrown, rememberWord, lastWord, recordWordDone } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 import type { Result } from './tracer.svelte';
@@ -81,6 +81,7 @@ describe('PracticeSession', () => {
 
   it('クリア済みの単語をやり直しても完了モーダルは出ない。王冠を新しく取ったときは出る', () => {
     for (const c of 'ばす') clear(c);
+    recordWordDone(bus);
     const s = new PracticeSession(bus);
     expect([s.i, s.mode]).toEqual([0, 'trace']);
     s.select(1, 'free');
@@ -118,12 +119,8 @@ describe('PracticeSession', () => {
     clear('あ');
     expect(nextMode('あ')).toBeNull(); // おてほんなし は自動では入らない
     // ばす・でんしゃ を終えると、ばす の次は しんかんせん
-    for (const w of ['ばす', 'でんしゃ']) {
-      for (const c of w) {
-        clear(c);
-        record(c, 'test');
-      }
-    }
+    recordWordDone(bus);
+    recordWordDone(wordById('train')!);
     expect(nextWordId(bus)).toBe('shinkansen');
     // 1 文字練習: あ の次はまだ終わっていない い
     expect(nextWordId(wordById('char-あ')!)).toBe('char-い');
@@ -134,15 +131,16 @@ describe('PracticeSession', () => {
     const giraffe = wordById('giraffe')!;
     rememberWord(giraffe);
     expect(nextOpenWord()).toBeNull(); // 開いただけでは出さない
-    record('き', 'trace');
+    new PracticeSession(giraffe).done(ok('trace'));
+    vi.runAllTimers();
     expect(nextOpenWord()?.id).toBe('giraffe'); // 1 文字でも書けば やりかけ
     rememberWord(wordById('char-あ')!); // 1 文字練習は覚えない
     expect(lastWord()).toBe('giraffe');
     setLang('kana');
     expect(nextOpenWord()).toBeNull(); // かたかな の記録は別
     setLang('ja');
-    for (const c of 'きりん') clear(c);
-    expect(nextOpenWord()).toBeNull(); // クリアしたら出さない
+    recordWordDone(giraffe);
+    expect(nextOpenWord()).toBeNull(); // 最後まで練習したら出さない
     reset();
     expect(lastWord()).toBeNull(); // リセットで消える
   });

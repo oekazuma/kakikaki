@@ -3,7 +3,7 @@ import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
 import { removeBest, loadBests } from './balloon.svelte';
 import { secretOf, removeSecret } from './secret';
-import { isCharWord, type Word } from './words';
+import { WORDS, isCharWord, type Word } from './words';
 import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 import { today } from './today';
 import { streak } from './streak';
@@ -18,20 +18,40 @@ type Data = {
   days: string[];
   quiz: Record<string, number>;
   last: string | null; // 最後に練習に入った単語 id（ホームの「つづきから」）
+  // 単語 id → 最後まで練習した日。null は始めた（1 文字でも書いた）だけ、'' は単語の記録を持つ前に星が付いていた単語（移行）
+  words: Record<string, string | null>;
 };
 
 export const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
+// 文字クリア = なぞる 2 + じぶんでかく 1、金の星 = おてほんなし 1（CAP と同じ数）
+const clearedIn = (p: CharProgress) => p.trace >= CAP.trace && p.free >= CAP.free;
+const goldIn = (p: CharProgress) => p.test >= CAP.test;
 const key = (l: Lang, name: keyof Data) => keyOf(profiles.cur, l, name);
 
 const isDays = (v: unknown) => Array.isArray(v) && v.every((d) => typeof d === 'string');
+// 単語の記録が無い保存値（単語の星を文字から計算していた頃）は、そのとき星が付いていた単語を練習済みとして引き継ぐ
+function loadWords(pid: string, l: Lang, progress: Data['progress']): Data['words'] {
+  const saved = loadJSON<Data['words'] | null>(keyOf(pid, l, 'words'), null, isObject);
+  if (saved) return saved;
+  const g = (c: string) => progress[c] ?? { trace: 0, free: 0, test: 0 };
+  const words: Data['words'] = Object.fromEntries(
+    WORDS.filter((w) => lettersOf(w, l).every((c) => clearedIn(g(c)))).map((w) => [w.id, ''])
+  );
+  saveJSON(keyOf(pid, l, 'words'), words);
+  return words;
+}
 // 任意の人・ことばの保存値を読む（保護者向けの一覧や削除の確認は使用中の人以外も見るため）
-const loadOf = (pid: string, l: Lang): Data => ({
-  progress: loadJSON<Data['progress']>(keyOf(pid, l, 'progress'), {}, isObject),
-  earned: loadJSON<Data['earned']>(keyOf(pid, l, 'earned'), {}, isObject),
-  days: loadJSON<Data['days']>(keyOf(pid, l, 'days'), [], isDays),
-  quiz: loadJSON<Data['quiz']>(keyOf(pid, l, 'quiz'), {}, isObject),
-  last: loadJSON<Data['last']>(keyOf(pid, l, 'last'), null, (v) => typeof v === 'string')
-});
+const loadOf = (pid: string, l: Lang): Data => {
+  const progress = loadJSON<Data['progress']>(keyOf(pid, l, 'progress'), {}, isObject);
+  return {
+    progress,
+    earned: loadJSON<Data['earned']>(keyOf(pid, l, 'earned'), {}, isObject),
+    days: loadJSON<Data['days']>(keyOf(pid, l, 'days'), [], isDays),
+    quiz: loadJSON<Data['quiz']>(keyOf(pid, l, 'quiz'), {}, isObject),
+    last: loadJSON<Data['last']>(keyOf(pid, l, 'last'), null, (v) => typeof v === 'string'),
+    words: loadWords(pid, l, progress)
+  };
+};
 const load = (l: Lang) => loadOf(profiles.cur, l);
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
 const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
@@ -113,19 +133,29 @@ function earn(id: string) {
   save(lang.v, 'earned');
 }
 
-// 文字クリア = なぞる 2 + じぶんでかく 1、金の星 = おてほんなし 1（CAP と同じ数）
-const clearedIn = (p: CharProgress) => p.trace >= CAP.trace && p.free >= CAP.free;
-const goldIn = (p: CharProgress) => p.test >= CAP.test;
 export const charCleared = (c: string) => clearedIn(get(c));
 export const charGold = (c: string) => goldIn(get(c));
-export const wordStar = (w: Word) => lettersOf(w).every(charCleared);
-export const wordCrown = (w: Word) => lettersOf(w).every(charGold);
+// 単語の星は「その単語を最後まで練習した」記録。文字を他の単語でそろえても勝手には付かない。王冠は星 + 全文字が金の星
+export const wordStar = (w: Word) => cur().words[w.id] != null;
+export const wordCrown = (w: Word) => wordStar(w) && lettersOf(w).every(charGold);
+// やりかけ: 始めた（1 文字でも書いた）が、まだ最後まで練習していない
+export const wordStarted = (w: Word) => w.id in cur().words && cur().words[w.id] === null;
+export function recordWordStart(w: Word) {
+  if (isCharWord(w) || w.id in cur().words) return;
+  cur().words[w.id] = null;
+  save(lang.v, 'words');
+}
+export function recordWordDone(w: Word) {
+  if (isCharWord(w) || wordStar(w)) return;
+  cur().words[w.id] = today();
+  save(lang.v, 'words');
+}
 
 // 任意の人・ことばの記録を消す。使用中の人なら画面の状態も空にする
 export function resetRecords(pid: string, langs: Lang[]) {
   for (const l of langs) {
     for (const name of DATA_NAMES) removeKey(keyOf(pid, l, name));
-    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {}, last: null };
+    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {}, last: null, words: {} };
   }
   // ことばをまたぐ かくし要素の記録は「すべて」のときだけ消す（1 ことば だけのリセットでは残す）
   if (langs.length === LANGS.length) {
@@ -142,7 +172,16 @@ export const allDays = () => [...new Set(LANGS.flatMap((l) => data[l].days))];
 export const streakNow = () => streak(allDays(), today());
 const secretStats = (pid: string) => ({ ...secretOf(pid), balloon: loadBests()[pid]?.score ?? 0 });
 export const stats = () =>
-  computeStats(lang.v, charCleared, charGold, days().length, quiz(), streakNow(), secretStats(profiles.cur));
+  computeStats(
+    lang.v,
+    charCleared,
+    charGold,
+    (id) => cur().words[id] != null,
+    days().length,
+    quiz(),
+    streakNow(),
+    secretStats(profiles.cur)
+  );
 
 // にがてな文字: おてほんなし で 2 回以上外したか、じぶんでかく の最高が星 1 のまま。外した回数が多い順
 const weakIn = (progress: Data['progress']) =>
@@ -166,6 +205,7 @@ export function detailOf(pid: string, l: Lang): Detail {
     l,
     (c) => clearedIn(g(c)),
     (c) => goldIn(g(c)),
+    (id) => d.words[id] != null,
     d.days.length,
     d.quiz,
     0,

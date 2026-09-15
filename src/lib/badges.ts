@@ -56,13 +56,14 @@ export function computeStats(
   l: Lang,
   charCleared: (c: string) => boolean,
   charGold: (c: string) => boolean,
+  wordDone: (id: string) => boolean,
   dayCount: number,
   quiz: Record<string, number> = {},
   streak = 0,
   secret: SecretStats = NO_SECRET
 ): Stats {
-  const wordStar = (w: Word) => lettersOf(w, l).every(charCleared);
-  const wordCrown = (w: Word) => lettersOf(w, l).every(charGold);
+  const wordStar = (w: Word) => wordDone(w.id);
+  const wordCrown = (w: Word) => wordDone(w.id) && lettersOf(w, l).every(charGold);
   return {
     chars: ALL_CHARS[l].filter(charCleared).length,
     gold: ALL_CHARS[l].filter(charGold).length,

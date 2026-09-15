@@ -7,6 +7,7 @@ import {
   charGold,
   wordStar,
   wordCrown,
+  recordWordDone,
   reset,
   switchProfile,
   days,
@@ -45,21 +46,32 @@ describe('progress', () => {
     expect(charCleared('あ')).toBe(true);
     expect(charGold('あ')).toBe(false);
   });
-  it('単語の星と王冠', () => {
+  it('単語の星は最後まで練習した記録、王冠は星 + 全文字が金の星', () => {
     for (const c of 'ばす') {
       record(c, 'trace');
       record(c, 'trace');
       record(c, 'free');
     }
+    expect(wordStar(bus)).toBe(false); // 文字がそろっただけでは付かない
+    recordWordDone(bus);
     expect(wordStar(bus)).toBe(true);
     expect(wordCrown(bus)).toBe(false);
     for (const c of 'ばす') record(c, 'test');
     expect(wordCrown(bus)).toBe(true);
   });
+  it('単語の記録が無い保存値は、星の付いていた単語を練習済みとして引き継ぐ', () => {
+    const done = { trace: 2, free: 1, test: 0 };
+    localStorage.setItem('kk:p1:ja:progress', JSON.stringify({ い: done, ぬ: done }));
+    localStorage.removeItem('kk:p1:ja:words');
+    switchProfile('p1');
+    expect(wordStar(wordById('dog')!)).toBe(true);
+    expect(JSON.parse(localStorage.getItem('kk:p1:ja:words')!)).toEqual({ dog: '' });
+  });
   it('言語ごとに記録は別', () => {
     record('あ', 'trace');
     setLang('en');
     expect(get('あ').trace).toBe(0);
+    recordWordDone(bus);
     for (const c of 'Bus') {
       record(c, 'trace');
       record(c, 'trace');

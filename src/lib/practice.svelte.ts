@@ -8,6 +8,9 @@ import {
   charGold,
   wordStar,
   wordCrown,
+  wordStarted,
+  recordWordStart,
+  recordWordDone,
   checkBadges,
   CAP,
   lastWord,
@@ -64,19 +67,12 @@ export function nextMode(ch: string): Mode | null {
   return p.trace < CAP.trace ? 'trace' : p.free < CAP.free ? 'free' : null;
 }
 
-export const wordDone = (w: Word) => lettersOf(w).every((ch) => nextMode(ch) === null);
+export const wordDone = (w: Word) => wordStar(w);
 
-// 1 文字でも書いた記録があるか（開いただけの単語は「やりかけ」にしない）
-const started = (w: Word) =>
-  lettersOf(w).some((ch) => {
-    const p = get(ch);
-    return p.trace + p.free + p.test > 0;
-  });
-
-// ホームの「つづきから」: 最後に練習に入った単語に書いた記録があり、まだクリアしていなければそれ。無ければ null（カードを出さない）
+// ホームの「つづきから」: 最後に練習に入った単語が やりかけ（1 文字でも書いて、まだ最後まで練習していない）ならそれ。無ければ null
 export function nextOpenWord(): Word | null {
   const w = wordById(lastWord() ?? '');
-  return w && started(w) && !wordDone(w) ? w : null;
+  return w && wordStarted(w) ? w : null;
 }
 
 // まだ終わっていない次の単語（同じ並び順で後ろから探し、末尾なら先頭へ）。全部終わっていれば null
@@ -203,6 +199,9 @@ export class PracticeSession {
       wasW = wordStar(this.word),
       wasG = wordCrown(this.word);
     record(c, r.mode);
+    recordWordStart(this.word);
+    // 単語の星: 最後の文字をクリアして単語を通し終えたとき（おてほんなし は別枠）
+    if (r.mode !== 'test' && !nextMode(c) && this.i === this.chars.length - 1) recordWordDone(this.word);
     const st = r.mode === 'trace' ? 3 : stars(r.score);
     if (r.mode === 'free') recordStar(c, st);
     this.msg = r.mode === 'trace' ? 'できた！' : `${'★'.repeat(st)} ${praise(st)}`;
