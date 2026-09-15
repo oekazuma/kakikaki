@@ -15,13 +15,13 @@
 <ul>
   {#each cells as c (c.name)}
     <li class={{ done: c.have === c.need }}>
-      <span class="head">
-        <span class="kyokasho">{c.name}</span>
+      <span class="kyokasho name">{c.name}</span>
+      <span class="line">
+        <span class="bar"><span class="fill" style:width="{c.pct}%"></span></span>
         <small
           >{#if c.have === c.need}<Icon name="check" size={14} />{/if}{c.have}/{c.need}</small
         >
       </span>
-      <span class="bar"><span class="fill" style:width="{c.pct}%"></span></span>
     </li>
   {/each}
 </ul>
@@ -37,8 +37,8 @@
   }
   li {
     display: grid;
-    gap: 4px;
-    padding: 6px 8px;
+    gap: 3px;
+    padding: 7px 10px;
     border-radius: 8px;
     background: var(--pill);
     font-size: 14px;
@@ -49,11 +49,16 @@
     background: #fff4d6;
     color: var(--warn);
   }
-  .head {
-    display: flex;
-    justify-content: space-between;
+  /* 教科書体は字間が詰まって見えるので少し空ける */
+  .name {
+    font-size: 16px;
+    letter-spacing: 0.14em;
+  }
+  .line {
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
   }
   small {
     display: inline-flex;
