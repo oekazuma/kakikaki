@@ -23,22 +23,24 @@
   let best = $state(loadBests()[profiles.cur]?.score ?? 0);
   let toast = $state<Badge | null>(null);
 
+  let raf = 0;
+  let last = 0;
+  const loop = (t: number) => {
+    g.tick(Math.min(0.05, (t - last) / 1000));
+    last = t;
+    if (g.over) return finish(); // 終了画面では回さない（もういちど で start() が再開する）
+    raf = requestAnimationFrame(loop);
+  };
   function start() {
     isBest = false;
     settled = false;
     g.start();
+    cancelAnimationFrame(raf);
+    last = performance.now();
+    raf = requestAnimationFrame(loop);
   }
   $effect(() => {
     start();
-    let last = performance.now();
-    let raf = 0;
-    const loop = (t: number) => {
-      g.tick(Math.min(0.05, (t - last) / 1000));
-      last = t;
-      if (g.over && !settled) finish();
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   });
   function finish() {
@@ -68,7 +70,10 @@
     sfx.pon();
     fx.burst(e.clientX, e.clientY, 22, [b.color, '#fff']);
     floater = { x: e.clientX, y: e.clientY, pts, id: b.id };
-    setTimeout(() => (floater = null), 600);
+    const id = b.id;
+    setTimeout(() => {
+      if (floater?.id === id) floater = null;
+    }, 600);
   }
 </script>
 
