@@ -55,7 +55,7 @@ export const Home = () => {
             color: C.warn
           }}
         >
-          <Icon name="trophy" size={22} /> 12 / 54
+          <Icon name="trophy" size={22} /> 12 こ
         </div>
         <div
           style={{

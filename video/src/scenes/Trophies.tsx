@@ -18,7 +18,7 @@ const DAYS = new Set([1, 2, 4, 5, 8, 9, 10, 11, 12, 13, 14]);
 export const Trophies = () => {
   const frame = useCurrentFrame();
   const t = THEME.ja;
-  const ring = interpolate(frame, [10, 50], [0, 12 / 54], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
+  const ring = interpolate(frame, [10, 50], [0, 0.22], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
   const R = 52;
   const L = 2 * Math.PI * R;
   return (
@@ -75,9 +75,8 @@ export const Trophies = () => {
             />
           </svg>
           <div style={{ textAlign: 'center', lineHeight: 1 }}>
-            <b style={{ fontSize: 34 }}>{Math.round(ring * 54)}</b>
-            <small style={{ fontSize: 14, color: C.sub }}> / 54</small>
-            <div style={{ fontSize: 12, color: C.sub, marginTop: 4 }}>めだる {Math.round(ring * 100)}%</div>
+            <b style={{ fontSize: 34 }}>{Math.round(ring * 100)}%</b>
+            <div style={{ fontSize: 12, color: C.sub, marginTop: 4 }}>めだる</div>
           </div>
         </div>
         <div style={{ display: 'grid', gap: 4 }}>
