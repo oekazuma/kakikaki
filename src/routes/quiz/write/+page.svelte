@@ -96,7 +96,7 @@
     grid-template-columns: 240px 1fr 110px;
     grid-template-rows: auto 1fr;
     gap: 12px 18px;
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100vh - var(--sat) - var(--sab));
     padding: 16px 22px;
   }
   .left {

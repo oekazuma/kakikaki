@@ -88,7 +88,7 @@
 <style>
   main {
     padding: 20px 28px 40px;
-    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: calc(100vh - var(--sat) - var(--sab));
   }
   header {
     display: flex;

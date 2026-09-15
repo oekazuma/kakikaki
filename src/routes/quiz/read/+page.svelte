@@ -49,7 +49,7 @@
 <style>
   main {
     padding: 16px 22px 30px;
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100vh - var(--sat) - var(--sab));
     display: grid;
     grid-template-rows: auto 1fr;
     gap: 14px;

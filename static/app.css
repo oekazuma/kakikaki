@@ -13,6 +13,9 @@
   --danger: #e53935;
   --danger-ink: #c62828;
   --pill: #eef1f4;
+  /* 安全領域。上は iPad のホーム画面アプリでステータスバーの帯が内容に少し被るので、実際の値より 1.35 倍空ける（ブラウザでは 0 のまま） */
+  --sat: calc(env(safe-area-inset-top, 0px) * 1.35);
+  --sab: env(safe-area-inset-bottom, 0px);
 }
 /* かたかな は緑系、えいご はオレンジ系。切替時は色がにじむように変わる */
 [data-lang='kana'] {
@@ -71,7 +74,7 @@ body {
 }
 /* PWA(standalone) ではステータスバーの下までコンテンツが広がるため、安全領域ぶんを body で確保する */
 body {
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  padding: var(--sat) env(safe-area-inset-right) var(--sab) env(safe-area-inset-left);
 }
 button {
   font: inherit;
