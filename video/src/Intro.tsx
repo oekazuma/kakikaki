@@ -2,7 +2,6 @@ import { linearTiming, TransitionSeries } from '@remotion/transitions';
 import { fade } from '@remotion/transitions/fade';
 import { Audio, interpolate } from 'remotion';
 import bgm from './bgm.wav';
-import { Balloon } from './scenes/Balloon';
 import { Complete } from './scenes/Complete';
 import { Home } from './scenes/Home';
 import { Langs } from './scenes/Langs';
@@ -24,7 +23,6 @@ export const SCENES = [
   ['Quiz', Quiz, 150],
   ['Trophies', Trophies, 150],
   ['Profiles', Profiles, 110],
-  ['Balloon', Balloon, 130],
   ['Outro', Outro, 120]
 ] as const;
 export const FADE = 12;
