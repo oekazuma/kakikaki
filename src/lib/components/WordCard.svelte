@@ -4,18 +4,20 @@
   import { wordStar, wordCrown } from '$lib/progress.svelte';
   import { nameOf, subOf } from '$lib/lang.svelte';
   import Icon from './Icon.svelte';
-  // ghost: イラストを灰色のシルエットにする（かくし演出でイラストが跳び出している間）
+  // ghost: イラストを灰色のシルエットにする（かくし演出でイラストが跳び出している間）。
+  // fill: 親のグリッドのマス幅に合わせる（ホームの一覧。画面幅で右に余白が残らないように）
   let {
     word,
     onclick,
     size = 180,
     lazy = false,
-    ghost = false
-  }: { word: Word; onclick?: () => void; size?: number; lazy?: boolean; ghost?: boolean } = $props();
+    ghost = false,
+    fill = false
+  }: { word: Word; onclick?: () => void; size?: number; lazy?: boolean; ghost?: boolean; fill?: boolean } = $props();
   let missing = $state(false);
 </script>
 
-<button class="card" style:width="{size}px" {onclick}>
+<button class="card" style:width={fill ? '100%' : `${size}px`} {onclick}>
   {#if wordCrown(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span
     >{:else if wordStar(word)}<span class="badge"><Icon name="star" size={18} fill /></span>{/if}
   {#if missing}

@@ -69,6 +69,7 @@
             <WordCard
               word={w}
               size={150}
+              fill
               lazy={cat !== CATEGORIES[0] || n >= 7}
               onclick={() => {
                 unlock();
@@ -176,9 +177,10 @@
       transform: scale(1.25);
     }
   }
+  /* 150px 以上のマスで幅いっぱいに並べる（iPad mini で右に大きな余白が残らないように） */
   .row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     padding: 6px 0 10px;
   }

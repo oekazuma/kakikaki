@@ -14,6 +14,7 @@
     <WordCard
       word={next}
       size={150}
+      fill
       onclick={() => {
         unlock();
         goto(practiceUrl(next.id));
@@ -28,8 +29,11 @@
     color: var(--teal);
     margin: 22px 0 8px;
   }
+  /* ホームの一覧と同じマス幅にそろえる */
   .row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
     padding: 6px 0 10px;
   }
 </style>
