@@ -1,0 +1,44 @@
+{
+  "extends": ["markuplint:recommended-svelte"],
+  "parser": {
+    "\\.svelte$": "@markuplint/svelte-parser",
+    "\\.html$": "@markuplint/svelte-parser/kit"
+  },
+  "specs": {
+    "\\.svelte$": "@markuplint/svelte-spec"
+  },
+  "rules": {
+    // Svelte の onclick={fn} は文字列のインラインハンドラではなくイベントリスナー
+    "security/no-event-handler-attr": false,
+    // svelte-parser 5.0.0 はファイル末尾の自己閉じコンポーネント（<Board … />）を未閉じと誤検知する。
+    // 本当に閉じ忘れていれば Svelte コンパイラが止める
+    "html-standard/no-unclosed-element-at-eof": false,
+    "no-unknown-attr": {
+      "options": {
+        // Pointer Events は HTML 仕様の GlobalEventHandlers に無く、html-spec も持っていない
+        "allowAttrs": [
+          "onpointerdown",
+          "onpointermove",
+          "onpointerup",
+          "onpointercancel",
+          "onpointerenter",
+          "onpointerleave",
+          "onpointerover",
+          "onpointerout",
+          "ongotpointercapture",
+          "onlostpointercapture"
+        ],
+        // {@attach fn} を svelte-parser 5.0.0 が "attach fn" という属性として読む
+        "ignoreAttrNamePrefix": ["attach "]
+      }
+    }
+  },
+  "overrides": {
+    // SvelteKit の殻 HTML。見出しは各ページが置く
+    "src/app.html": {
+      "rules": {
+        "require-h1": false
+      }
+    }
+  }
+}

@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { base } from '$app/paths';
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import Icon from './Icon.svelte';
   import SplashRunner from './SplashRunner.svelte';
   import { lang, info } from '$lib/lang.svelte';
+  import { logoUrl } from '$lib/image';
   import { vp } from '$lib/viewport.svelte';
   // 起動画面。見栄えのために出す（最短 1.3 秒。ロゴが跳ねて、文字が 1 つずつ飛び出し、星が瞬き、線が引かれる演出が終わる長さ）。
   // あわせて、iPad のホーム画面アプリが起動直後に縦向きの座標系で一度描かれてから横向きに組み替わるのを隠す:
@@ -44,7 +44,7 @@
     <SplashRunner />
     <div class="logo">
       <div class="mark">
-        <img src="{base}/logo-mark{lang.v === 'ja' ? '' : `-${lang.v}`}.svg" alt="" width="120" height="120" />
+        <img src={logoUrl(lang.v)} alt="" width="120" height="120" />
         {#each STARS as st (st.t)}
           <span class="star" style:--x="{st.x}px" style:--y="{st.y}px" style:--t="{st.t}s" style:color={st.c}
             ><Icon name="star" size={st.s} fill /></span
