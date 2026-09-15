@@ -15,7 +15,6 @@
   import CompleteModal from '$lib/components/CompleteModal.svelte';
   import BadgeToast from '$lib/components/BadgeToast.svelte';
   import Hint from '$lib/components/Hint.svelte';
-  import Sample from '$lib/components/Sample.svelte';
   import DriveBy from '$lib/components/DriveBy.svelte';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { PracticeSession, resolveWord } from '$lib/practice.svelte';
@@ -69,9 +68,7 @@
   <section class="center">
     <ModeBar mode={s.mode} onselect={(m) => s.select(s.i, m)} />
     <div class="board card">
-      {#if s.mode === 'test'}
-        <Sample strokes={total} />
-      {:else}
+      {#if s.mode !== 'test'}
         <span class="count">{Math.min(s.stroke + 1, total)} / {total}</span>
       {/if}
       {#key `${lang.v}-${s.c}-${s.mode}-${s.gen}`}
