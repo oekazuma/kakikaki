@@ -4,12 +4,13 @@
   import AvatarCrop from './AvatarCrop.svelte';
   import { AVATARS, loadImage } from '$lib/avatar';
   import { photos, addPhoto, removePhoto } from '$lib/photos.svelte';
+  import { Hold } from '$lib/hold';
   let { value = $bindable() }: { value: string } = $props();
   let error = $state('');
   let cropping = $state<HTMLImageElement | null>(null);
   // 長押しした写真。「けす」ボタンを出す
   let holding = $state<string | null>(null);
-  let timer: ReturnType<typeof setTimeout> | undefined;
+  const hold = new Hold();
 
   async function upload(e: Event) {
     const input = e.currentTarget as HTMLInputElement;
@@ -34,17 +35,11 @@
     if (!addPhoto(url)) error = 'しゃしんの いちらんが いっぱいです（この人には つかえます）';
   }
   // 600ms 押し続けたら削除モード。タップ（短い押下）は選択。削除モードの写真をもう一度タップすると抜ける
-  let justHeld = false;
   function press(url: string) {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      holding = url;
-      justHeld = true;
-    }, 600);
+    hold.down(() => (holding = url));
   }
   function release(url: string) {
-    clearTimeout(timer);
-    if (justHeld) return void (justHeld = false); // 長押しを離した瞬間は削除モードのまま
+    if (hold.up()) return; // 長押しを離した瞬間は削除モードのまま
     if (holding === url) return void (holding = null);
     holding = null;
     value = url;
@@ -73,8 +68,8 @@
             aria-label="しゃしん"
             onpointerdown={() => press(p)}
             onpointerup={() => release(p)}
-            onpointercancel={() => clearTimeout(timer)}
-            onpointerleave={() => clearTimeout(timer)}
+            onpointercancel={() => hold.cancel()}
+            onpointerleave={() => hold.cancel()}
             oncontextmenu={(e) => e.preventDefault()}><Avatar avatar={p} size={56} /></button
           >
           {#if holding === p}

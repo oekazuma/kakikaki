@@ -8,8 +8,7 @@
   {#each balloons as b (b.id)}
     <button
       class="balloon"
-      style:left="{b.x * 100}%"
-      style:top="{b.y * 100}%"
+      style:translate="calc({b.x * 100}cqw - 50%) {b.y * 100}cqh"
       style:--size="{b.size}px"
       style:--c={b.color}
       onpointerdown={(e) => onpop(b, e)}
@@ -28,12 +27,17 @@
     inset: 0;
     overflow: hidden;
     touch-action: none;
+    container-type: size; /* translate の cqw/cqh を left/top の % の代わりに使うため */
   }
   .balloon {
     position: absolute;
+    left: 0;
+    top: 0;
     width: var(--size);
     height: calc(var(--size) * 1.6);
-    transform: translate(-50%, 0);
+    /* 毎フレームの位置更新は left/top ではなく translate（transform とは別プロパティで、
+       sway の transform: rotate アニメーションと干渉しない）で行い、レイアウトの再計算を避ける */
+    will-change: translate;
     display: grid;
     justify-items: center;
     align-content: start;
@@ -62,10 +66,10 @@
   }
   @keyframes sway {
     from {
-      transform: translate(-50%, 0) rotate(-5deg);
+      transform: rotate(-5deg);
     }
     to {
-      transform: translate(-50%, 0) rotate(5deg);
+      transform: rotate(5deg);
     }
   }
 </style>
