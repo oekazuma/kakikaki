@@ -19,6 +19,10 @@ export function exportAll(version: string): string {
   return JSON.stringify(b);
 }
 
+// iPad の共有シート（AirDrop・ファイル・メール）に渡すための File。中身は exportAll と同じ
+export const backupFile = (version: string) =>
+  new File([exportAll(version)], `kakikaki-${today()}.json`, { type: 'application/json' });
+
 // 形が違えば throw（呼び出し側が「読み込めません」と出す）
 export function parseBackup(text: string): Backup {
   if (text.length > MAX_BYTES) throw new Error('backup');

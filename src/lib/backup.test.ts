@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { exportAll, parseBackup, importAll, summarize, type Backup } from './backup';
+import { exportAll, parseBackup, importAll, summarize, backupFile, type Backup } from './backup';
 
 describe('backup', () => {
   beforeEach(() => localStorage.clear());
@@ -20,6 +20,15 @@ describe('backup', () => {
     expect(localStorage.getItem('kk:p1:ja:progress')).toBe('{"あ":{"trace":2,"free":1,"test":0}}');
     expect(localStorage.getItem('kk:p9:ja:progress')).toBeNull();
     expect(localStorage.getItem('other')).toBe('keep');
+  });
+
+  it('共有シート用の File は日付入りの名前と型を持ち、中身は書き出しと同じ', async () => {
+    const f = backupFile('123-abc');
+    expect(f.name).toMatch(/^kakikaki-\d{4}-\d{2}-\d{2}\.json$/);
+    expect(f.type).toBe('application/json');
+    // happy-dom は File.text を持たないため Response 経由で読む
+    const text = await new Response(f).text();
+    expect(parseBackup(text).version).toBe('123-abc');
   });
 
   it('形が違うファイルは受け付けない', () => {
