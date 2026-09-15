@@ -1,14 +1,14 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import Icon from './Icon.svelte';
-  // onclick を渡すと遷移せずボタンになる（クイズ途中の確認など）
-  let { onclick }: { onclick?: () => void } = $props();
+  // onclick を渡すと遷移せずボタンになる（クイズ途中の確認など）。href は戻り先（既定はホーム。resolve 済みの値を渡す）
+  let { onclick, href = resolve('/') }: { onclick?: () => void; href?: string } = $props();
 </script>
 
 {#if onclick}
   <button class="card back" {onclick}><Icon name="back" size={28} /> もどる</button>
 {:else}
-  <a class="card back" href={resolve('/')}><Icon name="back" size={28} /> もどる</a>
+  <a class="card back" {href}><Icon name="back" size={28} /> もどる</a>
 {/if}
 
 <style>

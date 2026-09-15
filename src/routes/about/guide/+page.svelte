@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { info } from '$lib/lang.svelte';
   import BackButton from '$lib/components/BackButton.svelte';
   import Guide from '$lib/components/about/Guide.svelte';
@@ -22,7 +23,7 @@
 
 <main>
   <header>
-    <BackButton />
+    <BackButton href={resolve('/about')} />
     <h1>つかいかた</h1>
   </header>
   <div class="list">
