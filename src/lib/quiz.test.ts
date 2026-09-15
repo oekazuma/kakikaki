@@ -87,11 +87,29 @@ describe('quiz', () => {
       }
     }
   });
-  it('かきクイズは 5 問、絵と音が交互、英語は文字が分かれている', () => {
+  it('かきクイズは 5 問、絵・音・穴埋めの順、英語は文字が分かれている', () => {
     const ws = makeWriteQuiz('en', 1, 5, seeded(2));
-    expect(ws.map((q) => q.kind)).toEqual(['picture', 'listen', 'picture', 'listen', 'picture']);
+    expect(ws.map((q) => q.kind)).toEqual(['picture', 'listen', 'blank', 'picture', 'listen']);
     expect(new Set(ws.map((q) => q.word.id)).size).toBe(5);
     for (const { word } of ws) expect(lettersOf(word, 'en').length).toBeLessThanOrEqual(4);
+  });
+  it('かきクイズの穴埋めは 2 文字以上の語から、範囲内の 1 文字を隠す（1 文字の語は絵に振り替わる）', () => {
+    for (const l of LANGS)
+      for (const level of [1, 2, 3] as const)
+        for (const seed of [1, 2]) {
+          const ws = makeWriteQuiz(l, level, 10, seeded(seed));
+          ws.forEach((q, i) => {
+            const letters = lettersOf(q.word, l);
+            // 絵→聞く→穴埋め の順。1 文字の語は穴埋めが絵に振り替わる
+            const wantsBlank = i % 3 === 2;
+            expect(q.kind).toBe(wantsBlank && letters.length < 2 ? 'picture' : ['picture', 'listen', 'blank'][i % 3]);
+            if (q.kind === 'blank') {
+              expect(letters.length).toBeGreaterThan(1);
+              expect(q.blank).toBeGreaterThanOrEqual(0);
+              expect(q.blank).toBeLessThan(letters.length);
+            } else expect(q.blank).toBeUndefined();
+          });
+        }
   });
   it('表示名が同じ 2 語は同じカテゴリに置かない（よみクイズの選択肢に並ぶと区別できない）', () => {
     for (const l of LANGS) {

@@ -106,8 +106,12 @@ export class WriteQuiz {
   get letters() {
     return this.word ? lettersOf(this.word) : [];
   }
+  // 書く文字の位置。絵/聞く は全文字を順に、穴埋めは ？ の 1 文字だけ
+  get targets() {
+    return this.kind === 'blank' ? [this.qs[this.i]!.blank!] : this.letters.map((_, n) => n);
+  }
   get c() {
-    return this.letters[this.k];
+    return this.letters[this.targets[this.k]];
   }
   start() {
     clearTimeout(this.timer);
@@ -141,7 +145,7 @@ export class WriteQuiz {
       return;
     }
     this.fx.pon?.();
-    if (this.k < this.letters.length - 1) return this.nextLetter(this.k + 1);
+    if (this.k < this.targets.length - 1) return this.nextLetter(this.k + 1);
     if (!this.helped) this.correct++;
     this.fx.kira?.();
     this.fx.confetti?.(80);
