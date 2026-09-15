@@ -8,7 +8,7 @@ export const RUN_SPEED = 520; // 着地後の px/秒
 const JUMP = 560; // 跳び出す初速（上向き）
 const GRAVITY = 1500; // 跳び出しの落下
 export const LIFE = 6; // 弾いてから消えるまでの秒数（タップするたびに延びる）
-export const GOAL = 20; // 壁に当たった回数がここに届くと紙吹雪
+export const GOAL = 100; // 壁に当たった回数がここに届くと紙吹雪
 const KICK_MIN = 560;
 
 export class Bouncer {

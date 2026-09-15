@@ -47,7 +47,7 @@ describe('ピンボール', () => {
   });
   it('弾き続ければ壁に当たった回数が GOAL に届く', () => {
     const b = new Bouncer(600, 400, { x: 100, y: 100 }, () => 0.3);
-    for (let t = 0; t < 30 && b.hits < GOAL; t += 0.05) {
+    for (let t = 0; t < 120 && b.hits < GOAL; t += 0.05) {
       if (t % 1 < 0.05) b.kick();
       b.tick(0.05);
     }
