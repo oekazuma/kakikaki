@@ -13,6 +13,8 @@
   let taps = 0;
   let lastTap = 0;
   let egg = $state(false);
+  let from = $state({ x: 0, y: 0 });
+  let box = $state<HTMLDivElement>();
   function tap() {
     unlock();
     const now = Date.now();
@@ -22,6 +24,9 @@
     sfx.pon();
     if (taps >= TAPS) {
       taps = 0;
+      const r = box?.querySelector('img')?.getBoundingClientRect();
+      if (!r) return;
+      from = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
       egg = true;
     }
   }
@@ -32,14 +37,14 @@
   }
 </script>
 
-<div class="wordbox">
-  <WordCard {word} {size} onclick={tap} />
+<div class="wordbox" bind:this={box}>
+  <WordCard {word} {size} onclick={tap} ghost={egg} />
   <button class={['wordhear', { speaking }]} onclick={hear} aria-label="たんごを きく"
     ><Icon name="speaker" size={22} /></button
   >
 </div>
 {#if egg}
-  <Bouncer {word} onend={() => (egg = false)} />
+  <Bouncer {word} {from} onend={() => (egg = false)} />
 {/if}
 
 <style>

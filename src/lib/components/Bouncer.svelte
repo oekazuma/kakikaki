@@ -6,11 +6,12 @@
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
   import type { Word } from '$lib/words';
-  // かくし演出: イラストが画面下を走り、タップすると弾かれて飛び回る。イラスト以外はポインタを通す
-  let { word, onend }: { word: Word; onend: () => void } = $props();
+  // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。イラスト以外はポインタを通す
+  let { word, from, onend }: { word: Word; from: { x: number; y: number }; onend: () => void } = $props();
   const b = new Bouncer(
     untrack(() => vp.w),
-    untrack(() => vp.h)
+    untrack(() => vp.h),
+    untrack(() => from)
   );
   $effect(() => b.resize(vp.w, vp.h));
   $effect(() => {

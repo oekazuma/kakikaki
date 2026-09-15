@@ -1,9 +1,12 @@
-// かくし演出「ピンボール」: 練習画面の単語カードを 10 回タップすると、そのイラストが画面下を走り抜ける。
+// かくし演出「ピンボール」: 練習画面の単語カードを 10 回タップすると、そのイラストがカードから跳び出し、着地して右へ走り抜ける
+// （カードには灰色のシルエットが残る）。
 // 走っているイラストをタップすると弾かれて画面の端で跳ね返りながら飛び回り、タップするたびに速く・回転が増す。
 // 座標は画面の px（左上原点）。イラストの大きさは SIZE の正方形とみなす
 export const SIZE = 160;
 export const TAPS = 10;
-export const RUN_SPEED = 520; // px/秒
+export const RUN_SPEED = 520; // 着地後の px/秒
+const JUMP = 560; // 跳び出す初速（上向き）
+const GRAVITY = 1500; // 跳び出しの落下
 export const LIFE = 6; // 弾いてから消えるまでの秒数（タップするたびに延びる）
 const KICK_MIN = 560;
 
@@ -13,18 +16,20 @@ export class Bouncer {
   rot = $state(0);
   phase = $state<'run' | 'pinball' | 'done'>('run');
   kicks = $state(0);
-  private vx = RUN_SPEED;
-  private vy = 0;
+  private vx = RUN_SPEED * 0.6;
+  private vy = -JUMP;
   private spin = 0;
   private life = 0;
 
+  // start はイラストの中心（画面 px）。そこから跳び出す
   constructor(
     private w: number,
     private h: number,
+    start: { x: number; y: number },
     private rnd = Math.random
   ) {
-    this.x = -SIZE;
-    this.y = h - SIZE - 20;
+    this.x = start.x - SIZE / 2;
+    this.y = start.y - SIZE / 2;
   }
 
   resize(w: number, h: number) {
@@ -37,6 +42,14 @@ export class Bouncer {
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     if (this.phase === 'run') {
+      // 放物線で落ちて、地面（画面下）に着いたら走る
+      const ground = this.h - SIZE - 20;
+      this.vy += GRAVITY * dt;
+      if (this.y >= ground) {
+        this.y = ground;
+        this.vy = 0;
+        this.vx = RUN_SPEED;
+      }
       if (this.x > this.w) this.phase = 'done';
       return;
     }
