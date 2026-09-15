@@ -72,8 +72,9 @@
     height: clamp(140px, 28vh, 260px);
     width: auto;
   }
+  /* 1 文字の選択肢は出題の文字と同じ大きさ・色 */
   .choice.letter {
-    font-size: 72px;
+    font-size: 56px;
     color: var(--blue);
   }
   .choice:active {

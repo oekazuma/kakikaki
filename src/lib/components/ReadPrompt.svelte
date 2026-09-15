@@ -50,6 +50,7 @@
     padding: 22px;
     font-size: 30px;
     font-weight: bold;
+    color: var(--ink);
   }
   .picture {
     flex-direction: column;
@@ -71,10 +72,11 @@
     font-size: 56px;
     color: var(--blue);
   }
+  /* 答えの手がかり（単語・頭文字・穴埋めの文字列）は 56px の青で揃える。質問文は 30px の黒 */
   .letters {
     display: flex;
     gap: 6px;
-    font-size: 48px;
+    font-size: 56px;
     color: var(--blue);
   }
   .letters .blank {

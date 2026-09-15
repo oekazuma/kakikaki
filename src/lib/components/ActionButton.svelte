@@ -9,7 +9,7 @@
     ready = false,
     active = false
   }: {
-    icon: 'speaker' | 'redo' | 'check' | 'eye';
+    icon: 'speaker' | 'redo' | 'undo' | 'check' | 'eye';
     label: string;
     onclick: () => void;
     done?: boolean;

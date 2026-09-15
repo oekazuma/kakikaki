@@ -53,6 +53,7 @@
     onpointerup={(e) => on.up(e.pointerId)}
     onpointercancel={(e) => on.up(e.pointerId)}
   >
+    <rect x="1" y="1" width="107" height="107" rx="6" class="frame" />
     <line x1="54.5" y1="2" x2="54.5" y2="107" class="grid" />
     <line x1="2" y1="54.5" x2="107" y2="54.5" class="grid" />
     {#if mode !== 'test'}
@@ -101,6 +102,12 @@
     width: 100%;
     height: 100%;
     touch-action: none;
+  }
+  /* 書ける範囲。白いカードの中で面の境界が分かるように薄く塗って枠を引く */
+  .frame {
+    fill: #f7f9fb;
+    stroke: var(--guide);
+    stroke-width: 1.5;
   }
   .grid {
     stroke: #e1e5ea;

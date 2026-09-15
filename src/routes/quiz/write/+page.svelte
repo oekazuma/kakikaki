@@ -73,7 +73,7 @@
             {strokes}
             mode={w.mode}
             onDone={(r) => w.onDone(r)}
-            onDraw={() => (w.drawn = true)}
+            onDrawn={(v) => (w.drawn = v)}
           />
         {/key}
       </div>
@@ -83,6 +83,9 @@
     </section>
 
     <div class="right">
+      {#if w.mode === 'test'}
+        <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
+      {/if}
       <ActionButton icon="redo" label="やりなおす" onclick={() => w.nextLetter(w.k)} />
       {#if w.mode === 'test'}
         <ActionButton icon="check" label="できた" done ready={w.drawn} onclick={() => canvas?.judge()} />
