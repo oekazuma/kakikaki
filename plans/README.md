@@ -56,6 +56,8 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 
 統合ブランチ `integ/improve-2026-09-15`（`dbe4daa` に 6 本を順にマージ、衝突なし）で `pnpm verify`（build 込み）が exit 0、テスト 116 件、svelte-vitals 100/100。取り込みは `git merge integ/improve-2026-09-15`（fast-forward）か、上の表のブランチを個別に merge / cherry-pick する。
 
+019 の install の非原子化は取り込み後に一部を戻した。build（ハッシュ付き JS/CSS）と prerendered（殻 HTML）は版が揃わないと起動しないので `addAll` でまとめて入れ、1 件でも失敗したら install を失敗させて前の版を残す。`Promise.allSettled` は files（イラスト・フォント・効果音）だけに使う。全部を `allSettled` にすると、デプロイ直後に CDN の古い HTML と新しい JS が混ざった状態でも install が成功して古い正常なキャッシュを消してしまうため。
+
 残っている手作業。
 
 - `oekazuma/hitoiki` の Service Worker にも同じ接頭辞フィルタを入れる（019 の Maintenance notes）。片側だけでは かきかき のキャッシュが消され続ける。
