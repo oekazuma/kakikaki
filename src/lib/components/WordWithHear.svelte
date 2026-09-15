@@ -5,26 +5,23 @@
   import { info, nameOf } from '$lib/lang.svelte';
   import { speaker, sfx, unlock } from '$lib/audio';
   import { TAPS } from '$lib/bouncer.svelte';
+  import { TapCounter } from '$lib/taps';
   import type { Word } from '$lib/words';
   // 練習画面の左上: 単語カードに、単語全体を読み上げるスピーカーを重ねる（右の きく は 1 文字だけ）。
   // かくし演出: カードを 10 回続けてタップ（2 秒あくと数え直し）するとイラストが画面を走る
   let { word, size = 240, onegg }: { word: Word; size?: number; onegg?: () => void } = $props();
   let speaking = $state(false);
   const hear = speaker((on) => (speaking = on));
-  let taps = 0;
-  let lastTap = 0;
+  const taps = new TapCounter(TAPS, 2000);
   let egg = $state(false);
   let from = $state({ x: 0, y: 0 });
   let box = $state<HTMLDivElement>();
   function tap() {
     unlock();
-    const now = Date.now();
-    taps = now - lastTap < 2000 ? taps + 1 : 1;
-    lastTap = now;
+    const hit = taps.tap(Date.now());
     if (egg) return;
     sfx.pon();
-    if (taps >= TAPS) {
-      taps = 0;
+    if (hit) {
       const r = box?.querySelector('img')?.getBoundingClientRect();
       if (!r) return;
       from = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
