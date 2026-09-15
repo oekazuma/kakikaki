@@ -1,33 +1,25 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { imageUrl } from '$lib/image';
-  import { Bouncer, SIZE, GOAL, type EggStyle } from '$lib/bouncer.svelte';
+  import { Bouncer, SIZE, GOAL } from '$lib/bouncer.svelte';
   import { vp } from '$lib/viewport.svelte';
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
   import { flipFor } from '$lib/facing';
-  import { lettersOf, strokesOf } from '$lib/lang.svelte';
-  import { pathToPoints } from '$lib/geometry';
   import { profiles } from '$lib/profiles.svelte';
   import { recordEgg, recordPinball } from '$lib/secret';
   import type { Word } from '$lib/words';
-  // かくし演出: イラストがカード（from の中心）から跳び出し、単語の頭文字を書き順どおりに走って書いてから戻る。
-  // 走っている間にタップすると弾かれて飛び回る。出るたびに「頭文字を書く」と「壁で折り返して足あとを残して歩いて帰る」を半々で選ぶ。
+  // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。
   // 左右反転は transform の最後に入れる（scale プロパティだと translate ごと反転して画面外へ出る）
   // 出ている間は透明な覆いで他の操作を止める（もどる だけは覆いより上に置いてある）
   let { word, from, onend }: { word: Word; from: { x: number; y: number }; onend: () => void } = $props();
-  const letter = untrack(() => (strokesOf()[lettersOf(word)[0]] ?? []).map((d) => pathToPoints(d)));
   const b = new Bouncer(
     untrack(() => vp.w),
     untrack(() => vp.h),
-    untrack(() => from),
-    Math.random,
-    letter,
-    (Math.random() < 0.5 ? 'write' : 'walk') as EggStyle
+    untrack(() => from)
   );
   $effect(() => b.resize(vp.w, vp.h));
   let celebrated = false;
-  let written = false;
   $effect(() => {
     untrack(() => recordEgg(profiles.cur));
     let raf = 0;
@@ -35,12 +27,6 @@
     const loop = (t: number) => {
       b.tick(Math.min(0.05, (t - last) / 1000));
       last = t;
-      // 文字を書き終えて帰り始めた瞬間に、跡に沿ってキラキラ
-      if (b.phase === 'home' && b.trails.length && !written) {
-        written = true;
-        sfx.kira();
-        for (const tr of b.trails) for (const p of tr.filter((_, k) => k % 8 === 0)) fx.burst(p.x, p.y, 3);
-      }
       if (b.hits >= GOAL && !celebrated) {
         celebrated = true;
         fx.confetti(300);
@@ -68,16 +54,6 @@
 </script>
 
 <div class="shield" role="presentation"></div>
-{#if b.trails.length || b.steps.length}
-  <svg class="trail" aria-hidden="true">
-    {#each b.trails as tr (tr)}
-      <polyline points={tr.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')} />
-    {/each}
-    {#each b.steps as p (p)}
-      <ellipse cx={p.x} cy={p.y} rx="9" ry="6" class="step" />
-    {/each}
-  </svg>
-{/if}
 {#if b.phase === 'pinball'}
   <div class={['count', { goal: b.hits >= GOAL }]}>
     {#key b.hits}<b>{b.hits}</b>{/key}
@@ -104,26 +80,6 @@
     inset: 0;
     z-index: 59;
     touch-action: none;
-  }
-  .trail {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 60;
-    pointer-events: none;
-  }
-  .step {
-    fill: var(--sub);
-    opacity: 0.35;
-  }
-  .trail polyline {
-    fill: none;
-    stroke: var(--blue);
-    stroke-width: 14;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: 0.85;
   }
   .count {
     position: fixed;

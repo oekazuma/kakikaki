@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { scale } from 'svelte/transition';
+  import { backOut } from 'svelte/easing';
   import WordCard from './WordCard.svelte';
   import Icon from './Icon.svelte';
   import Bouncer from './Bouncer.svelte';
@@ -31,7 +33,14 @@
 </script>
 
 <div class="wordbox" bind:this={box}>
-  <WordCard {word} {size} onclick={tap} ghost={egg} />
+  {#if egg}
+    <WordCard {word} {size} onclick={tap} ghost />
+  {:else}
+    <!-- 跳び出した絵が戻ってきたとき、カードがぽんと跳ねる（最初の表示では動かない） -->
+    <div in:scale={{ start: 0.6, duration: 350, easing: backOut }}>
+      <WordCard {word} {size} onclick={tap} />
+    </div>
+  {/if}
   <button
     class={['wordhear', { speaking }]}
     onclick={() => hear(nameOf(word), info().speech)}
