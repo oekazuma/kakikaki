@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fx } from '$lib/fx';
   import Icon from '$lib/components/Icon.svelte';
+  import Splash from '$lib/components/Splash.svelte';
   import { lang } from '$lib/lang.svelte';
   import { rememberLang } from '$lib/progress.svelte';
   import { updated } from '$app/state';
@@ -29,6 +30,7 @@
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
 {@render children()}
+<Splash />
 {#if tooSmall}
   <div class="guard card">
     {#if vp.portrait}
