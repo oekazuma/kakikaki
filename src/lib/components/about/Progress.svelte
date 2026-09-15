@@ -1,100 +1,86 @@
 <script lang="ts">
   import Avatar from '../Avatar.svelte';
-  import Bar from '../Bar.svelte';
+  import Icon from '../Icon.svelte';
+  import ProgressDetail from './ProgressDetail.svelte';
   import { LANGS, info } from '$lib/lang.svelte';
-  import { profiles } from '$lib/profiles.svelte';
-  import { summaryOf, weakOf, type Summary } from '$lib/progress.svelte';
+  import { profiles, type Profile } from '$lib/profiles.svelte';
+  import { summaryOf } from '$lib/progress.svelte';
   import { TOTAL } from '$lib/badges';
-  // 保護者向け: 全員 × 3 ことば の進み具合を、ことばを切り替えずに一覧する（記録は保存値から直接読む）
+  // 保護者向け: 人ごとに 1 行の一覧（ことばごとのクリア文字数だけ）。押すと詳細のモーダル
   const rows = $derived(
     profiles.list.map((p) => ({
       p,
-      cells: LANGS.map((l) => ({ l, s: summaryOf(p.id, l), total: TOTAL(l), weak: weakOf(p.id, l).slice(0, 5) }))
+      chips: LANGS.map((l) => ({ l, chars: summaryOf(p.id, l).chars, total: TOTAL(l).chars }))
     }))
   );
-  const empty = (s: Summary) => s.chars + s.words + s.medals + s.days + s.quiz === 0;
+  let open = $state<Profile | null>(null);
 </script>
 
 <section class="card">
   <h2>みんなの進み具合</h2>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        {#each LANGS as l (l)}<th>{info(l).short}</th>{/each}
-      </tr>
-    </thead>
-    <tbody>
-      {#each rows as { p, cells } (p.id)}
-        <tr>
-          <th class="who"><Avatar avatar={p.avatar} size={36} /><span>{p.name}</span></th>
-          {#each cells as { l, s, total, weak } (l)}
-            <td>
-              {#if empty(s)}
-                <span class="none">まだ</span>
-              {:else}
-                <div class="line">
-                  <span>文字 {s.chars}/{total.chars}</span><Bar have={s.chars} need={total.chars} />
-                </div>
-                <div class="line">
-                  <span>単語 {s.words}/{total.words}</span><Bar have={s.words} need={total.words} color="var(--teal)" />
-                </div>
-                <small>金の星 {s.gold}・メダル {s.medals}・{s.days} 日・クイズ {s.quiz} 問</small>
-                {#if weak.length}<small class="weak">苦手: <span class="kyokasho">{weak.join('・')}</span></small>{/if}
-              {/if}
-            </td>
+  <ul>
+    {#each rows as { p, chips } (p.id)}
+      <li>
+        <button onclick={() => (open = p)}>
+          <Avatar avatar={p.avatar} size={36} />
+          <b>{p.name}</b>
+          {#each chips as { l, chars, total } (l)}
+            <span class={['chip', { none: chars === 0 }]}
+              >{info(l).short} {chars === 0 ? 'まだ' : `${chars}/${total}`}</span
+            >
           {/each}
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+          <Icon name="back" size={18} />
+        </button>
+      </li>
+    {/each}
+  </ul>
+  <p class="note">押すと文字・単語・行ごとの進み具合、クイズの正解数、苦手な文字が見られます。</p>
 </section>
 
+{#if open}
+  <ProgressDetail p={open} onclose={() => (open = null)} />
+{/if}
+
 <style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    line-height: 1.4;
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
-  th,
-  td {
-    text-align: left;
-    vertical-align: top;
-    padding: 8px 6px;
+  li + li {
     border-top: 1px solid #e6e9ed;
   }
-  thead th {
-    border-top: 0;
-    color: var(--sub);
-    font-weight: bold;
-    padding-bottom: 4px;
-  }
-  .who {
+  button {
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 8px;
-    white-space: nowrap;
+    gap: 10px;
+    padding: 8px 4px;
+    text-align: left;
+    font-size: 14px;
+  }
+  b {
+    min-width: 6em;
+  }
+  .chip {
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: var(--pill);
     font-weight: bold;
+    font-size: 13px;
+    white-space: nowrap;
   }
-  .line {
-    display: grid;
-    grid-template-columns: 96px 1fr;
-    align-items: center;
-    gap: 6px;
+  .chip.none {
+    color: var(--sub);
+    font-weight: normal;
   }
-  .line + .line {
-    margin-top: 4px;
-  }
-  small {
-    display: block;
-    margin-top: 4px;
+  button :global(svg) {
+    margin-left: auto;
+    transform: scaleX(-1);
     color: var(--sub);
   }
-  .none {
+  .note {
     color: var(--sub);
-  }
-  .weak {
-    color: var(--danger-ink);
+    font-size: 13px;
   }
 </style>

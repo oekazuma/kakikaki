@@ -12,7 +12,9 @@ import {
   days,
   recordStar,
   recordMiss,
-  weakOf
+  weakOf,
+  detailOf,
+  streakOf
 } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
@@ -77,6 +79,30 @@ describe('progress', () => {
     expect([get('あ').star, get('あ').miss, get('い').miss]).toEqual([2, 1, 2]);
     expect(weakOf('p1', 'ja')).toEqual(['う', 'い', 'え']);
     expect(get('あ')).toMatchObject({ trace: 0, free: 0, test: 0 });
+  });
+  it('detailOf: 行ごとのクリア数・クイズ・メダル・最後の日・苦手（回数つき）をまとめる', () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2026, 8, 14, 10));
+      for (const c of 'あいう') {
+        record(c, 'trace');
+        record(c, 'trace');
+        record(c, 'free');
+      }
+      vi.setSystemTime(new Date(2026, 8, 15, 10));
+      recordQuiz('read', 1, 4);
+      recordQuiz('write', 2, 1);
+      recordMiss('か');
+      recordMiss('か');
+      const d = detailOf('p1', 'ja');
+      expect([d.chars, d.rows['あいうえお'], d.last, d.days]).toEqual([3, 3, '2026-09-15', 2]);
+      expect([d.quiz.read1, d.quiz.write2, d.medalTotal > 0]).toEqual([4, 1, true]);
+      expect(d.weak).toEqual([{ c: 'か', miss: 2 }]);
+      expect(streakOf('p1')).toBe(2);
+      expect(detailOf('p1', 'en').last).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
   it('練習した日付は 1 日に 1 つだけ増え、翌日のクイズでも増える', () => {
     vi.useFakeTimers();
