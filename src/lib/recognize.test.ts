@@ -15,8 +15,12 @@ describe('recognize', () => {
   it('お手本そのものは 81 文字すべて 1 位が自分', () => {
     for (const c of CHARS) expect(recognize(drawn(STROKES, c), T_JA)[0].char, c).toBe(c);
   });
-  it('英語: お手本そのものは 52 文字すべて合格（I と l のように同形の字は 2 位でも可）', () => {
+  it('英語: お手本そのものは 62 文字すべて合格（I と l のように同形の字は 2 位でも可）', () => {
     for (const c of CHARS_EN) expect(passes(c, recognize(drawn(STROKES_EN, c), T_EN)), c).toBe(true);
+  });
+  it('数字を足しても O と 0 はそれぞれ合格する（0 は縦長の楕円にして区別している）', () => {
+    expect(passes('O', recognize(drawn(STROKES_EN, 'O'), T_EN))).toBe(true);
+    expect(passes('0', recognize(drawn(STROKES_EN, '0'), T_EN))).toBe(true);
   });
   it('カタカナ: お手本そのものは 81 文字すべて合格', () => {
     for (const c of CHARS_KANA) expect(passes(c, recognize(drawn(STROKES_KANA, c), T_KANA)), c).toBe(true);

@@ -1,5 +1,6 @@
 import { WORDS, type Word } from './words';
 import { charsOf, lettersOf, type Lang } from './lang.svelte';
+import { DIGITS } from './chars';
 
 export type Level = 1 | 2 | 3;
 export type Kind = 'read' | 'write';
@@ -58,9 +59,12 @@ export function pickChoices(
 }
 
 // ？ に入る文字の選択肢: 正解と同じ文字セット（英語は同じ大文字小文字）から 2 つ
+// 数字は単語に出てこないので候補にしない（英語の 1 文字練習には数字があるが、クイズの出題対象は単語のみ）
 function blankLetters(correct: string, l: Lang, rnd: () => number): string[] {
   const lower = correct === correct.toLowerCase();
-  const pool = charsOf(l).filter((c) => c !== correct && (l !== 'en' || (c === c.toLowerCase()) === lower));
+  const pool = charsOf(l).filter(
+    (c) => c !== correct && !DIGITS.includes(c) && (l !== 'en' || (c === c.toLowerCase()) === lower)
+  );
   return shuffle([correct, ...shuffle(pool, rnd).slice(0, 2)], rnd);
 }
 

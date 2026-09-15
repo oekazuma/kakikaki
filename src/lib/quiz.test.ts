@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, type ReadQ } from './quiz';
 import { WORDS, wordById } from './words';
 import { lettersOf, nameOf, LANGS, type Lang } from './lang.svelte';
+import { DIGITS } from './chars';
 
 // 決定的な乱数
 const seeded =
@@ -75,6 +76,11 @@ describe('quiz', () => {
         const upper = q.blank === 0;
         for (const c of q.letters!) expect(c === c.toUpperCase(), `${q.answer.en}:${c}`).toBe(upper);
       }
+  });
+  it('英語の穴埋めの選択肢に数字は出ない（数字は単語に出てこない 1 文字練習だけの対象）', () => {
+    for (const seed of [1, 2, 3, 4, 5])
+      for (const q of makeReadQuiz('en', 2, 40, seeded(seed)))
+        if (q.kind === 'blank') for (const c of q.letters!) expect(DIGITS).not.toContain(c);
   });
   it('むずかしい の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
     const answer = wordById('hamburger')!; // はんばーがー 6 文字。たべもの には同じ 6 文字の語が 4 つある

@@ -1,30 +1,32 @@
 // 実行: node scripts/make-strokes-en.ts
-// アルファベット 52 文字の書き順を 109×109 の座標で生成し src/lib/strokes-en.ts に書き出す。
+// アルファベット 52 文字と数字 10 文字の書き順を 109×109 の座標で生成し src/lib/strokes-en.ts に書き出す。
 // 線分と円弧の DSL で定義し、円弧は 3 次ベジェに変換する（実行時パーサは M/L/C だけを扱えばよい）。
 import { writeFileSync } from 'node:fs';
 
-type Seg = { to: [number, number] } | { arc: [cx: number, cy: number, r: number, from: number, to: number] };
+// ry を渡すと楕円（0 が O と同じ丸みだと紛らわしいので縦長にする用）
+type Seg =
+  { to: [number, number] } | { arc: [cx: number, cy: number, r: number, from: number, to: number, ry?: number] };
 type Stroke = [start: [number, number], ...Seg[]];
 
 const P = (x: number, y: number) => `${+x.toFixed(2)} ${+y.toFixed(2)}`;
 const rad = (d: number) => (d * Math.PI) / 180;
-const pt = (cx: number, cy: number, r: number, a: number): [number, number] => [
+const pt = (cx: number, cy: number, r: number, a: number, ry = r): [number, number] => [
   cx + r * Math.cos(rad(a)),
-  cy + r * Math.sin(rad(a))
+  cy + ry * Math.sin(rad(a))
 ];
 
 // 円弧を 90° 以下に分割して C コマンドにする
-function arcPath(cx: number, cy: number, r: number, a0: number, a1: number) {
+function arcPath(cx: number, cy: number, r: number, a0: number, a1: number, ry = r) {
   const out: string[] = [];
   const n = Math.ceil(Math.abs(a1 - a0) / 90);
   for (let i = 0; i < n; i++) {
     const s = a0 + ((a1 - a0) * i) / n,
       e = a0 + ((a1 - a0) * (i + 1)) / n;
     const k = (4 / 3) * Math.tan(rad(e - s) / 4);
-    const [x0, y0] = pt(cx, cy, r, s),
-      [x3, y3] = pt(cx, cy, r, e);
-    const c1 = [x0 - k * r * Math.sin(rad(s)), y0 + k * r * Math.cos(rad(s))];
-    const c2 = [x3 + k * r * Math.sin(rad(e)), y3 - k * r * Math.cos(rad(e))];
+    const [x0, y0] = pt(cx, cy, r, s, ry),
+      [x3, y3] = pt(cx, cy, r, e, ry);
+    const c1 = [x0 - k * r * Math.sin(rad(s)), y0 + k * ry * Math.cos(rad(s))];
+    const c2 = [x3 + k * r * Math.sin(rad(e)), y3 - k * ry * Math.cos(rad(e))];
     out.push(`C${P(c1[0], c1[1])} ${P(c2[0], c2[1])} ${P(x3, y3)}`);
   }
   return out.join(' ');
@@ -34,7 +36,9 @@ const toPath = (s: Stroke) =>
   (s.slice(1) as Seg[]).map((g) => ('to' in g ? `L${P(g.to[0], g.to[1])}` : arcPath(...g.arc))).join(' ');
 
 const L = (x: number, y: number): Seg => ({ to: [x, y] });
-const A = (cx: number, cy: number, r: number, from: number, to: number): Seg => ({ arc: [cx, cy, r, from, to] });
+const A = (cx: number, cy: number, r: number, from: number, to: number, ry?: number): Seg => ({
+  arc: [cx, cy, r, from, to, ry]
+});
 // 円弧の始点から始める画
 const arcStroke = (cx: number, cy: number, r: number, from: number, to: number, ...rest: Seg[]): Stroke => [
   pt(cx, cy, r, from),
@@ -196,10 +200,30 @@ const lo: Record<string, Stroke[]> = {
   z: [[[34, 42], L(75, 42), L(34, 84), L(75, 84)]]
 };
 
+// 数字: 大文字と同じ枠（上 16 / 下 90 / 左右 30〜80）。学校の書き順に合わせる
+const D: Record<string, Stroke[]> = {
+  '0': [[[54.5, 16], A(54.5, 53, 25, -90, -450, 37)]], // O と同じ丸だと紛らわしいので縦長の楕円
+  '1': [[[45, 28], L(58, 16), L(58, 90)]],
+  '2': [[[38.05, 20.5], A(54.5, 30, 19, 210, 30), L(30, 90), L(80, 90)]],
+  '3': [[[58, 16], A(58, 34, 18, -90, 90), A(58, 71, 19, -90, 90)]],
+  '4': [
+    [[65, 16], L(30, 64), L(78, 64)],
+    [[65, 16], L(65, 90)]
+  ],
+  '5': [
+    [[58, 16], L(58, 50), A(58, 70, 20, -90, 90)],
+    [[34, 16], L(78, 16)]
+  ],
+  '6': [[[68, 20], L(54.5, 46), A(54.5, 68, 22, -90, -450)]],
+  '7': [[[32, 16], L(80, 16), L(40, 90)]],
+  '8': [[[54.5, 53], A(54.5, 34.5, 18.5, 90, -270), A(54.5, 71.5, 18.5, -90, 270)]],
+  '9': [[[48, 16], A(48, 34, 18, -90, -450), L(66, 90)]]
+};
+
 const out: Record<string, string[]> = {};
-for (const [k, v] of Object.entries({ ...U, ...lo })) out[k] = v.map(toPath);
+for (const [k, v] of Object.entries({ ...U, ...lo, ...D })) out[k] = v.map(toPath);
 writeFileSync(
   'src/lib/strokes-en.ts',
-  `// アルファベットの書き順データ（scripts/make-strokes-en.ts で生成）。座標は 109×109。\nexport const STROKES_EN: Record<string, string[]> = ${JSON.stringify(out, null, '\t')};\n`
+  `// アルファベットと数字の書き順データ（scripts/make-strokes-en.ts で生成）。座標は 109×109。\nexport const STROKES_EN: Record<string, string[]> = ${JSON.stringify(out, null, '\t')};\n`
 );
-console.log(Object.keys(out).length, 'letters');
+console.log(Object.keys(out).length, 'letters/digits');

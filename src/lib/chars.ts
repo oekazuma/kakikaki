@@ -43,4 +43,5 @@ export const ALPHABET: string[][] = [
   [...AZ.toLowerCase().slice(0, 13)],
   [...AZ.toLowerCase().slice(13)]
 ];
-export const CHARS_EN = ALPHABET.flat();
+export const DIGITS = [...'0123456789'];
+export const CHARS_EN = [...ALPHABET.flat(), ...DIGITS];
