@@ -4,7 +4,7 @@
   import { practiceUrl } from '$lib/nav';
   import { nextOpenWord } from '$lib/practice.svelte';
   import { unlock } from '$lib/audio';
-  // ホームの先頭: 次の未クリア単語を 1 枚。全部終わっていれば何も出さない
+  // ホームの先頭: やりかけの単語を 1 枚。無ければ何も出さない
   const next = $derived(nextOpenWord());
 </script>
 

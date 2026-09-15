@@ -107,23 +107,18 @@ describe('PracticeSession', () => {
     expect(nextWordId(wordById('char-あ')!)).toBe('char-い');
   });
 
-  it('nextOpenWord: 記録が無ければ並び順で最初の未クリア単語', () => {
-    expect(nextOpenWord()?.id).toBe('dog'); // WORDS の先頭
-    for (const c of 'いぬ') clear(c);
-    expect(nextOpenWord()?.id).toBe('cat'); // 次の未クリア（ねこ が先頭から 2 番目）
-  });
-
-  it('nextOpenWord: 最後に練習した単語から続き、ことば ごとに独立', () => {
+  it('nextOpenWord: やりかけの単語があるときだけ、ことば ごとに独立して出す', () => {
+    expect(nextOpenWord()).toBeNull(); // 記録が無ければ出さない
     const giraffe = wordById('giraffe')!;
     rememberWord(giraffe);
     expect(nextOpenWord()?.id).toBe('giraffe');
     rememberWord(wordById('char-あ')!); // 1 文字練習は覚えない
     expect(lastWord()).toBe('giraffe');
-    for (const c of 'きりん') clear(c);
-    expect(nextOpenWord()?.id).toBe(nextWordId(giraffe)); // クリア済みなら並び順で次の未クリア
     setLang('kana');
-    expect(nextOpenWord()?.id).toBe('dog'); // かたかな の記録は別
+    expect(nextOpenWord()).toBeNull(); // かたかな の記録は別
     setLang('ja');
+    for (const c of 'きりん') clear(c);
+    expect(nextOpenWord()).toBeNull(); // クリアしたら出さない
     reset();
     expect(lastWord()).toBeNull(); // リセットで消える
   });
