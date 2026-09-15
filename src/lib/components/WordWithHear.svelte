@@ -3,13 +3,14 @@
   import Icon from './Icon.svelte';
   import Bouncer from './Bouncer.svelte';
   import { info, nameOf } from '$lib/lang.svelte';
-  import { say, sfx, unlock } from '$lib/audio';
+  import { speaker, sfx, unlock } from '$lib/audio';
   import { TAPS } from '$lib/bouncer.svelte';
   import type { Word } from '$lib/words';
   // 練習画面の左上: 単語カードに、単語全体を読み上げるスピーカーを重ねる（右の きく は 1 文字だけ）。
   // かくし演出: カードを 10 回続けてタップ（2 秒あくと数え直し）するとイラストが画面を走る
   let { word, size = 240, onegg }: { word: Word; size?: number; onegg?: () => void } = $props();
   let speaking = $state(false);
+  const hear = speaker((on) => (speaking = on));
   let taps = 0;
   let lastTap = 0;
   let egg = $state(false);
@@ -30,16 +31,14 @@
       egg = true;
     }
   }
-  async function hear() {
-    speaking = true;
-    await say(nameOf(word), info().speech);
-    speaking = false;
-  }
 </script>
 
 <div class="wordbox" bind:this={box}>
   <WordCard {word} {size} onclick={tap} ghost={egg} />
-  <button class={['wordhear', { speaking }]} onclick={hear} aria-label="たんごを きく"
+  <button
+    class={['wordhear', { speaking }]}
+    onclick={() => hear(nameOf(word), info().speech)}
+    aria-label="たんごを きく"
     ><Icon name="speaker" size={22} /></button
   >
 </div>

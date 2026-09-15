@@ -2,25 +2,27 @@
   import Icon from './Icon.svelte';
   import { imageUrl } from '$lib/image';
   import { info, nameOf, lettersOf } from '$lib/lang.svelte';
-  import { say } from '$lib/audio';
+  import { speaker } from '$lib/audio';
   import type { ReadQ } from '$lib/quiz';
   // よみクイズの出題部分（形式ごとに見せ方が変わる）
   let { q }: { q: ReadQ } = $props();
   let speaking = $state(false);
-  async function hear() {
-    speaking = true;
-    await say(nameOf(q.answer), info().speech);
-    speaking = false;
-  }
+  const hear = speaker((on) => (speaking = on));
 </script>
 
 <div class={['prompt', 'card', q.kind]} data-kind={q.kind}>
   {#if q.kind === 'word'}
-    <button class={['hear', { speaking }]} onclick={hear} aria-label="きく"><Icon name="speaker" size={26} /></button>
+    <button
+      class={['hear', { speaking }]}
+      onclick={() => hear(nameOf(q.answer), info().speech)}
+      aria-label="きく"><Icon name="speaker" size={26} /></button
+    >
     <b class="word kyokasho">{nameOf(q.answer)}</b>
     <span>は どれ？</span>
   {:else if q.kind === 'listen'}
-    <button class={['hear', 'big', { speaking }]} onclick={hear}><Icon name="speaker" size={40} /> きく</button>
+    <button class={['hear', 'big', { speaking }]} onclick={() => hear(nameOf(q.answer), info().speech)}
+      ><Icon name="speaker" size={40} /> きく</button
+    >
     <span>きこえた ものは どれ？</span>
   {:else if q.kind === 'initial'}
     <b class="word kyokasho">{lettersOf(q.answer)[0]}</b>
