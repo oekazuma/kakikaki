@@ -13,14 +13,14 @@
     mode,
     onDone,
     onStroke,
-    onDraw
+    onDrawn
   }: {
     char: string;
     strokes: Record<string, string[]>;
     mode: Mode;
     onDone: (r: Result) => void;
     onStroke?: (i: number) => void;
-    onDraw?: () => void;
+    onDrawn?: (has: boolean) => void; // おてほんなし で線が 1 本以上あるか（できた を押せるか）
   } = $props();
 
   // 文字・モードの切替は親が {#key} で再マウントするので、判定器は初期値で 1 回だけ作る
@@ -46,6 +46,16 @@
     clearTimeout(idle);
     const r = t.judge();
     if (r) onDone(r);
+  }
+  // ひとつ もどる。画を取り消したら画数の表示も戻し、おてほんなし の線が無くなれば親に知らせる
+  export function undo() {
+    clearTimeout(idle);
+    const r = t.undo();
+    if (!r) return;
+    if (r === 'stroke') onStroke?.(t.si - 1);
+    if (mode !== 'test') return armIdle();
+    if (t.trails.length === 0) onDrawn?.(false);
+    else idle = setTimeout(judge, 4000);
   }
   // 書き順の再生。なぞる では自動で、他のモードでは右の「みる」から
   export function playDemo() {
@@ -82,7 +92,7 @@
     if (ev === 'fail') failed();
     else if (ev === 'stroke' || ev === 'done') completed(i, ev === 'done');
     else if (ev === 'drawn') {
-      onDraw?.();
+      onDrawn?.(true);
       clearTimeout(idle);
       idle = setTimeout(judge, 4000);
     }

@@ -77,7 +77,7 @@
           mode={s.mode}
           onDone={(r) => s.done(r)}
           onStroke={(k) => (s.stroke = k + 1)}
-          onDraw={() => (s.drawn = true)}
+          onDrawn={(v) => (s.drawn = v)}
         />
       {/key}
       {#if s.flyStar}<div class="flystar"><Icon name="star" size={90} fill /></div>{/if}
@@ -89,6 +89,9 @@
     <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(readingOf(s.c), info().speech)} />
     {#if s.mode !== 'test'}
       <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
+    {/if}
+    {#if s.mode !== 'trace'}
+      <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
     {/if}
     <ActionButton icon="redo" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
     {#if s.mode === 'test'}

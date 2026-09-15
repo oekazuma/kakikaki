@@ -61,6 +61,27 @@ describe('Tracer なぞる', () => {
 });
 
 describe('Tracer じぶんでかく', () => {
+  it('ひとつ もどる: 最後の線を消し、線が無ければ直前の画を取り消す。なぞる では戻さない', () => {
+    const t = new Tracer('あ', STROKES, 'free');
+    expect(drag(t, strokePts('あ', 0))).toBe('stroke');
+    expect(t.si).toBe(1);
+    drag(t, [
+      { x: 10, y: 100 },
+      { x: 30, y: 100 }
+    ]);
+    expect(t.trails.length).toBe(1);
+    expect(t.undo()).toBe('line');
+    expect(t.trails.length).toBe(0);
+    expect(t.undo()).toBe('stroke');
+    expect(t.si).toBe(0);
+    expect(t.undo()).toBeNull();
+    expect(new Tracer('あ', STROKES, 'trace').undo()).toBeNull();
+    const test = new Tracer('あ', STROKES, 'test');
+    drag(test, strokePts('あ', 0));
+    expect(test.undo()).toBe('line');
+    expect(test.judge()).toBeNull(); // 線が無いので判定しない
+  });
+
   it('半分だけ塗ると pending、残りを塗ると stroke。採点は 3 つ星相当', () => {
     const t = new Tracer('ー', STROKES, 'free');
     const pts = strokePts('ー', 0);

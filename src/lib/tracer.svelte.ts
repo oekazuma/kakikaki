@@ -89,6 +89,22 @@ export class Tracer {
     return 'drawn';
   }
 
+  // ひとつ もどる: 最後に引いた線を消す。線が無ければ（じぶんでかく）直前に完成した画を取り消す。戻せなければ null
+  undo(): 'line' | 'stroke' | null {
+    if (this.tracing || this.mode === 'trace') return null;
+    if (this.trails.length > 0) {
+      this.trails.pop();
+      this.judged = false;
+      return 'line';
+    }
+    if (this.mode === 'free' && this.si > 0) {
+      this.si -= 1;
+      this.scores.pop();
+      return 'stroke';
+    }
+    return null;
+  }
+
   private fail() {
     this.pointer = null;
     this.tracing = false;
