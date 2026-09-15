@@ -17,7 +17,7 @@ export const Write = () => {
     <Practice
       mode={test ? 'test' : 'free'}
       title={test ? 'おてほんなしで かいてみよう！' : 'じぶんで かいてみよう！'}
-      hint={test ? 'おもいだして かいてみよう。こまったら みぎの「みる」' : 'いろの みちを ぬろう'}
+      hint={test ? 'おもいだして かいてみよう' : 'いろの みちを ぬろう'}
       chars={['き', 'り', 'ん']}
       active={1}
       done={1}

@@ -147,24 +147,6 @@ export const Practice = ({
             {mode === 'trace' ? '4かく' : '2かく'}
           </span>
         )}
-        {mode === 'test' && (
-          <div
-            style={{
-              ...card,
-              position: 'absolute',
-              top: 10,
-              left: 14,
-              padding: '4px 14px 8px',
-              border: `3px solid ${C.guide}`,
-              minWidth: 92,
-              display: 'grid',
-              justifyItems: 'center'
-            }}
-          >
-            <b style={{ fontFamily: KYOKASHO, fontSize: 60, lineHeight: 1.1, color: C.sub }}>？</b>
-            <small style={{ fontSize: 12, fontWeight: 700, color: C.warn }}>2 かく</small>
-          </div>
-        )}
       </div>
       <div
         style={{
@@ -184,16 +166,35 @@ export const Practice = ({
       >
         <div style={{ display: 'grid', justifyItems: 'center', gap: 6 }}>
           <div style={{ ...card, width: 68, height: 68, display: 'grid', placeContent: 'center', color: t.blue }}>
-            <Icon name={mode === 'test' ? 'eye' : 'speaker'} size={32} />
+            <Icon name="speaker" size={32} />
           </div>
-          {mode === 'test' ? 'みる' : 'きく'}
+          きく
         </div>
         <div style={{ display: 'grid', justifyItems: 'center', gap: 6 }}>
           <div style={{ ...card, width: 68, height: 68, display: 'grid', placeContent: 'center', color: t.blue }}>
             <Icon name="redo" size={32} />
           </div>
-          もういちど
+          やりなおす
         </div>
+        {mode === 'test' && (
+          <div style={{ display: 'grid', justifyItems: 'center', gap: 6 }}>
+            <div
+              style={{
+                ...card,
+                width: 76,
+                height: 76,
+                borderRadius: 20,
+                display: 'grid',
+                placeContent: 'center',
+                background: t.teal,
+                color: '#fff'
+              }}
+            >
+              <Icon name="check" size={36} />
+            </div>
+            できた
+          </div>
+        )}
       </div>
       {overlay}
     </AbsoluteFill>
