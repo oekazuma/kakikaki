@@ -115,7 +115,7 @@
     grid-template-columns: 240px 1fr 120px;
     grid-template-rows: auto 1fr;
     gap: 14px 22px;
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100vh - var(--sat) - var(--sab));
     padding: 16px 22px;
   }
   header {

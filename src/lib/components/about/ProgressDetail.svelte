@@ -32,10 +32,10 @@
   .detail {
     position: fixed;
     left: 50%;
-    top: calc(50% + (env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) / 2);
+    top: calc(50% + (var(--sat) - var(--sab)) / 2);
     transform: translate(-50%, -50%);
     width: min(760px, calc(100vw - 60px));
-    max-height: calc(100vh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    max-height: calc(100vh - 60px - var(--sat) - var(--sab));
     display: grid;
     grid-template-rows: auto 1fr;
     z-index: 71;

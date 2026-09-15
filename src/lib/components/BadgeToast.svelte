@@ -12,7 +12,7 @@
 <style>
   .toast {
     position: fixed;
-    top: calc(24px + env(safe-area-inset-top));
+    top: calc(24px + var(--sat));
     left: 50%;
     transform: translateX(-50%);
     z-index: 70;

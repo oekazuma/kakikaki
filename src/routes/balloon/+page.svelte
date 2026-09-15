@@ -89,7 +89,7 @@
 <style>
   main {
     position: relative;
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(100vh - var(--sat) - var(--sab));
     overflow: hidden;
     background: linear-gradient(#dff1ff, var(--bg) 70%);
     -webkit-user-select: none;
