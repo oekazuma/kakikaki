@@ -12,7 +12,7 @@
 
 <div class={['prompt', 'card', q.kind]} data-kind={q.kind}>
   {#if q.kind === 'word'}
-    <b class="word kyokasho">{nameOf(q.answer)}</b>
+    <b class="target kyokasho">{nameOf(q.answer)}</b>
     <span>は どれ？</span>
   {:else if q.kind === 'listen'}
     <button class={['hear', 'big', { speaking }]} onclick={() => hear(nameOf(q.answer), info().speech)}
@@ -20,7 +20,7 @@
     >
     <span>きこえた ものは どれ？</span>
   {:else if q.kind === 'initial'}
-    <b class="word kyokasho">{lettersOf(q.answer)[0]}</b>
+    <b class="target kyokasho">{lettersOf(q.answer)[0]}</b>
     <span>で はじまる ものは どれ？</span>
   {:else if q.kind === 'blank'}
     <img src={imageUrl(q.answer)} alt="" width="200" height="140" loading="eager" />
@@ -65,7 +65,8 @@
     gap: 4px;
     justify-items: center;
   }
-  .word {
+  /* 手がかりの単語・頭文字。枠には形式名（word など）もクラスとして付くので、同じ名前を避ける */
+  .target {
     font-size: 56px;
     color: var(--blue);
   }
