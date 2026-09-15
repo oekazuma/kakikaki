@@ -71,9 +71,13 @@ body {
   user-select: none;
   -webkit-touch-callout: none;
   overscroll-behavior: none;
+  /* 連打を iOS がダブルタップ拡大と解釈して画面がずれるのを防ぐ（パンとピンチはそのまま） */
+  touch-action: manipulation;
 }
-/* PWA(standalone) ではステータスバーの下までコンテンツが広がるため、安全領域ぶんを body で確保する */
+/* PWA(standalone) ではステータスバーの下までコンテンツが広がるため、安全領域ぶんを body で確保する。
+   余白を高さに足すと安全領域ぶんだけ縦にはみ出してスクロールできてしまうので border-box にする */
 body {
+  box-sizing: border-box;
   padding: var(--sat) env(safe-area-inset-right) var(--sab) env(safe-area-inset-left);
 }
 button {
