@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
   import Icon from './Icon.svelte';
+  import SplashRunner from './SplashRunner.svelte';
   import { lang, info } from '$lib/lang.svelte';
   import { vp } from '$lib/viewport.svelte';
   // 起動画面。見栄えのために出す（最短 1.3 秒。ロゴが跳ねて、文字が 1 つずつ飛び出し、星が瞬き、線が引かれる演出が終わる長さ）。
@@ -40,6 +41,7 @@
 
 {#if show}
   <div class="splash" out:fade={{ duration: 300 }} role="presentation">
+    <SplashRunner />
     <div class="logo">
       <div class="mark">
         <img src="{base}/logo-mark{lang.v === 'ja' ? '' : `-${lang.v}`}.svg" alt="" width="120" height="120" />
