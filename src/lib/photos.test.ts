@@ -26,4 +26,18 @@ describe('photos', () => {
     localStorage.setItem('kk:photos', '{');
     expect((await fresh()).photos.list).toEqual([]);
   });
+
+  it('容量超過で保存できないときは一覧を据え置く', async () => {
+    const m = await fresh();
+    const spy = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
+      throw new DOMException('quota', 'QuotaExceededError');
+    });
+    try {
+      expect(m.addPhoto('data:x')).toBe(false);
+      expect(m.photos.list).toEqual([]);
+      expect(m.removePhoto('data:x')).toBe(false);
+    } finally {
+      spy.mockRestore();
+    }
+  });
 });

@@ -14,7 +14,10 @@ import {
   recordMiss,
   weakOf,
   detailOf,
-  streakOf
+  streakOf,
+  checkBadges,
+  earned,
+  summaryOf
 } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
@@ -126,5 +129,40 @@ describe('progress', () => {
     expect([days(), get('あ')]).toEqual([[], { trace: 0, free: 0, test: 0 }]);
     record('あ', 'trace');
     expect(days().length).toBe(1);
+  });
+  it('checkBadges: 新規獲得は一度だけ、ことばをまたがず、かくし要素も対象', async () => {
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date(2026, 8, 15, 10));
+      record('あ', 'trace');
+      record('あ', 'trace');
+      record('あ', 'free');
+      const first = checkBadges();
+      expect(first.some((b) => b.id === 'first-char')).toBe(true);
+      expect(earned()['first-char']).toBe('2026-09-15');
+      expect(checkBadges()).toEqual([]);
+      setLang('en');
+      expect(checkBadges().some((b) => b.id === 'first-char')).toBe(false);
+      expect(earned()['first-char']).toBeUndefined();
+      setLang('ja');
+      const { recordBalloon } = await import('./secret');
+      recordBalloon('p1');
+      const balloon = checkBadges().find((b) => b.id === 'balloon-found');
+      expect(balloon?.secret).toBe(true);
+    } finally {
+      vi.useRealTimers();
+      localStorage.removeItem('kk:secret');
+      localStorage.removeItem('kk:balloon');
+    }
+  });
+  it('summaryOf: 使用中でない人の集計は他の人と混ざらない', () => {
+    localStorage.setItem(
+      'kk:p2:ja:progress',
+      JSON.stringify({ あ: { trace: 2, free: 1, test: 1 }, い: { trace: 2, free: 1, test: 0 } })
+    );
+    localStorage.setItem('kk:p2:ja:quiz', JSON.stringify({ read1: 3 }));
+    expect(summaryOf('p2', 'ja')).toMatchObject({ chars: 2, gold: 1, quiz: 3 });
+    expect(summaryOf('p1', 'ja').chars).toBe(0);
+    expect(detailOf('p2', 'ja').rows['あいうえお']).toBe(2);
   });
 });
