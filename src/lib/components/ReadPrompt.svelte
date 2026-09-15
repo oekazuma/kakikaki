@@ -12,10 +12,8 @@
 
 <div class={['prompt', 'card', q.kind]} data-kind={q.kind}>
   {#if q.kind === 'word'}
-    <button
-      class={['hear', { speaking }]}
-      onclick={() => hear(nameOf(q.answer), info().speech)}
-      aria-label="きく"><Icon name="speaker" size={26} /></button
+    <button class={['hear', { speaking }]} onclick={() => hear(nameOf(q.answer), info().speech)} aria-label="きく"
+      ><Icon name="speaker" size={26} /></button
     >
     <b class="word kyokasho">{nameOf(q.answer)}</b>
     <span>は どれ？</span>

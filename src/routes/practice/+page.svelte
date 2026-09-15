@@ -84,12 +84,7 @@
   </section>
 
   <div class="right">
-    <ActionButton
-      icon="speaker"
-      label="きく"
-      active={speaking}
-      onclick={() => hear(readingOf(s.c), info().speech)}
-    />
+    <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(readingOf(s.c), info().speech)} />
     {#if s.mode !== 'test'}
       <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
     {/if}
