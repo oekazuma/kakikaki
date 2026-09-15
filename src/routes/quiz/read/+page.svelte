@@ -20,6 +20,11 @@
     );
   });
 
+  $effect(() => {
+    const q = r;
+    return () => q.dispose();
+  });
+
   function pick(key: string, e: MouseEvent) {
     unlock();
     if (r.pick(key) === 'hit') fx.burst(e.clientX, e.clientY, 24);

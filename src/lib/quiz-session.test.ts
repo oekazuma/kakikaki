@@ -45,6 +45,19 @@ describe('quiz session', () => {
     expect(fx.buu).toHaveBeenCalledOnce();
   });
 
+  it('よみクイズ: 最終問題の正解直後に dispose すると演出・記録が出ない', () => {
+    const r = new ReadQuiz(1, {}, seeded());
+    for (let n = 0; n < 9; n++) {
+      r.pick(r.q.key);
+      vi.advanceTimersByTime(900);
+    }
+    r.pick(r.q.key);
+    r.dispose();
+    vi.advanceTimersByTime(900);
+    expect(r.done).toBe(false);
+    expect(quiz().read1).toBeUndefined();
+  });
+
   it('かきクイズ: 全文字書けば正解、2 回外すとなぞるに切り替わり正解に数えない', () => {
     const w = new WriteQuiz(1, {}, seeded(3));
     expect(w.qs.length).toBe(5);
