@@ -10,8 +10,15 @@ describe('ピンボール', () => {
     expect(b.x).toBeGreaterThan(60);
     for (let i = 0; i < 40 && b.y < 700 - SIZE - 20; i++) b.tick(0.05);
     expect(b.y).toBe(700 - SIZE - 20); // 着地
-    b.tick(3);
-    expect(b.phase).toBe('return'); // 右へ抜けたらカードへ戻り始める
+    for (let i = 0; i < 60 && b.phase === 'run'; i++) b.tick(0.05);
+    expect([b.phase, b.x, b.right]).toEqual(['back', 1000 - SIZE, true]); // 右の壁で折り返す
+    b.tick(0.05);
+    expect(b.right).toBe(false); // 左を向いて地面を戻る
+    for (let i = 0; i < 60 && b.phase === 'back'; i++) {
+      b.tick(0.05);
+      expect(b.y).toBe(700 - SIZE - 20);
+    }
+    expect([b.phase, b.x]).toEqual(['up', 140 - SIZE / 2]); // カードの真下から跳び上がる
     for (let t = 0; t < RETURN + 0.1; t += 0.05) b.tick(0.05);
     expect([b.phase, b.x, b.y, b.rot]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2, 0]);
   });
@@ -35,18 +42,24 @@ describe('ピンボール', () => {
     b.tick(0.1);
     expect(b.kicks).toBe(2);
     expect(b.x).toBeGreaterThan(x1);
-    // 何もしないと LIFE 秒で終わる。画面内に留まる
-    for (let t = 0; t < LIFE + 0.5; t += 0.05) {
+    // 何もしないと LIFE 秒で帰り道に入る。画面内に留まる
+    for (let t = 0; t < LIFE + 0.5 && b.phase === 'pinball'; t += 0.05) {
       b.tick(0.05);
       expect(b.x).toBeGreaterThanOrEqual(0);
       expect(b.x).toBeLessThanOrEqual(1000 - SIZE);
       expect(b.y).toBeGreaterThanOrEqual(0);
       expect(b.y).toBeLessThanOrEqual(700 - SIZE);
     }
-    expect(b.phase).toBe('return'); // 時間切れでもカードへ戻る
-    b.kick(); // 戻っている間は弾けない
-    expect(b.phase).toBe('return');
-    for (let t = 0; t < RETURN + 0.1; t += 0.05) b.tick(0.05);
+    expect(b.phase).toBe('back'); // 時間切れでも落ちて地面を走って帰る
+    b.kick(); // 帰り道では弾けない
+    expect(b.phase).toBe('back');
+    for (let t = 0; t < 10 && b.phase !== 'done'; t += 0.05) {
+      b.tick(0.05);
+      expect(b.x).toBeGreaterThanOrEqual(0);
+      expect(b.x).toBeLessThanOrEqual(1000 - SIZE);
+      expect(b.y).toBeGreaterThanOrEqual(0);
+      expect(b.y).toBeLessThanOrEqual(700 - SIZE);
+    }
     expect([b.phase, b.x, b.y]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2]);
     b.kick();
     expect(b.phase).toBe('done');
