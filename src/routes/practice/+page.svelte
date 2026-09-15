@@ -93,7 +93,7 @@
     {#if s.mode !== 'trace'}
       <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
     {/if}
-    <ActionButton icon="redo" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
+    <ActionButton icon="refresh" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
     {#if s.mode === 'test'}
       <ActionButton icon="check" label="できた" done ready={s.drawn} onclick={() => canvas?.judge()} />
     {/if}

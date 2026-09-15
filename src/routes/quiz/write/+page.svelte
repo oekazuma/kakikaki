@@ -86,7 +86,7 @@
       {#if w.mode === 'test'}
         <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
       {/if}
-      <ActionButton icon="redo" label="やりなおす" onclick={() => w.nextLetter(w.k)} />
+      <ActionButton icon="refresh" label="やりなおす" onclick={() => w.nextLetter(w.k)} />
       {#if w.mode === 'test'}
         <ActionButton icon="check" label="できた" done ready={w.drawn} onclick={() => canvas?.judge()} />
       {/if}
