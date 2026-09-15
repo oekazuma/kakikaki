@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { resolve } from '$app/paths';
   import BackButton from '$lib/components/BackButton.svelte';
   import Calendar from '$lib/components/trophies/Calendar.svelte';
   import PersonTabs from '$lib/components/about/PersonTabs.svelte';
@@ -27,7 +26,7 @@
 
 <main>
   <header>
-    <BackButton href={resolve('/about')} />
+    <BackButton to="/about" />
     <h1>みんなの進み具合</h1>
     <PersonTabs list={profiles.list} cur={p.id} onselect={(id) => (pid = id)} />
   </header>
