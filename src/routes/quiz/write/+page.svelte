@@ -12,7 +12,7 @@
   import { info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { WriteQuiz, levelFromParam } from '$lib/quiz-session.svelte';
   import { LEVEL_NAME } from '$lib/quiz';
-  import { sfx, say } from '$lib/audio';
+  import { sfx, speaker } from '$lib/audio';
   import { fx } from '$lib/fx';
 
   const level = $derived(levelFromParam(page.url.searchParams.get('level')));
@@ -29,14 +29,14 @@
         })
     );
   });
+  $effect(() => {
+    const q = w;
+    return () => q.dispose();
+  });
   const strokes = $derived(strokesOf());
   let canvas = $state<Canvas>();
   let speaking = $state(false);
-  async function hear() {
-    speaking = true;
-    await say(nameOf(w.word), info().speech);
-    speaking = false;
-  }
+  const hear = speaker((on) => (speaking = on));
 </script>
 
 <svelte:head>
@@ -50,11 +50,15 @@
     <div class="left">
       <div class="card pic">
         {#if w.kind === 'listen'}
-          <button class={['hear', 'big', { speaking }]} onclick={hear}><Icon name="speaker" size={40} /> きく</button>
+          <button class={['hear', 'big', { speaking }]} onclick={() => hear(nameOf(w.word), info().speech)}
+            ><Icon name="speaker" size={40} /> きく</button
+          >
           <small>きこえた ことばを かこう</small>
         {:else}
           <img src={imageUrl(w.word)} alt="" width="210" height="150" loading="eager" />
-          <button class={['hear', { speaking }]} onclick={hear}><Icon name="speaker" size={22} /> きく</button>
+          <button class={['hear', { speaking }]} onclick={() => hear(nameOf(w.word), info().speech)}
+            ><Icon name="speaker" size={22} /> きく</button
+          >
         {/if}
       </div>
       <LetterSlots {w} />

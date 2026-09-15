@@ -19,6 +19,8 @@ export class Tracer {
   private scores: number[] = [];
   // いま追っている指。2 本目の指や手のひらは無視する（1 本目の画を壊さない）
   private pointer: number | null = null;
+  // おてほんなし: 前回の judge() から新しい線を足したか
+  private judged = false;
 
   constructor(
     readonly char: string,
@@ -78,6 +80,7 @@ export class Tracer {
     }
     this.trails.push(this.trail);
     this.trail = [];
+    this.judged = false;
     if (this.mode === 'free') {
       const all = this.trails.flat();
       if (coverage(this.current, all) >= JUDGE.FREE_DONE) return this.complete(strokeScore(all, this.current));
@@ -108,9 +111,10 @@ export class Tracer {
     return { mode: this.mode, score: s, ok: true, top: this.char };
   }
 
-  // おてほんなし: 書いた画列を全文字のお手本と照合する。何も書いていなければ null
+  // おてほんなし: 書いた画列を全文字のお手本と照合する。何も書いていない・前回の判定から線を足していなければ null
   judge(): Result | null {
-    if (this.trails.length === 0) return null;
+    if (this.trails.length === 0 || this.judged) return null;
+    this.judged = true;
     const r = recognize(this.trails, templatesFor(this.strokes));
     const mine = r.find((x) => x.char === this.char)!;
     return { mode: 'test', score: testScore(mine.dist), ok: passes(this.char, r), top: r[0].char };

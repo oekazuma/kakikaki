@@ -25,6 +25,7 @@ export class ReadQuiz {
   wrong = $state<string[]>([]); // この問題で外した選択肢
   hit = $state<string | null>(null);
   done = $state(false);
+  private timer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     readonly level: Level,
@@ -37,6 +38,7 @@ export class ReadQuiz {
     return this.qs[this.i];
   }
   start() {
+    clearTimeout(this.timer);
     this.qs = makeReadQuiz(lang.v, this.level, undefined, this.rnd);
     this.i = 0;
     this.correct = 0;
@@ -55,7 +57,7 @@ export class ReadQuiz {
     this.hit = key;
     if (this.wrong.length === 0) this.correct++;
     this.fx.kira?.();
-    setTimeout(() => {
+    this.timer = setTimeout(() => {
       if (this.i < this.qs.length - 1) {
         this.i++;
         this.wrong = [];
@@ -66,6 +68,10 @@ export class ReadQuiz {
       }
     }, 900);
     return 'hit';
+  }
+  // 画面を離れたら結果の演出と記録は出さない（ホームで紙吹雪が鳴らないように）
+  dispose() {
+    clearTimeout(this.timer);
   }
 }
 
@@ -82,6 +88,7 @@ export class WriteQuiz {
   msg = $state('');
   drawn = $state(false);
   done = $state(false);
+  private timer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     readonly level: Level,
@@ -103,6 +110,7 @@ export class WriteQuiz {
     return this.letters[this.k];
   }
   start() {
+    clearTimeout(this.timer);
     this.qs = makeWriteQuiz(lang.v, this.level, undefined, this.rnd);
     this.i = 0;
     this.correct = 0;
@@ -123,6 +131,7 @@ export class WriteQuiz {
       this.miss++;
       recordMiss(this.c);
       this.fx.buu?.();
+      this.drawn = false;
       if (this.miss >= 2) {
         this.helped = true;
         this.mode = 'trace';
@@ -137,7 +146,7 @@ export class WriteQuiz {
     this.fx.kira?.();
     this.fx.confetti?.(80);
     this.msg = this.helped ? 'かけたね！' : 'せいかい！';
-    setTimeout(() => {
+    this.timer = setTimeout(() => {
       if (this.i < this.qs.length - 1) {
         this.i++;
         this.nextLetter(0);
@@ -146,5 +155,9 @@ export class WriteQuiz {
         finish('write', this.level, this.correct, this.qs.length, this.fx);
       }
     }, 1400);
+  }
+  // 画面を離れたら結果の演出と記録は出さない（ホームで紙吹雪が鳴らないように）
+  dispose() {
+    clearTimeout(this.timer);
   }
 }

@@ -18,7 +18,7 @@
   import DriveBy from '$lib/components/DriveBy.svelte';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { PracticeSession, resolveWord } from '$lib/practice.svelte';
-  import { say, sfx, readingOf } from '$lib/audio';
+  import { speaker, sfx, readingOf } from '$lib/audio';
   import { fx } from '$lib/fx';
 
   const word = $derived(resolveWord(page.url.searchParams.get('w'), lang.v));
@@ -34,11 +34,7 @@
   const total = $derived(strokes[s.c].length);
 
   // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
-  async function hear() {
-    speaking = true;
-    await say(readingOf(s.c), info().speech);
-    speaking = false;
-  }
+  const hear = speaker((on) => (speaking = on));
   function goNext() {
     s.complete = false;
     const id = s.nextId();
@@ -88,7 +84,7 @@
   </section>
 
   <div class="right">
-    <ActionButton icon="speaker" label="きく" active={speaking} onclick={hear} />
+    <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(readingOf(s.c), info().speech)} />
     {#if s.mode !== 'test'}
       <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
     {/if}
