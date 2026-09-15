@@ -25,6 +25,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      # svelte-vitals.config.ts が svelte-vitals を import するので node_modules が要る
+      - name: Setup Node.js and dependencies
+        uses: ./.github/workflows/setup-node
       - uses: oekazuma/svelte-vitals-action@91ef310a72272f7473aeadcdec63c9ba1ba6ea11 # v0.12.1
         with:
           diff: origin/${{ github.base_ref }}

@@ -12,7 +12,7 @@ iPad 横画面用の子ども向け ひらがな・カタカナ・アルファ�
 pnpm dev                      # http://localhost:5173/kakikaki/
 pnpm test:run                 # vitest 一括実行（unit プロジェクト、happy-dom）。pnpm test で watch
 pnpm exec vitest run src/lib/judge.test.ts   # 単一ファイル
-pnpm lint                     # prettier --check と eslint（CI と同じ）
+pnpm lint                     # prettier --check と eslint と markuplint（CI と同じ）
 pnpm verify                   # lint / check / test:run / vitals / build をまとめて実行（PR の CI と同じ判定）
 pnpm vitals                   # svelte-vitals の全体スキャン。編集後は `pnpm vitals --diff`、コミット前は `pnpm vitals --staged`
 pnpm format                   # prettier --write
@@ -27,6 +27,8 @@ pnpm icon                     # アイコン/ロゴマーク SVG を生成（引
 `video/` は README の紹介動画（`docs/intro.gif`）を作る Remotion プロジェクトで、本体とは別の pnpm プロジェクト（`cd video && pnpm install`）。`pnpm dev` で Studio、`pnpm render` で MP4（`video/out/`、コミットしない）を描画し、ffmpeg で `docs/intro.gif` に変換する（GitHub の README はリポジトリ内の動画を埋め込めないので GIF だけを使う）。BGM は `video/scripts/make-bgm.ts` がオシレータで合成して `src/bgm.wav`（生成物、コミットしない）に書き、`dev` / `render` の前に自動で作る。イラスト・ロゴ・Klee One は `static/` を `publicDir` として直接参照し、書き順と単語は `src/lib/` を import するので複製しない。UI の丸ゴシックは Mac のシステムフォント（Hiragino Maru Gothic ProN）に頼るため、Linux で描画すると字面が変わる。`video/` を触ったら `pnpm check:video` で型を確認する。
 
 svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。コンポーネントは 200 行未満に保つ（`architecture/component-size`、抑制ファイルは使っていない）。画面の状態遷移はクラス（`tracer.svelte.ts` / `practice.svelte.ts` / `quiz-session.svelte.ts` / `gate.svelte.ts`）に寄せて vitest で検証し、`.svelte` は描画とイベント配線だけにする。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
+
+markuplint は `pnpm lint` の中で `src/**/*.svelte` と `src/app.html` を検査する（警告も失敗扱い）。外している規則とその理由は `.markuplintrc.jsonc` のコメントにある。
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は PR では lint（+ svelte-vitals 全体スキャン）/ check / test / build を並列に、`main` への push では build を除く 3 つを回す（ビルドと配信は `deploy.yml`）。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 

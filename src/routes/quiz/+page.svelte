@@ -26,7 +26,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1><Icon name="bulb" /> クイズ <small>（{info().short}）</small></h1>
+    <h1><Icon name="bulb" /> クイズ <span class="sub">（{info().short}）</span></h1>
   </header>
   <div class="kinds">
     {#each KINDS as k (k.id)}
@@ -75,7 +75,7 @@
   h1 :global(svg) {
     color: var(--warn);
   }
-  h1 small {
+  h1 .sub {
     font-size: 14px;
     color: var(--sub);
   }

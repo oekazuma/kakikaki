@@ -35,7 +35,6 @@
         stroke-linecap="round"
         stroke-dasharray={C}
         stroke-dashoffset={C * (1 - got / badges.length)}
-        transform="rotate(-90 60 60)"
       />
     </svg>
     <div class="num"><b>{got}</b><small>/ {badges.length}</small></div>
@@ -93,6 +92,8 @@
   }
   .ring circle:last-of-type {
     transition: stroke-dashoffset 0.8s ease-out;
+    transform: rotate(-90deg);
+    transform-origin: center;
   }
   .num {
     position: absolute;
