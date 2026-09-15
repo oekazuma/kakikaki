@@ -38,8 +38,7 @@
   <button
     class={['wordhear', { speaking }]}
     onclick={() => hear(nameOf(word), info().speech)}
-    aria-label="たんごを きく"
-    ><Icon name="speaker" size={22} /></button
+    aria-label="たんごを きく"><Icon name="speaker" size={22} /></button
   >
 </div>
 {#if egg}
