@@ -156,7 +156,7 @@ export const Home = () => {
             boxShadow: '0 8px 24px rgba(0,0,0,.15)'
           }}
         >
-          {WORDS.length} の たんご・{CATEGORIES.length} の カテゴリから えらぶ
+          いろいろな たんごを カテゴリから えらぶ
         </span>
       </Pop>
     </AbsoluteFill>
