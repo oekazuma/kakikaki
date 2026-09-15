@@ -4,12 +4,14 @@
   import { wordStar, wordCrown } from '$lib/progress.svelte';
   import { nameOf, subOf } from '$lib/lang.svelte';
   import Icon from './Icon.svelte';
+  // ghost: イラストを灰色のシルエットにする（かくし演出でイラストが跳び出している間）
   let {
     word,
     onclick,
     size = 180,
-    lazy = false
-  }: { word: Word; onclick?: () => void; size?: number; lazy?: boolean } = $props();
+    lazy = false,
+    ghost = false
+  }: { word: Word; onclick?: () => void; size?: number; lazy?: boolean; ghost?: boolean } = $props();
   let missing = $state(false);
 </script>
 
@@ -20,6 +22,7 @@
     <span class="initial kyokasho" style:height="{size * 0.6}px">{word.name[0]}</span>
   {:else}
     <img
+      class={{ ghost }}
       src={imageUrl(word)}
       alt=""
       width={size - 20}
@@ -34,6 +37,9 @@
 </button>
 
 <style>
+  img.ghost {
+    filter: brightness(0) opacity(0.18);
+  }
   .card {
     position: relative;
     padding: 14px 10px 12px;

@@ -2,18 +2,21 @@ import { describe, it, expect } from 'vitest';
 import { Bouncer, SIZE, LIFE } from './bouncer.svelte';
 
 describe('ピンボール', () => {
-  it('左から走って右へ抜けると終わる', () => {
-    const b = new Bouncer(1000, 700, () => 0.5);
-    expect([b.phase, b.x, b.y]).toEqual(['run', -SIZE, 700 - SIZE - 20]);
-    b.tick(1);
-    expect(b.x).toBeGreaterThan(0);
+  it('イラストの位置から跳び出し、着地して右へ抜けると終わる', () => {
+    const b = new Bouncer(1000, 700, { x: 140, y: 180 }, () => 0.5);
+    expect([b.phase, b.x, b.y]).toEqual(['run', 140 - SIZE / 2, 180 - SIZE / 2]);
+    b.tick(0.1);
+    expect(b.y).toBeLessThan(100); // まず上へ
+    expect(b.x).toBeGreaterThan(60);
+    for (let i = 0; i < 40 && b.y < 700 - SIZE - 20; i++) b.tick(0.05);
+    expect(b.y).toBe(700 - SIZE - 20); // 着地
     b.tick(3);
     expect(b.phase).toBe('done');
   });
   it('弾くと上へ飛び、端で跳ね返り、LIFE 秒で消える。弾くたびに速くなる', () => {
     let r = 0.5; // 0.5 は真上、0.2 は右上へ
-    const b = new Bouncer(1000, 700, () => r);
-    b.tick(1);
+    const b = new Bouncer(1000, 700, { x: 140, y: 180 }, () => r);
+    for (let i = 0; i < 40 && b.y < 700 - SIZE - 20; i++) b.tick(0.05);
     const y0 = b.y;
     b.kick();
     expect([b.phase, b.kicks]).toEqual(['pinball', 1]);
