@@ -93,7 +93,7 @@
   .ring circle:last-of-type {
     transition: stroke-dashoffset 0.8s ease-out;
     transform: rotate(-90deg);
-    transform-origin: 60px 60px;
+    transform-origin: center;
   }
   .num {
     position: absolute;
