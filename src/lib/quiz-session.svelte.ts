@@ -123,6 +123,7 @@ export class WriteQuiz {
       this.miss++;
       recordMiss(this.c);
       this.fx.buu?.();
+      this.drawn = false;
       if (this.miss >= 2) {
         this.helped = true;
         this.mode = 'trace';

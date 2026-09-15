@@ -57,8 +57,10 @@ describe('quiz session', () => {
     vi.advanceTimersByTime(1400);
     expect([w.i, w.k, w.mode]).toEqual([1, 0, 'test']);
     // 2 語目: 1 文字目を 2 回外す → なぞる。なぞって進めても正解にならない
+    w.drawn = true;
     w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
     expect(w.msg).toContain('おしい');
+    expect(w.drawn).toBe(false);
     w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
     expect([w.mode, w.helped, w.msg]).toEqual(['trace', true, 'おてほんを なぞって みよう']);
     w.onDone(ok('trace'));
