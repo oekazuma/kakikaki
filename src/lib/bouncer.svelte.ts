@@ -8,6 +8,7 @@ export const RUN_SPEED = 520; // 着地後の px/秒
 const JUMP = 560; // 跳び出す初速（上向き）
 const GRAVITY = 1500; // 跳び出しの落下
 export const LIFE = 6; // 弾いてから消えるまでの秒数（タップするたびに延びる）
+export const GOAL = 20; // 壁に当たった回数がここに届くと紙吹雪
 const KICK_MIN = 560;
 
 export class Bouncer {
@@ -16,6 +17,7 @@ export class Bouncer {
   rot = $state(0);
   phase = $state<'run' | 'pinball' | 'done'>('run');
   kicks = $state(0);
+  hits = $state(0); // 壁に当たった回数
   private vx = RUN_SPEED * 0.6;
   private vy = -JUMP;
   private spin = 0;
@@ -53,20 +55,24 @@ export class Bouncer {
       if (this.x > this.w) this.phase = 'done';
       return;
     }
-    // 画面の端で跳ね返る
+    // 画面の端で跳ね返る（回数を数える）
     if (this.x <= 0) {
       this.x = 0;
       this.vx = Math.abs(this.vx);
+      this.hits++;
     } else if (this.x >= this.w - SIZE) {
       this.x = this.w - SIZE;
       this.vx = -Math.abs(this.vx);
+      this.hits++;
     }
     if (this.y <= 0) {
       this.y = 0;
       this.vy = Math.abs(this.vy);
+      this.hits++;
     } else if (this.y >= this.h - SIZE) {
       this.y = this.h - SIZE;
       this.vy = -Math.abs(this.vy);
+      this.hits++;
     }
     this.rot += this.spin * dt;
     this.life -= dt;
