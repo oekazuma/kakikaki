@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Bouncer, SIZE, LIFE } from './bouncer.svelte';
+import { Bouncer, SIZE, LIFE, GOAL } from './bouncer.svelte';
 
 describe('ピンボール', () => {
   it('イラストの位置から跳び出し、着地して右へ抜けると終わる', () => {
@@ -24,7 +24,7 @@ describe('ピンボール', () => {
     expect(b.y).toBeLessThan(y0);
     // 上端まで飛ばして跳ね返る
     for (let i = 0; i < 20 && b.y > 0; i++) b.tick(0.05);
-    expect(b.y).toBe(0);
+    expect([b.y, b.hits]).toEqual([0, 1]);
     b.tick(0.1);
     expect(b.y).toBeGreaterThan(0);
     const x1 = b.x;
@@ -44,5 +44,14 @@ describe('ピンボール', () => {
     expect(b.phase).toBe('done');
     b.kick();
     expect(b.phase).toBe('done');
+  });
+  it('弾き続ければ壁に当たった回数が GOAL に届く', () => {
+    const b = new Bouncer(600, 400, { x: 100, y: 100 }, () => 0.3);
+    for (let t = 0; t < 30 && b.hits < GOAL; t += 0.05) {
+      if (t % 1 < 0.05) b.kick();
+      b.tick(0.05);
+    }
+    expect(b.hits).toBeGreaterThanOrEqual(GOAL);
+    expect(b.phase).toBe('pinball');
   });
 });
