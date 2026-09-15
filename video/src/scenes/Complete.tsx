@@ -46,7 +46,7 @@ export const Complete = () => {
               left: 380,
               top: 200,
               width: 520,
-              height: 400,
+              height: 450,
               display: 'grid',
               justifyItems: 'center',
               alignContent: 'center',
@@ -61,7 +61,23 @@ export const Complete = () => {
             <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: C.star, fontWeight: 700 }}>
               <Icon name="star" size={22} fill /> ほし ゲット
             </span>
-            <div style={{ display: 'flex', gap: 12, marginTop: 10, fontSize: 17, fontWeight: 700 }}>
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginTop: 10,
+                padding: '12px 24px',
+                borderRadius: 16,
+                background: C.warn,
+                color: '#fff',
+                fontSize: 18,
+                fontWeight: 700
+              }}
+            >
+              <Icon name="star" size={22} fill /> おてほんなしに ちょうせん
+            </span>
+            <div style={{ display: 'flex', gap: 12, marginTop: 4, fontSize: 17, fontWeight: 700 }}>
               <span style={{ padding: '12px 20px', borderRadius: 16, background: THEME.ja.blue, color: '#fff' }}>
                 つぎの たんご
               </span>
