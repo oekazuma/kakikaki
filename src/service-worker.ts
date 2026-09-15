@@ -3,18 +3,23 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 import { base, build, files, prerendered, version } from '$service-worker';
-import { bypass, cacheable } from './lib/sw-rules';
+import { bypass, cacheable, stale } from './lib/sw-rules';
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 const CACHE = `kk-${version}`;
-const ASSETS = [...build, ...files, ...prerendered];
 
-// 画像などは URL にハッシュが無いので、新しい版を入れるときは HTTP キャッシュを無視して取り直す
+// ハッシュ付きの build は HTTP キャッシュのままでよい。files / prerendered は URL が変わらないので取り直す。
+// 1 件の失敗で全体を捨てない（残りは使われたときに fetch ハンドラが入れる）
 sw.addEventListener('install', (e) => {
   e.waitUntil(
     caches
       .open(CACHE)
-      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' }))))
+      .then((c) =>
+        Promise.allSettled([
+          ...build.map((u) => c.add(u)),
+          ...[...files, ...prerendered].map((u) => c.add(new Request(u, { cache: 'reload' })))
+        ])
+      )
       .then(() => sw.skipWaiting())
   );
 });
@@ -23,7 +28,7 @@ sw.addEventListener('activate', (e) => {
   e.waitUntil(
     caches
       .keys()
-      .then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then((ks) => Promise.all(ks.filter((k) => stale(k, CACHE)).map((k) => caches.delete(k))))
       .then(() => sw.clients.claim())
   );
 });

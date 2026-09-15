@@ -7,3 +7,7 @@ export const bypass = (url: string) => new URL(url).pathname.endsWith('/_app/ver
 // 取りに行った応答をキャッシュに入れてよいか: 成功した同一オリジンのものだけ（opaque な他オリジンは status 0 で ok が false）
 export const cacheable = (res: { ok: boolean }, url: string, origin: string) =>
   res.ok && new URL(url).origin === origin;
+
+// このアプリのキャッシュ名（kk-<version>）。同じオリジンには姉妹アプリのキャッシュもあるので、他所のものは触らない
+export const ours = (key: string) => key.startsWith('kk-');
+export const stale = (key: string, current: string) => ours(key) && key !== current;
