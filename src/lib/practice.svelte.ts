@@ -178,6 +178,7 @@ export class PracticeSession {
       recordMiss(this.c);
       this.msg = `おしい！ 「${r.top}」に みえるよ。もういちど！`;
       this.fx.buu?.();
+      this.drawn = false;
       return;
     }
     this.busy = true;

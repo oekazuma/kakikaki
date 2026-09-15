@@ -64,9 +64,11 @@ describe('PracticeSession', () => {
     expect(s.complete).toBe(true);
     s.challenge();
     expect([s.complete, s.i, s.mode]).toEqual([false, 0, 'test']);
+    s.drawn = true;
     s.done({ mode: 'test', score: 0.5, ok: false, top: 'は' });
     expect(s.msg).toContain('「は」に みえるよ');
     expect([get('ば').test, get('ば').miss]).toEqual([0, 1]);
+    expect(s.drawn).toBe(false);
     s.done(ok('test', 0.8));
     vi.runAllTimers();
     expect([s.i, s.c, s.mode, s.complete]).toEqual([1, 'す', 'test', false]);
