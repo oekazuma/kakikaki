@@ -1,9 +1,9 @@
 <script lang="ts">
   import { imageUrl } from '$lib/image';
   import { WORDS } from '$lib/words';
-  // スプラッシュのおまけ: 3 回に 1 回くらい、どうぶつ のイラストが画面の下を右から左へ走り抜ける
+  // スプラッシュのおまけ: 5 回に 1 回くらい、どうぶつ のイラストが画面の下を右から左へ走り抜ける
   const ANIMALS = WORDS.filter((w) => w.category === 'どうぶつ');
-  const runner = Math.random() < 1 / 3 ? ANIMALS[Math.floor(Math.random() * ANIMALS.length)] : null;
+  const runner = Math.random() < 1 / 5 ? ANIMALS[Math.floor(Math.random() * ANIMALS.length)] : null;
 </script>
 
 {#if runner}
