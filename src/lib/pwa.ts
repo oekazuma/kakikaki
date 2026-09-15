@@ -1,3 +1,5 @@
+import { ours } from './sw-rules';
+
 export type PwaStatus = { standalone: boolean; swActive: boolean; cached: boolean };
 
 // ホーム画面から起動しているか / Service Worker が有効か / オフライン用の保存があるか
@@ -30,7 +32,7 @@ export async function updateApp() {
       });
     }
   } else {
-    await Promise.all((await caches.keys()).map((k) => caches.delete(k)));
+    await Promise.all((await caches.keys()).filter(ours).map((k) => caches.delete(k)));
   }
   location.reload();
 }

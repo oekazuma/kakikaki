@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { bypass, cacheable } from './sw-rules';
+import { bypass, cacheable, ours, stale } from './sw-rules';
 
 describe('Service Worker の判断', () => {
   it('version.json だけ素通しする', () => {
@@ -12,5 +12,12 @@ describe('Service Worker の判断', () => {
     expect(cacheable({ ok: true }, `${origin}/kakikaki/img/dog.svg`, origin)).toBe(true);
     expect(cacheable({ ok: false }, `${origin}/kakikaki/img/nope.svg`, origin)).toBe(false);
     expect(cacheable({ ok: true }, 'https://cdn.example.com/x.svg', origin)).toBe(false);
+  });
+  it('自分の古いキャッシュだけを消す対象にし、他アプリのキャッシュは触らない', () => {
+    expect(stale('kk-1-abc', 'kk-2-def')).toBe(true);
+    expect(stale('kk-2-def', 'kk-2-def')).toBe(false);
+    expect(stale('hitoiki-1', 'kk-2-def')).toBe(false);
+    expect(ours('kk-x')).toBe(true);
+    expect(ours('workbox-precache')).toBe(false);
   });
 });
