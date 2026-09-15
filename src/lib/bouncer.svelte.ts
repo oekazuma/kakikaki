@@ -18,6 +18,7 @@ export class Bouncer {
   phase = $state<'run' | 'pinball' | 'done'>('run');
   kicks = $state(0);
   hits = $state(0); // 壁に当たった回数
+  right = $state(true); // 右へ進んでいる（絵の向きを合わせる）
   private vx = RUN_SPEED * 0.6;
   private vy = -JUMP;
   private spin = 0;
@@ -43,6 +44,7 @@ export class Bouncer {
     if (this.phase === 'done') return;
     this.x += this.vx * dt;
     this.y += this.vy * dt;
+    this.right = this.vx >= 0;
     if (this.phase === 'run') {
       // 放物線で落ちて、地面（画面下）に着いたら走る
       const ground = this.h - SIZE - 20;

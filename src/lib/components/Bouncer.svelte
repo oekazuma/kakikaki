@@ -5,10 +5,12 @@
   import { vp } from '$lib/viewport.svelte';
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
+  import { flipFor } from '$lib/facing';
   import { profiles } from '$lib/profiles.svelte';
   import { recordEgg, recordPinball } from '$lib/secret';
   import type { Word } from '$lib/words';
   // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。
+  // 左右反転は transform の最後に入れる（scale プロパティだと translate ごと反転して画面外へ出る）
   // 出ている間は透明な覆いで他の操作を止める（もどる だけは覆いより上に置いてある）
   let { word, from, onend }: { word: Word; from: { x: number; y: number }; onend: () => void } = $props();
   const b = new Bouncer(
@@ -61,7 +63,9 @@
   width={SIZE}
   height={SIZE}
   draggable="false"
-  style:transform="translate({b.x}px, {b.y}px) rotate({b.rot}deg)"
+  style:transform="translate({b.x}px, {b.y}px) rotate({b.rot}deg) scale({flipFor(word.id, b.right ? 'right' : 'left')
+    ? -1
+    : 1}, 1)"
   onpointerdown={kick}
   onerror={onend}
 />
