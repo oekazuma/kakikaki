@@ -66,10 +66,17 @@ export function nextMode(ch: string): Mode | null {
 
 export const wordDone = (w: Word) => lettersOf(w).every((ch) => nextMode(ch) === null);
 
-// ホームの「つづきから」: 最後に練習に入った単語がまだクリアしていなければそれ。やりかけが無ければ null（カードを出さない）
+// 1 文字でも書いた記録があるか（開いただけの単語は「やりかけ」にしない）
+const started = (w: Word) =>
+  lettersOf(w).some((ch) => {
+    const p = get(ch);
+    return p.trace + p.free + p.test > 0;
+  });
+
+// ホームの「つづきから」: 最後に練習に入った単語に書いた記録があり、まだクリアしていなければそれ。無ければ null（カードを出さない）
 export function nextOpenWord(): Word | null {
   const w = wordById(lastWord() ?? '');
-  return w && !wordDone(w) ? w : null;
+  return w && started(w) && !wordDone(w) ? w : null;
 }
 
 // まだ終わっていない次の単語（同じ並び順で後ろから探し、末尾なら先頭へ）。全部終わっていれば null

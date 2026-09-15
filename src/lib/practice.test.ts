@@ -133,7 +133,9 @@ describe('PracticeSession', () => {
     expect(nextOpenWord()).toBeNull(); // 記録が無ければ出さない
     const giraffe = wordById('giraffe')!;
     rememberWord(giraffe);
-    expect(nextOpenWord()?.id).toBe('giraffe');
+    expect(nextOpenWord()).toBeNull(); // 開いただけでは出さない
+    record('き', 'trace');
+    expect(nextOpenWord()?.id).toBe('giraffe'); // 1 文字でも書けば やりかけ
     rememberWord(wordById('char-あ')!); // 1 文字練習は覚えない
     expect(lastWord()).toBe('giraffe');
     setLang('kana');
