@@ -2,7 +2,7 @@
   import { version } from '$app/environment';
   import Icon from '../Icon.svelte';
   import { Gate, MAX_FAILS } from '$lib/gate.svelte';
-  import { exportAll, parseBackup, importAll, summarize, type Backup } from '$lib/backup';
+  import { exportAll, parseBackup, importAll, summarize, backupFile, type Backup } from '$lib/backup';
   import { today } from '$lib/today';
   // 記録の書き出し（ファイルに保存）と読み込み（掛け算ゲート → 件数の確認 → 全部置き換え）
   let pending = $state<Backup | null>(null);
@@ -11,6 +11,12 @@
   let agreed = $state(false);
   let error = $state('');
   const sum = $derived(pending ? summarize(pending) : null);
+  // iPad のホーム画面アプリはダウンロードが分かりにくいため、対応端末では共有シート（AirDrop・ファイル・メール）も出す
+  const canShare = $derived(
+    typeof navigator !== 'undefined' &&
+      typeof navigator.canShare === 'function' &&
+      navigator.canShare({ files: [backupFile(version)] })
+  );
 
   function save() {
     const url = URL.createObjectURL(new Blob([exportAll(version)], { type: 'application/json' }));
@@ -19,6 +25,13 @@
     a.download = `kakikaki-${today()}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  function share() {
+    // Safari はユーザー操作のハンドラ内で同期に呼ばれた share() しか通さないため、await を挟まない
+    navigator.share({ files: [backupFile(version)], title: 'かきかき の記録' }).catch((e: unknown) => {
+      if (e instanceof Error && e.name === 'AbortError') return;
+      error = '共有できませんでした。「記録を書き出す」をお使いください。';
+    });
   }
   async function pick(e: Event) {
     const input = e.currentTarget as HTMLInputElement;
@@ -50,6 +63,9 @@
   <p>全員の記録・名前・アバターを 1 つのファイルに書き出せます。端末を替えるときや、初期化の前に。</p>
   <div class="row">
     <button class="act" onclick={save}><Icon name="check" size={18} /> 記録を書き出す</button>
+    {#if canShare}
+      <button class="act" onclick={share}><Icon name="share" size={18} /> 共有する</button>
+    {/if}
     <label class="act file"
       ><Icon name="upload" size={18} /> 記録を読み込む<input
         type="file"
