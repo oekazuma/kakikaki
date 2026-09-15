@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Bouncer, SIZE, LIFE, GOAL } from './bouncer.svelte';
+import { Bouncer, SIZE, LIFE, GOAL, RETURN } from './bouncer.svelte';
 
 describe('ピンボール', () => {
   it('イラストの位置から跳び出し、着地して右へ抜けると終わる', () => {
@@ -11,7 +11,9 @@ describe('ピンボール', () => {
     for (let i = 0; i < 40 && b.y < 700 - SIZE - 20; i++) b.tick(0.05);
     expect(b.y).toBe(700 - SIZE - 20); // 着地
     b.tick(3);
-    expect(b.phase).toBe('done');
+    expect(b.phase).toBe('return'); // 右へ抜けたらカードへ戻り始める
+    for (let t = 0; t < RETURN + 0.1; t += 0.05) b.tick(0.05);
+    expect([b.phase, b.x, b.y, b.rot]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2, 0]);
   });
   it('弾くと上へ飛び、端で跳ね返り、LIFE 秒で消える。弾くたびに速くなる', () => {
     let r = 0.5; // 0.5 は真上、0.2 は右上へ
@@ -41,7 +43,11 @@ describe('ピンボール', () => {
       expect(b.y).toBeGreaterThanOrEqual(0);
       expect(b.y).toBeLessThanOrEqual(700 - SIZE);
     }
-    expect(b.phase).toBe('done');
+    expect(b.phase).toBe('return'); // 時間切れでもカードへ戻る
+    b.kick(); // 戻っている間は弾けない
+    expect(b.phase).toBe('return');
+    for (let t = 0; t < RETURN + 0.1; t += 0.05) b.tick(0.05);
+    expect([b.phase, b.x, b.y]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2]);
     b.kick();
     expect(b.phase).toBe('done');
   });

@@ -1,6 +1,7 @@
 // かくし演出「ピンボール」: 練習画面の単語カードを 10 回タップすると、そのイラストがカードから跳び出し、着地して右へ走り抜ける
 // （カードには灰色のシルエットが残る）。
 // 走っているイラストをタップすると弾かれて画面の端で跳ね返りながら飛び回り、タップするたびに速く・回転が増す。
+// 終わるときは（右へ抜けたあとでも、弾いて時間切れでも）カードの元の場所へ飛んで戻る。
 // 座標は画面の px（左上原点）。イラストの大きさは SIZE の正方形とみなす
 export const SIZE = 160;
 export const TAPS = 10;
@@ -10,12 +11,14 @@ const GRAVITY = 1500; // 跳び出しの落下
 export const LIFE = 6; // 弾いてから消えるまでの秒数（タップするたびに延びる）
 export const GOAL = 100; // 壁に当たった回数がここに届くと紙吹雪
 const KICK_MIN = 560;
+export const RETURN = 0.7; // カードへ戻る秒数
+const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
 export class Bouncer {
   x = $state(0);
   y = $state(0);
   rot = $state(0);
-  phase = $state<'run' | 'pinball' | 'done'>('run');
+  phase = $state<'run' | 'pinball' | 'return' | 'done'>('run');
   kicks = $state(0);
   hits = $state(0); // 壁に当たった回数
   right = $state(true); // 右へ進んでいる（絵の向きを合わせる）
@@ -23,6 +26,9 @@ export class Bouncer {
   private vy = -JUMP;
   private spin = 0;
   private life = 0;
+  // 戻り: 出発点（戻り始めの位置と回転）と経過の割合。行き先はカードの元の場所
+  private home: { x: number; y: number };
+  private back = { x: 0, y: 0, rot: 0, t: 0 };
 
   // start はイラストの中心（画面 px）。そこから跳び出す
   constructor(
@@ -33,6 +39,7 @@ export class Bouncer {
   ) {
     this.x = start.x - SIZE / 2;
     this.y = start.y - SIZE / 2;
+    this.home = { x: this.x, y: this.y };
   }
 
   resize(w: number, h: number) {
@@ -42,6 +49,15 @@ export class Bouncer {
 
   tick(dt: number) {
     if (this.phase === 'done') return;
+    if (this.phase === 'return') {
+      this.back.t = Math.min(1, this.back.t + dt / RETURN);
+      const k = ease(this.back.t);
+      this.x = this.back.x + (this.home.x - this.back.x) * k;
+      this.y = this.back.y + (this.home.y - this.back.y) * k;
+      this.rot = this.back.rot * (1 - k);
+      if (this.back.t >= 1) this.phase = 'done';
+      return;
+    }
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     this.right = this.vx >= 0;
@@ -54,7 +70,7 @@ export class Bouncer {
         this.vy = 0;
         this.vx = RUN_SPEED;
       }
-      if (this.x > this.w) this.phase = 'done';
+      if (this.x > this.w) this.goHome();
       return;
     }
     // 画面の端で跳ね返る（回数を数える）
@@ -78,12 +94,19 @@ export class Bouncer {
     }
     this.rot += this.spin * dt;
     this.life -= dt;
-    if (this.life <= 0) this.phase = 'done';
+    if (this.life <= 0) this.goHome();
+  }
+
+  // カードへ飛んで戻り始める。回転は一周未満に丸めてから 0 へ戻す
+  private goHome() {
+    this.phase = 'return';
+    this.back = { x: this.x, y: this.y, rot: this.rot % 360, t: 0 };
+    this.right = this.home.x >= this.x;
   }
 
   // 指で弾く: 上向き寄りのランダムな方向へ、いまより速く飛ばす
   kick() {
-    if (this.phase === 'done') return;
+    if (this.phase === 'done' || this.phase === 'return') return;
     this.phase = 'pinball';
     this.kicks++;
     const speed = Math.max(KICK_MIN, Math.hypot(this.vx, this.vy) * 1.25);
