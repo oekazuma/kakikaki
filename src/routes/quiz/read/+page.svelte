@@ -32,7 +32,7 @@
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
-  <QuizHeader title="よみクイズ" {level} i={r.i} total={r.qs.length} />
+  <QuizHeader title="よみクイズ" {level} i={r.i} total={r.qs.length} done={r.done} />
   {#if r.q}
     {#key r.i}
       <div class="qwrap" in:fly={{ x: 60, duration: 300 }}><ReadQuestion {r} onpick={pick} /></div>

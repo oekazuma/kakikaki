@@ -45,7 +45,7 @@
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
-  <QuizHeader title="かきクイズ" {level} i={w.i} total={w.qs.length} />
+  <QuizHeader title="かきクイズ" {level} i={w.i} total={w.qs.length} done={w.done} />
   {#if w.word}
     <div class="left">
       <div class="card pic">

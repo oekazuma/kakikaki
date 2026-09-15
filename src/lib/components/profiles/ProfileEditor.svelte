@@ -97,8 +97,8 @@
   }
   .del {
     margin-right: auto;
-    color: var(--danger-ink);
-    background: #fdecea;
+    background: var(--danger);
+    color: #fff;
   }
   .cancel {
     background: var(--pill);

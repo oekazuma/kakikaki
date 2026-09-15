@@ -73,7 +73,6 @@
     padding: 12px 14px;
     border-radius: 14px;
     text-align: left;
-    background: #f3f5f7;
     transition: transform 0.1s;
   }
   .opt:active {
@@ -86,12 +85,14 @@
     font-size: 17px;
   }
   .opt small {
-    color: var(--sub);
+    opacity: 0.85;
   }
   .reset {
-    color: var(--warn);
+    background: var(--warn);
+    color: #fff;
   }
   .person {
-    color: var(--danger-ink);
+    background: var(--danger);
+    color: #fff;
   }
 </style>
