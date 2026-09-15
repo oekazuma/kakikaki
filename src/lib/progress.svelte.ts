@@ -117,6 +117,11 @@ export function resetRecords(pid: string, langs: Lang[]) {
     for (const name of DATA_NAMES) removeKey(keyOf(pid, l, name));
     if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
   }
+  // ことばをまたぐ かくし要素の記録は「すべて」のときだけ消す（1 ことば だけのリセットでは残す）
+  if (langs.length === LANGS.length) {
+    removeSecret(pid);
+    removeBest(pid);
+  }
 }
 // 現在の人・言語の記録だけ消す
 export const reset = () => resetRecords(profiles.cur, [lang.v]);

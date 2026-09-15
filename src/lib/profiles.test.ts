@@ -66,10 +66,18 @@ describe('profiles', () => {
     m.record('あ', 'trace');
     m.setLang('en');
     m.record('a', 'trace');
+    const secret = await import('./secret');
+    const balloon = await import('./balloon.svelte');
+    secret.recordPinball('p1', 30);
+    balloon.saveScore('p1', 80, '2026-09-15');
     m.resetRecords('p1', ['ja']);
     expect([m.get('a').trace, localStorage.getItem('kk:p1:ja:progress')]).toEqual([1, null]);
+    expect(secret.secretOf('p1').pinball).toBe(30); // 1 ことば だけのリセットでは残る
     m.setLang('ja');
     expect(m.get('あ').trace).toBe(0);
+    m.resetRecords('p1', [...m.LANGS]);
+    expect(secret.secretOf('p1').pinball).toBe(0);
+    expect(balloon.loadBests().p1).toBeUndefined();
     expect(m.updateProfile('p1', { name: 'たろう', avatar: 'bear' })).toBe(true);
     expect(m.current()).toMatchObject({ name: 'たろう', avatar: 'bear' });
   });
