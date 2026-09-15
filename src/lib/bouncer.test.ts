@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Bouncer, SIZE, LIFE, GOAL, WRITE, RETURN } from './bouncer.svelte';
+import { Bouncer, SIZE, LIFE, GOAL, WRITE, RETURN, PAUSE } from './bouncer.svelte';
 
 // 2 画の簡単な文字（109 マスの座標）
 const LETTER = [
@@ -33,6 +33,22 @@ describe('ピンボール', () => {
     expect(b.right).toBe(false); // 書き終わりは右端なので、左のカードへ向く
     for (let t = 0; t < RETURN + 0.1; t += 0.05) b.tick(0.05);
     expect([b.phase, b.x, b.y, b.rot]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2, 0]);
+  });
+  it('walk: 右の壁で折り返し、足あとを残して地面を戻り、カードの下でひと呼吸おいて跳び込む', () => {
+    const b = new Bouncer(1000, 700, { x: 140, y: 180 }, () => 0.5, LETTER, 'walk');
+    for (let i = 0; i < 80 && b.phase === 'run'; i++) b.tick(0.05);
+    expect([b.phase, b.x, b.trails]).toEqual(['back', 1000 - SIZE, []]);
+    for (let i = 0; i < 80 && b.phase === 'back'; i++) {
+      b.tick(0.05);
+      expect(b.y).toBe(700 - SIZE - 20);
+    }
+    expect([b.phase, b.x, b.right]).toEqual(['pause', 140 - SIZE / 2, false]);
+    expect(b.steps.length).toBeGreaterThan(5); // 足あとが並ぶ
+    expect(b.steps[0].x).toBeGreaterThan(b.steps[1].x); // 右から左へ
+    for (let t = 0; t < PAUSE; t += 0.05) b.tick(0.05);
+    expect(b.phase).toBe('home');
+    for (let t = 0; t < RETURN + 0.1; t += 0.05) b.tick(0.05);
+    expect([b.phase, b.x, b.y]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2]);
   });
   it('文字が無ければ着地してすぐ戻る', () => {
     const b = new Bouncer(1000, 700, { x: 140, y: 180 }, () => 0.5);
@@ -72,14 +88,16 @@ describe('ピンボール', () => {
     expect(b.phase).toBe('back');
     b.kick(); // 帰り道では弾けない
     expect(b.phase).toBe('back');
+    let paused = false;
     for (let t = 0; t < 10 && b.phase !== 'done'; t += 0.05) {
       b.tick(0.05);
+      if (b.phase === 'pause') paused = true;
       expect(b.x).toBeGreaterThanOrEqual(0);
       expect(b.x).toBeLessThanOrEqual(1000 - SIZE);
       expect(b.y).toBeGreaterThanOrEqual(0);
       expect(b.y).toBeLessThanOrEqual(700 - SIZE);
     }
-    expect([b.phase, b.x, b.y]).toEqual(['done', 140 - SIZE / 2, 180 - SIZE / 2]);
+    expect([paused, b.phase, b.x, b.y]).toEqual([true, 'done', 140 - SIZE / 2, 180 - SIZE / 2]);
     b.kick();
     expect(b.phase).toBe('done');
   });

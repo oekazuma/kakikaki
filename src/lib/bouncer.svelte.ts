@@ -5,6 +5,7 @@ import type { Pt } from './geometry';
 // （カードには灰色のシルエットが残る）。
 // 走っているイラストをタップすると弾かれて画面の端で跳ね返りながら飛び回り、タップするたびに速く・回転が増す。
 // 弾かれて時間切れになると落ちて地面をカードの真下まで走り、跳び上がって戻る（画面の外には出ない）。
+// style 'walk' は文字を書かずに右の壁まで走って折り返し、足あとを残しながら地面を戻り、カードの下でひと呼吸おいて跳び込む。
 // 座標は画面の px（左上原点）。イラストの大きさは SIZE の正方形とみなす
 export const SIZE = 160;
 export const TAPS = 10;
@@ -17,6 +18,9 @@ const KICK_MIN = 560;
 export const WRITE = 2.4; // 文字を書く秒数（全画の合計。画の長さで按分）
 const HOP = 0.2; // 画と画の間を移動する秒数
 export const RETURN = 0.5; // カードへ跳んで収まる秒数
+const STEP = 70; // 足あとの間隔 px
+export const PAUSE = 0.4; // カードの下でひと呼吸おく秒数
+export type EggStyle = 'write' | 'walk';
 const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
 // 書く道のり。draw の区間は通った跡を残す
@@ -44,11 +48,14 @@ export class Bouncer {
   x = $state(0);
   y = $state(0);
   rot = $state(0);
-  phase = $state<'run' | 'write' | 'pinball' | 'back' | 'home' | 'done'>('run');
+  phase = $state<'run' | 'write' | 'pinball' | 'back' | 'pause' | 'home' | 'done'>('run');
   kicks = $state(0);
   hits = $state(0); // 壁に当たった回数
   right = $state(true); // 右へ進んでいる（絵の向きを合わせる）
   trails = $state<Pt[][]>([]); // 書いた跡（イラストの中心の軌跡。画ごと）
+  steps = $state<Pt[]>([]); // 地面を戻るときの足あと
+  private walked = 0; // 前の足あとからの距離
+  private pauseT = 0;
   private vx = RUN_SPEED * 0.6;
   private vy = -JUMP;
   private spin = 0;
@@ -65,7 +72,8 @@ export class Bouncer {
     private h: number,
     start: { x: number; y: number },
     private rnd = Math.random,
-    private letter: Pt[][] = []
+    private letter: Pt[][] = [],
+    private style: EggStyle = 'write'
   ) {
     this.x = start.x - SIZE / 2;
     this.y = start.y - SIZE / 2;
@@ -81,18 +89,31 @@ export class Bouncer {
     if (this.phase === 'done') return;
     if (this.phase === 'home') return this.tickHome(dt);
     if (this.phase === 'write') return this.tickWrite(dt);
+    if (this.phase === 'pause') {
+      this.pauseT += dt;
+      if (this.pauseT >= PAUSE) this.goHome();
+      return;
+    }
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     if (this.vx !== 0) this.right = this.vx >= 0;
     const ground = this.h - SIZE - 20;
     if (this.phase === 'run') {
-      // 放物線で落ちて、地面（画面下）に着いたら文字を書きに行く
+      // 放物線で落ちて、地面（画面下）に着いたら文字を書きに行く（walk は右へ走り、壁で折り返して帰り道へ）
       this.vy += GRAVITY * dt;
       if (this.y >= ground) {
         this.y = ground;
         this.vy = 0;
-        this.vx = 0;
-        this.startWrite();
+        if (this.style === 'walk') this.vx = RUN_SPEED;
+        else {
+          this.vx = 0;
+          this.startWrite();
+        }
+      }
+      if (this.vy === 0 && this.x >= this.w - SIZE) {
+        this.x = this.w - SIZE;
+        this.vx = -RUN_SPEED;
+        this.phase = 'back';
       }
       return;
     }
@@ -109,11 +130,19 @@ export class Bouncer {
       }
       this.y = ground;
       this.vy = 0;
+      // 足あと: 進んだ距離 STEP ごとに、左右交互に少しずらして置く
+      this.walked += Math.abs(this.vx) * dt;
+      if (this.walked >= STEP) {
+        this.walked = 0;
+        const side = this.steps.length % 2 ? 14 : -14;
+        this.steps.push({ x: this.x + SIZE / 2 + side, y: this.y + SIZE - 6 });
+      }
       const dx = this.home.x - this.x;
       if (Math.abs(dx) <= RUN_SPEED * dt) {
         this.x = this.home.x;
         this.vx = 0;
-        this.goHome();
+        this.pauseT = 0;
+        this.phase = 'pause';
         return;
       }
       this.vx = Math.sign(dx) * RUN_SPEED;
@@ -214,6 +243,7 @@ export class Bouncer {
     if (this.phase !== 'run' && this.phase !== 'write' && this.phase !== 'pinball') return;
     this.phase = 'pinball';
     this.trails = [];
+    this.steps = [];
     this.kicks++;
     const speed = Math.max(KICK_MIN, Math.hypot(this.vx, this.vy) * 1.25);
     const a = -Math.PI * (0.15 + this.rnd() * 0.7); // -27°〜-153°（上半分）
