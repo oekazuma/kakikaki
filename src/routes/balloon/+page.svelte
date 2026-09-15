@@ -18,7 +18,6 @@
   // かくしゲーム。プロフィール画面の風船を 10 回タップすると来る
   const g = untrack(() => new BalloonGame());
   let isBest = $state(false);
-  let settled = false; // 終了処理は 1 回だけ（自己ベスト未更新でも毎フレーム走らせない）
   let floater = $state<{ x: number; y: number; pts: number; id: number } | null>(null);
   let best = $state(loadBests()[profiles.cur]?.score ?? 0);
   let toast = $state<Badge | null>(null);
@@ -33,7 +32,6 @@
   };
   function start() {
     isBest = false;
-    settled = false;
     g.start();
     cancelAnimationFrame(raf);
     last = performance.now();
@@ -44,7 +42,6 @@
     return () => cancelAnimationFrame(raf);
   });
   function finish() {
-    settled = true;
     isBest = saveScore(profiles.cur, g.score, today());
     recordBalloon(profiles.cur);
     // かくしメダル（みつけた・100 てん・300 てん）を確定して順に見せる
