@@ -47,7 +47,7 @@
     <div class="ok" in:scale={{ duration: 300, start: 0.5 }}>○</div>
   {/if}
   {#if r.done}
-    <QuizResult correct={r.correct} total={r.qs.length} onRetry={() => r.start()} />
+    <QuizResult correct={r.correct} total={r.qs.length} kind="read" {level} onRetry={() => r.start()} />
   {/if}
 </main>
 

@@ -2,7 +2,16 @@
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
   import Stars from './Stars.svelte';
-  let { correct, total, onRetry }: { correct: number; total: number; onRetry: () => void } = $props();
+  import { LEVEL_NAME, type Kind, type Level } from '$lib/quiz';
+  // 次の級があればそちらを主ボタンにする（クリア後は もういちど より次へ進みたくなるため）
+  let {
+    correct,
+    total,
+    kind,
+    level,
+    onRetry
+  }: { correct: number; total: number; kind: Kind; level: Level; onRetry: () => void } = $props();
+  const next = $derived(level < 3 ? ((level + 1) as Level) : null);
   const stars = $derived(correct === total ? 3 : correct >= total * 0.7 ? 2 : 1);
   const msg = $derived(
     correct === total
@@ -18,8 +27,11 @@
   <Stars n={3} k={stars} size={56} />
   <p>{msg}</p>
   <div class="btns">
-    <button class="retry" onclick={onRetry}>もういちど</button>
-    <a class="home" href={resolve('/quiz')}>クイズを えらぶ</a>
+    {#if next}
+      <a class="main" href="{resolve(`/quiz/${kind}`)}?level={next}">つぎは {LEVEL_NAME[next]}</a>
+    {/if}
+    <button class={next ? 'sub' : 'main'} onclick={onRetry}>もういちど</button>
+    <a class="sub" href={resolve('/quiz')}>クイズを えらぶ</a>
   </div>
 </div>
 
@@ -55,19 +67,19 @@
     gap: 14px;
     margin-top: 8px;
   }
-  .retry,
-  .home {
+  .main,
+  .sub {
     padding: 12px 22px;
     border-radius: 16px;
     font-weight: bold;
     font-size: 18px;
     text-decoration: none;
   }
-  .retry {
+  .main {
     background: var(--blue);
     color: #fff;
   }
-  .home {
+  .sub {
     background: var(--pill);
     color: var(--ink);
   }

@@ -98,7 +98,7 @@
     </div>
   {/if}
   {#if w.done}
-    <QuizResult correct={w.correct} total={w.qs.length} onRetry={() => w.start()} />
+    <QuizResult correct={w.correct} total={w.qs.length} kind="write" {level} onRetry={() => w.start()} />
   {/if}
 </main>
 
