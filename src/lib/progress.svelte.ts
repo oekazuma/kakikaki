@@ -1,4 +1,4 @@
-import { computeStats, earnedBadges, type Badge } from './badges';
+import { computeStats, earnedBadges, badgesOf, type Badge, type Stats } from './badges';
 import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
 import { removeBest } from './balloon.svelte';
@@ -22,12 +22,14 @@ const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
 const key = (l: Lang, name: keyof Data) => keyOf(profiles.cur, l, name);
 
 const isDays = (v: unknown) => Array.isArray(v) && v.every((d) => typeof d === 'string');
-const load = (l: Lang): Data => ({
-  progress: loadJSON<Data['progress']>(key(l, 'progress'), {}, isObject),
-  earned: loadJSON<Data['earned']>(key(l, 'earned'), {}, isObject),
-  days: loadJSON<Data['days']>(key(l, 'days'), [], isDays),
-  quiz: loadJSON<Data['quiz']>(key(l, 'quiz'), {}, isObject)
+// 任意の人・ことばの保存値を読む（保護者向けの一覧や削除の確認は使用中の人以外も見るため）
+const loadOf = (pid: string, l: Lang): Data => ({
+  progress: loadJSON<Data['progress']>(keyOf(pid, l, 'progress'), {}, isObject),
+  earned: loadJSON<Data['earned']>(keyOf(pid, l, 'earned'), {}, isObject),
+  days: loadJSON<Data['days']>(keyOf(pid, l, 'days'), [], isDays),
+  quiz: loadJSON<Data['quiz']>(keyOf(pid, l, 'quiz'), {}, isObject)
 });
+const load = (l: Lang) => loadOf(profiles.cur, l);
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
 const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
 
@@ -124,13 +126,41 @@ export const streakNow = () => streak(allDays(), today());
 export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz(), streakNow());
 
 // にがてな文字: おてほんなし で 2 回以上外したか、じぶんでかく の最高が星 1 のまま。外した回数が多い順
-export function weakOf(pid: string, l: Lang): string[] {
-  const progress = loadJSON<Record<string, CharProgress>>(keyOf(pid, l, 'progress'), {}, isObject);
-  return Object.entries(progress)
+const weakIn = (progress: Data['progress']) =>
+  Object.entries(progress)
     .filter(([, p]) => (p.miss ?? 0) >= 2 || p.star === 1)
     .sort((a, b) => (b[1].miss ?? 0) - (a[1].miss ?? 0))
-    .map(([c]) => c);
+    .map(([c, p]) => ({ c, miss: p.miss ?? 0 }));
+export const weakOf = (pid: string, l: Lang) => weakIn(loadOf(pid, l).progress).map((w) => w.c);
+
+// 保護者向けの詳細: 集計値に加えて メダル数・最後に練習した日・にがてな文字（外した回数つき）
+export type Detail = Stats & {
+  medals: number;
+  medalTotal: number;
+  last: string | null;
+  weak: { c: string; miss: number }[];
+};
+export function detailOf(pid: string, l: Lang): Detail {
+  const d = loadOf(pid, l);
+  const g = (c: string) => d.progress[c] ?? { trace: 0, free: 0, test: 0 };
+  const st = computeStats(
+    l,
+    (c) => clearedIn(g(c)),
+    (c) => goldIn(g(c)),
+    d.days.length,
+    d.quiz
+  );
+  return {
+    ...st,
+    medals: Object.keys(d.earned).length,
+    medalTotal: badgesOf(l).length,
+    last: d.days.length ? [...d.days].sort().at(-1)! : null,
+    weak: weakIn(d.progress)
+  };
 }
+// その人の連続日数（3 ことば をまたいで数える）
+// eslint-disable-next-line svelte/prefer-svelte-reactivity
+export const streakOf = (pid: string) => streak([...new Set(LANGS.flatMap((l) => loadOf(pid, l).days))], today());
 
 // 削除の最終確認用: 任意の人・ことばの記録の件数（保存値を直接読む）
 export type Summary = {
@@ -143,24 +173,8 @@ export type Summary = {
   quiz: number;
 };
 export function summaryOf(pid: string, l: Lang): Summary {
-  const progress = loadJSON<Record<string, CharProgress>>(keyOf(pid, l, 'progress'), {}, isObject);
-  const g = (c: string) => progress[c] ?? { trace: 0, free: 0, test: 0 };
-  const st = computeStats(
-    l,
-    (c) => clearedIn(g(c)),
-    (c) => goldIn(g(c)),
-    loadJSON<string[]>(keyOf(pid, l, 'days'), [], isDays).length,
-    loadJSON<Record<string, number>>(keyOf(pid, l, 'quiz'), {}, isObject)
-  );
-  return {
-    chars: st.chars,
-    gold: st.gold,
-    words: st.words,
-    crowns: st.crowns,
-    medals: Object.keys(loadJSON<Record<string, string>>(keyOf(pid, l, 'earned'), {}, isObject)).length,
-    days: st.days,
-    quiz: Object.values(st.quiz).reduce((a, b) => a + b, 0)
-  };
+  const { chars, gold, words, crowns, medals, days, quiz } = detailOf(pid, l);
+  return { chars, gold, words, crowns, medals, days, quiz: Object.values(quiz).reduce((a, b) => a + b, 0) };
 }
 
 // 新しく条件を満たしたメダルを獲得済みにして返す
