@@ -206,10 +206,22 @@ export function badgesOf(l: Lang): Badge[] {
         Math.min(1, s.eggs),
         1
       ]),
-      count('pinball-20', 'かくし', '🏓', 'ピンボール 20かい', 'とびだした えを はじいて かべに 20かい あてた', (s) => [
-        Math.min(20, s.pinball),
-        20
-      ])
+      count(
+        'pinball-100',
+        'かくし',
+        '🏓',
+        'ピンボール 100かい',
+        'とびだした えを はじいて かべに 100かい あてた',
+        (s) => [Math.min(100, s.pinball), 100]
+      ),
+      count(
+        'pinball-200',
+        'かくし',
+        '🏆',
+        'ピンボール 200かい',
+        'とびだした えを はじいて かべに 200かい あてた',
+        (s) => [Math.min(200, s.pinball), 200]
+      )
     ].map((b) => ({ ...b, secret: true }))
   ];
 }
