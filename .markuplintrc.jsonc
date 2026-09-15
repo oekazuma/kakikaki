@@ -10,35 +10,34 @@
   "rules": {
     // Svelte の onclick={fn} は文字列のインラインハンドラではなくイベントリスナー
     "security/no-event-handler-attr": false,
-    // svelte-parser 5.0.0 はファイル末尾の自己閉じコンポーネント（<Board … />）を未閉じと誤検知する。
-    // 本当に閉じ忘れていれば Svelte コンパイラが止める
+    // @markuplint/rules 5.0.0 のこの規則は自己閉じ（tagCloseChar "/>"）を見ないので、
+    // ファイル末尾の <Board … /> を未閉じと誤検知する。本当に閉じ忘れていれば Svelte コンパイラが止める
     "html-standard/no-unclosed-element-at-eof": false,
     "no-unknown-attr": {
       "options": {
-        // Pointer Events は HTML 仕様の GlobalEventHandlers に無く、html-spec も持っていない
-        "allowAttrs": [
-          "onpointerdown",
-          "onpointermove",
-          "onpointerup",
-          "onpointercancel",
-          "onpointerenter",
-          "onpointerleave",
-          "onpointerover",
-          "onpointerout",
-          "ongotpointercapture",
-          "onlostpointercapture"
-        ],
-        // {@attach fn} を svelte-parser 5.0.0 が "attach fn" という属性として読む
-        "ignoreAttrNamePrefix": ["attach "]
+        // onpointer*: Pointer Events は HTML 仕様の GlobalEventHandlers に無く html-spec も持っていない（綴り違いは svelte-check が拒む）。
+        // "attach ": svelte-parser 5.0.0 が {@attach fn} を "attach fn" という属性として読む
+        "ignoreAttrNamePrefix": ["onpointer", "attach "]
       }
     }
   },
   "overrides": {
-    // SvelteKit の殻 HTML。見出しは各ページが置く
+    // SvelteKit の殻 HTML
     "src/app.html": {
       "rules": {
+        // 見出しは各ページが置く
         "require-h1": false
-      }
+      },
+      "nodeRules": [
+        {
+          // ホーム画面アプリでは user-scalable=no が効き、子どもが 2 本指で画面を拡大して戻せなくなるのを防いでいる。
+          // 描画面以外は touch-action: manipulation でピンチを許しているため、CSS では代替できない
+          "selector": "meta[name='viewport']",
+          "rules": {
+            "no-restricted-attr": false
+          }
+        }
+      ]
     }
   }
 }

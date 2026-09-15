@@ -28,7 +28,7 @@ pnpm icon                     # アイコン/ロゴマーク SVG を生成（引
 
 svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。コンポーネントは 200 行未満に保つ（`architecture/component-size`、抑制ファイルは使っていない）。画面の状態遷移はクラス（`tracer.svelte.ts` / `practice.svelte.ts` / `quiz-session.svelte.ts` / `gate.svelte.ts`）に寄せて vitest で検証し、`.svelte` は描画とイベント配線だけにする。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 
-markuplint（`.markuplintrc.jsonc`、`markuplint:recommended-svelte`）は `pnpm lint` の中で `src/**/*.svelte` と `src/app.html` を検査する。Svelte の `on*={}` はリスナーなので `security/no-event-handler-attr` を、Pointer Events と `{@attach}` は html-spec / svelte-parser 5.0.0 が知らないので `no-unknown-attr` の許可で、末尾の自己閉じコンポーネントを未閉じと誤検知する `no-unclosed-element-at-eof` をそれぞれ外してある。`app.html` は殻なので `require-h1` だけ切っている。
+markuplint は `pnpm lint` の中で `src/**/*.svelte` と `src/app.html` を検査する（警告も失敗扱い）。外している規則とその理由は `.markuplintrc.jsonc` のコメントにある。
 
 依存は `pnpm-workspace.yaml` の catalog で一元管理し（`minimumReleaseAge` あり）、Renovate が minor/patch を自動マージする。CI（`.github/workflows/ci.yml`）は PR では lint（+ svelte-vitals 全体スキャン）/ check / test / build を並列に、`main` への push では build を除く 3 つを回す（ビルドと配信は `deploy.yml`）。内部リンクは `resolve()`（クエリ付きは `src/lib/nav.ts` の `practiceUrl`）で書く。eslint の `no-navigation-without-resolve` に従うため。
 
