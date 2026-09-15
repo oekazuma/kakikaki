@@ -17,7 +17,11 @@ const LEFT = new Set([
   'shrimp',
   'snail',
   'ant',
-  'beetle'
+  'beetle',
+  'goat',
+  'hippo',
+  'elephant',
+  'squirrel'
 ]);
 const RIGHT = new Set(['kangaroo']);
 // dir の向きに進むとき反転が必要か（正面向きの絵はどちらでもそのまま）
