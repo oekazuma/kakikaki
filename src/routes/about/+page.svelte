@@ -111,15 +111,15 @@
   .link {
     display: grid;
     gap: 8px;
+    padding: 16px 20px;
+    color: inherit;
+    text-decoration: none;
+    border: 3px solid var(--blue);
   }
   .link p {
     margin: -4px 0 0;
     font-size: 14px;
     color: var(--sub);
-    padding: 16px 20px;
-    color: inherit;
-    text-decoration: none;
-    border: 3px solid var(--blue);
   }
   .faces {
     display: flex;
