@@ -1,5 +1,15 @@
 import { WORDS, wordById, charWordId, isCharWord, type Word } from './words';
-import { get, record, recordStar, recordMiss, charCleared, wordStar, checkBadges, type Mode } from './progress.svelte';
+import {
+  get,
+  record,
+  recordStar,
+  recordMiss,
+  charCleared,
+  charGold,
+  wordStar,
+  checkBadges,
+  type Mode
+} from './progress.svelte';
 import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
 import type { Badge } from './badges';
 import { stars, praise } from './score';
@@ -45,10 +55,10 @@ export function resolveWord(id: string | null, l: Lang): Word {
   return w && lettersOf(w, l).every((c) => c in strokes) ? w : wordById('patocar')!;
 }
 
-// その文字で次にやるべきモード。全部終わっていれば null
+// その文字で次にやるべきモード。クリア（なぞる 2 回 + じぶんでかく）済みなら null。おてほんなし は挑戦として別枠
 export function nextMode(ch: string): Mode | null {
   const p = get(ch);
-  return p.trace < 2 ? 'trace' : p.free < 1 ? 'free' : p.test < 1 ? 'test' : null;
+  return p.trace < 2 ? 'trace' : p.free < 1 ? 'free' : null;
 }
 
 const wordDone = (w: Word) => lettersOf(w).every((ch) => nextMode(ch) === null);
@@ -72,7 +82,8 @@ export function nextWordId(word: Word): string | null {
   return null;
 }
 
-// 1 単語ぶんの練習の進行。文字は左から順に解放し、文字ごとに なぞる 2 回 → じぶんでかく → おてほんなし
+// 1 単語ぶんの練習の進行。文字は左から順に解放し、文字ごとに なぞる 2 回 → じぶんでかく で次の文字へ。
+// 全文字クリアの完了モーダルから おてほんなし に挑戦でき、通ると次のまだ金星でない文字の おてほんなし へ進む
 export class PracticeSession {
   readonly chars: string[];
   i = $state(0);
@@ -82,7 +93,7 @@ export class PracticeSession {
   msg = $state('');
   drawn = $state(false); // おてほんなしで 1 画以上書いた
   busy = $state(false);
-  complete = $state(false); // 単語の全文字を初めて終えた
+  complete = $state(false); // 単語の最後の文字を終えた（完了モーダル）
   flyStar = $state(false);
   drive = $state(false);
   toast = $state<Badge | null>(null);
@@ -143,6 +154,14 @@ export class PracticeSession {
     this.select(0, 'trace');
   }
 
+  // 完了モーダルの「おてほんなしに ちょうせん」: まだ金星でない最初の文字から
+  challenge() {
+    const k = this.chars.findIndex((ch) => !charGold(ch));
+    if (k < 0) return;
+    this.complete = false;
+    this.select(k, 'test');
+  }
+
   nextId() {
     return nextWordId(this.word);
   }
@@ -187,8 +206,10 @@ export class PracticeSession {
     setTimeout(() => {
       this.busy = false;
       const next = nextMode(c);
+      const k = r.mode === 'test' ? this.chars.findIndex((ch, n) => n > this.i && !charGold(ch)) : -1;
       if (next) this.select(this.i, next);
-      else if (this.i < this.chars.length - 1) this.select(this.i + 1);
+      else if (k >= 0) this.select(k, 'test');
+      else if (r.mode !== 'test' && this.i < this.chars.length - 1) this.select(this.i + 1);
       else this.complete = true;
     }, wait);
   }

@@ -105,7 +105,7 @@
     <DriveBy {word} onend={() => (s.drive = false)} />
   {/if}
   {#if s.complete}
-    <CompleteModal {word} onnext={goNext} onreplay={() => s.replay()} />
+    <CompleteModal {word} onnext={goNext} onreplay={() => s.replay()} onchallenge={() => s.challenge()} />
   {/if}
   {#if s.toast}
     <BadgeToast badge={s.toast} />

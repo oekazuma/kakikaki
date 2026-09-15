@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PracticeSession, nextMode, nextWordId, resolveWord } from './practice.svelte';
-import { record, reset, get } from './progress.svelte';
+import { record, reset, get, wordCrown } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 import type { Result } from './tracer.svelte';
@@ -33,7 +33,7 @@ describe('PracticeSession', () => {
     expect(s.i).toBe(0);
   });
 
-  it('なぞる 2 回 → じぶんでかく → おてほんなし → 次の文字 と自動で進む', () => {
+  it('なぞる 2 回 → じぶんでかく → 次の文字 と自動で進み、おてほんなし には入らない', () => {
     const s = new PracticeSession(bus);
     s.done(ok('trace'));
     expect(s.busy).toBe(true);
@@ -47,25 +47,44 @@ describe('PracticeSession', () => {
     expect(s.msg).toContain('★★★');
     expect(s.flyStar).toBe(true); // 文字クリア
     vi.advanceTimersByTime(1200 + 2600); // はじめの いっぽ のメダル分
-    expect(s.mode).toBe('test');
-    expect(s.unlocked(1)).toBe(true);
-    s.done({ mode: 'test', score: 0.5, ok: false, top: 'は' });
-    expect(s.msg).toContain('「は」に みえるよ');
-    expect([get('ば').test, get('ば').miss, get('ば').star]).toEqual([0, 1, 3]);
-    s.done(ok('test', 0.8));
-    vi.advanceTimersByTime(1200 + 2600); // はじめての きんのほし
     expect([s.i, s.c, s.mode]).toEqual([1, 'す', 'trace']);
+    expect(get('ば').star).toBe(3);
   });
 
-  it('途中まで済んだ単語は残りの文字から再開し、最後を終えると完了になる', () => {
+  it('完了モーダルから おてほんなし に挑戦でき、通ると次の文字の おてほんなし へ進んで王冠になる', () => {
     clear('ば');
-    record('ば', 'test');
-    clear('す');
     const s = new PracticeSession(bus);
-    expect([s.c, s.mode]).toEqual(['す', 'test']);
-    s.done(ok('test'));
+    expect([s.c, s.mode]).toEqual(['す', 'trace']);
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    s.done(ok('free'));
     vi.runAllTimers();
     expect(s.complete).toBe(true);
+    s.challenge();
+    expect([s.complete, s.i, s.mode]).toEqual([false, 0, 'test']);
+    s.done({ mode: 'test', score: 0.5, ok: false, top: 'は' });
+    expect(s.msg).toContain('「は」に みえるよ');
+    expect([get('ば').test, get('ば').miss]).toEqual([0, 1]);
+    s.done(ok('test', 0.8));
+    vi.runAllTimers();
+    expect([s.i, s.c, s.mode, s.complete]).toEqual([1, 'す', 'test', false]);
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect([s.complete, wordCrown(bus)]).toEqual([true, true]);
+    s.challenge(); // 全部金星なら何も起きない
+    expect(s.complete).toBe(true);
+  });
+
+  it('途中まで済んだ単語は残りの文字から再開し、クリア済みの単語は最初の なぞる から', () => {
+    clear('ば');
+    record('ば', 'test');
+    expect([new PracticeSession(bus).c, new PracticeSession(bus).mode]).toEqual(['す', 'trace']);
+    clear('す');
+    const s = new PracticeSession(bus);
+    expect([s.i, s.mode]).toEqual([0, 'trace']);
+    s.complete = true;
     s.replay();
     expect([s.complete, s.i, s.mode]).toEqual([false, 0, 'trace']);
   });
@@ -73,9 +92,7 @@ describe('PracticeSession', () => {
   it('nextMode と nextWordId', () => {
     expect(nextMode('あ')).toBe('trace');
     clear('あ');
-    expect(nextMode('あ')).toBe('test');
-    record('あ', 'test');
-    expect(nextMode('あ')).toBeNull();
+    expect(nextMode('あ')).toBeNull(); // おてほんなし は自動では入らない
     // ばす・でんしゃ を終えると、ばす の次は しんかんせん
     for (const w of ['ばす', 'でんしゃ']) {
       for (const c of w) {
