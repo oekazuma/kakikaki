@@ -3,7 +3,7 @@ import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
 import { removeBest, loadBests } from './balloon.svelte';
 import { secretOf, removeSecret } from './secret';
-import type { Word } from './words';
+import { isCharWord, type Word } from './words';
 import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 import { today } from './today';
 import { streak } from './streak';
@@ -17,6 +17,7 @@ type Data = {
   earned: Record<string, string>;
   days: string[];
   quiz: Record<string, number>;
+  last: string | null; // 最後に練習に入った単語 id（ホームの「つづきから」）
 };
 
 export const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
@@ -28,7 +29,8 @@ const loadOf = (pid: string, l: Lang): Data => ({
   progress: loadJSON<Data['progress']>(keyOf(pid, l, 'progress'), {}, isObject),
   earned: loadJSON<Data['earned']>(keyOf(pid, l, 'earned'), {}, isObject),
   days: loadJSON<Data['days']>(keyOf(pid, l, 'days'), [], isDays),
-  quiz: loadJSON<Data['quiz']>(keyOf(pid, l, 'quiz'), {}, isObject)
+  quiz: loadJSON<Data['quiz']>(keyOf(pid, l, 'quiz'), {}, isObject),
+  last: loadJSON<Data['last']>(keyOf(pid, l, 'last'), null, (v) => typeof v === 'string')
 });
 const load = (l: Lang) => loadOf(profiles.cur, l);
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
@@ -59,6 +61,14 @@ export const get = (c: string): CharProgress => cur().progress[c] ?? { trace: 0,
 export const earned = () => cur().earned;
 export const days = () => cur().days;
 export const quiz = () => cur().quiz;
+export const lastWord = () => cur().last;
+
+// 練習に入った単語を人 × ことば ごとに覚える（1 文字練習は対象外）
+export function rememberWord(w: Word) {
+  if (isCharWord(w) || cur().last === w.id) return;
+  cur().last = w.id;
+  save(lang.v, 'last');
+}
 
 // 練習した日付に今日を足す（1 日 1 回）
 function markToday(l: Lang) {
@@ -115,7 +125,7 @@ export const wordCrown = (w: Word) => lettersOf(w).every(charGold);
 export function resetRecords(pid: string, langs: Lang[]) {
   for (const l of langs) {
     for (const name of DATA_NAMES) removeKey(keyOf(pid, l, name));
-    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
+    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {}, last: null };
   }
   // ことばをまたぐ かくし要素の記録は「すべて」のときだけ消す（1 ことば だけのリセットでは残す）
   if (langs.length === LANGS.length) {

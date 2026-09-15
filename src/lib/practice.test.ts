@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PracticeSession, nextMode, nextWordId, nextOpenWord, resolveWord } from './practice.svelte';
-import { record, reset, get, wordCrown } from './progress.svelte';
+import { record, reset, get, wordCrown, rememberWord, lastWord } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 import type { Result } from './tracer.svelte';
@@ -107,10 +107,25 @@ describe('PracticeSession', () => {
     expect(nextWordId(wordById('char-あ')!)).toBe('char-い');
   });
 
-  it('nextOpenWord: 並び順で最初の未クリア単語', () => {
+  it('nextOpenWord: 記録が無ければ並び順で最初の未クリア単語', () => {
     expect(nextOpenWord()?.id).toBe('dog'); // WORDS の先頭
     for (const c of 'いぬ') clear(c);
     expect(nextOpenWord()?.id).toBe('cat'); // 次の未クリア（ねこ が先頭から 2 番目）
+  });
+
+  it('nextOpenWord: 最後に練習した単語から続き、ことば ごとに独立', () => {
+    const giraffe = wordById('giraffe')!;
+    rememberWord(giraffe);
+    expect(nextOpenWord()?.id).toBe('giraffe');
+    rememberWord(wordById('char-あ')!); // 1 文字練習は覚えない
+    expect(lastWord()).toBe('giraffe');
+    for (const c of 'きりん') clear(c);
+    expect(nextOpenWord()?.id).toBe(nextWordId(giraffe)); // クリア済みなら並び順で次の未クリア
+    setLang('kana');
+    expect(nextOpenWord()?.id).toBe('dog'); // かたかな の記録は別
+    setLang('ja');
+    reset();
+    expect(lastWord()).toBeNull(); // リセットで消える
   });
 
   it('resolveWord: その言語に無い文字の単語は既定の単語に戻す', () => {
