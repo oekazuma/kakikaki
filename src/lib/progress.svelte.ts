@@ -179,9 +179,10 @@ export function detailOf(pid: string, l: Lang): Detail {
     weak: weakIn(d.progress)
   };
 }
-// その人の連続日数（3 ことば をまたいで数える）
+// その人が練習した日付（3 ことば の union）と連続日数
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
-export const streakOf = (pid: string) => streak([...new Set(LANGS.flatMap((l) => loadOf(pid, l).days))], today());
+export const daysOf = (pid: string) => [...new Set(LANGS.flatMap((l) => loadOf(pid, l).days))];
+export const streakOf = (pid: string) => streak(daysOf(pid), today());
 
 // 削除の最終確認用: 任意の人・ことばの記録の件数（保存値を直接読む）
 export type Summary = {
