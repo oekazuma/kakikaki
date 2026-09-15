@@ -29,6 +29,10 @@
         })
     );
   });
+  $effect(() => {
+    const q = w;
+    return () => q.dispose();
+  });
   const strokes = $derived(strokesOf());
   let canvas = $state<Canvas>();
   let speaking = $state(false);
