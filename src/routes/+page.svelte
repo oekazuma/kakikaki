@@ -4,6 +4,7 @@
   import { practiceUrl } from '$lib/nav';
   import { fly } from 'svelte/transition';
   import WordCard from '$lib/components/WordCard.svelte';
+  import ContinueCard from '$lib/components/ContinueCard.svelte';
   import { WORDS, CATEGORIES } from '$lib/words';
   import { unlock } from '$lib/audio';
   import Bar from '$lib/components/Bar.svelte';
@@ -65,6 +66,7 @@
   </header>
   {#key lang.v}
     <div class="words" in:fly={{ x: 80, duration: 350 }}>
+      <ContinueCard />
       {#each CATEGORIES as cat (cat)}
         <h2>{cat}</h2>
         <div class="row">
