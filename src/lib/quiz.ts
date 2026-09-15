@@ -100,10 +100,17 @@ export function makeReadQuiz(l: Lang, level: Level, n = QUESTIONS.read, rnd = Ma
     });
 }
 
-// かきクイズの出題形式。picture: イラストを見て書く / listen: 聞いて書く（絵なし）。交互に出す
-type WriteKind = 'picture' | 'listen';
-export type WriteQ = { word: Word; kind: WriteKind };
-export const makeWriteQuiz = (l: Lang, level: Level, n = QUESTIONS.write, rnd = Math.random): WriteQ[] =>
-  shuffle(wordsOf(l, level), rnd)
+// かきクイズの出題形式。picture: イラストを見て書く / listen: 聞いて書く（絵なし）/ blank: 1 文字だけ ？ にして書く。順に出す
+type WriteKind = 'picture' | 'listen' | 'blank';
+export const WRITE_KINDS: WriteKind[] = ['picture', 'listen', 'blank'];
+export type WriteQ = { word: Word; kind: WriteKind; blank?: number };
+export function makeWriteQuiz(l: Lang, level: Level, n = QUESTIONS.write, rnd = Math.random): WriteQ[] {
+  return shuffle(wordsOf(l, level), rnd)
     .slice(0, n)
-    .map((word, i) => ({ word, kind: i % 2 ? 'listen' : 'picture' }));
+    .map((word, i) => {
+      const letters = lettersOf(word, l);
+      let kind = WRITE_KINDS[i % WRITE_KINDS.length];
+      if (kind === 'blank' && letters.length < 2) kind = 'picture'; // 1 文字の語は穴埋めにならない
+      return kind === 'blank' ? { word, kind, blank: Math.floor(rnd() * letters.length) } : { word, kind };
+    });
+}

@@ -89,4 +89,43 @@ describe('quiz session', () => {
     expect(w.correct).toBe(4);
     expect(quiz().write1).toBe(4);
   });
+
+  it('かきクイズの穴埋め: ？ の 1 文字だけで正解、2 回外すとなぞるに切り替わり正解に数えない', () => {
+    const w = new WriteQuiz(1, {}, seeded(8));
+    const blankIdx = w.qs.findIndex((q) => q.kind === 'blank');
+    expect(blankIdx).toBeGreaterThanOrEqual(0);
+    for (let i = 0; i < blankIdx; i++) {
+      for (let k = 0; k < w.letters.length; k++) w.onDone({ mode: 'test', score: 1, ok: true, top: w.c });
+      vi.advanceTimersByTime(1400);
+    }
+    expect(w.kind).toBe('blank');
+    expect(w.targets.length).toBe(1);
+    const target = w.qs[w.i].blank!;
+    expect(w.targets[0]).toBe(target);
+    // 2 回外す → なぞる。なぞって正解しても正解数に数えない
+    w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
+    w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
+    expect(w.mode).toBe('trace');
+    const before = w.correct;
+    w.onDone({ mode: 'trace', score: 1, ok: true, top: w.c });
+    expect(w.msg).toBe('かけたね！');
+    expect(w.correct).toBe(before);
+  });
+
+  it('かきクイズの穴埋め: 一発で書けたら正解に数え、次の問題へ進む', () => {
+    const w = new WriteQuiz(1, {}, seeded(3));
+    const blankIdx = w.qs.findIndex((q) => q.kind === 'blank');
+    expect(blankIdx).toBeGreaterThanOrEqual(0);
+    for (let i = 0; i < blankIdx; i++) {
+      for (let k = 0; k < w.letters.length; k++) w.onDone({ mode: 'test', score: 1, ok: true, top: w.c });
+      vi.advanceTimersByTime(1400);
+    }
+    const before = w.correct;
+    w.onDone({ mode: 'test', score: 1, ok: true, top: w.c });
+    expect(w.msg).toBe('せいかい！');
+    expect(w.correct).toBe(before + 1);
+    vi.advanceTimersByTime(1400);
+    if (blankIdx + 1 < w.qs.length) expect(w.i).toBe(blankIdx + 1);
+    else expect(w.done).toBe(true);
+  });
 });
