@@ -6,26 +6,26 @@
   import { lang, info } from '$lib/lang.svelte';
   import { logoUrl } from '$lib/image';
   import { vp } from '$lib/viewport.svelte';
+  import { SplashGate } from '$lib/splash-gate';
   // 起動画面。見栄えのために出す（最短 1.3 秒。ロゴが跳ねて、文字が 1 つずつ飛び出し、星が瞬き、線が引かれる演出が終わる長さ）。
-  // あわせて、iPad のホーム画面アプリが起動直後に縦向きの座標系で一度描かれてから横向きに組み替わるのを隠す:
-  // 画面サイズが 200ms 変わらなくなり、フォントが読めたら消す（最長約 2.5 秒）。
+  // あわせて、iPad のホーム画面アプリが起動直後に縦向きの座標系で一度描かれてから横向きに組み替わるのを隠す
+  // （消すタイミングの判定は splash-gate.ts）。
   // 背景は画面より大きく取り、ずれて描かれても縁が見えないようにする
   let show = $state(true);
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-  async function settled() {
-    let last = '';
-    let stable = 0;
-    for (let t = 0; t < 2500 && stable < 200; t += 100) {
+  onMount(async () => {
+    const gate = new SplashGate(Date.now());
+    (document.fonts?.ready ?? Promise.resolve()).then(() => gate.fontsReady());
+    let key = '';
+    for (;;) {
       const now = `${vp.w}x${vp.h}x${vp.portrait}`;
-      stable = now === last ? stable + 100 : 0;
-      last = now;
+      if (now !== key) {
+        key = now;
+        gate.resize(Date.now());
+      }
+      if (gate.done(Date.now())) break;
       await sleep(100);
     }
-  }
-  onMount(async () => {
-    const start = Date.now();
-    await Promise.all([Promise.race([document.fonts?.ready, sleep(1500)]), settled()]);
-    await sleep(Math.max(0, 1300 - (Date.now() - start)));
     show = false;
   });
   // ロゴのまわりで瞬く星: 位置（ロゴ中心からの px）・大きさ・色・出るタイミング
