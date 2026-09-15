@@ -5,6 +5,8 @@
   import { vp } from '$lib/viewport.svelte';
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
+  import { profiles } from '$lib/profiles.svelte';
+  import { recordEgg, recordPinball } from '$lib/secret';
   import type { Word } from '$lib/words';
   // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。
   // 出ている間は透明な覆いで他の操作を止める（もどる だけは覆いより上に置いてある）
@@ -17,6 +19,7 @@
   $effect(() => b.resize(vp.w, vp.h));
   let celebrated = false;
   $effect(() => {
+    recordEgg(profiles.cur);
     let raf = 0;
     let last = performance.now();
     const loop = (t: number) => {
@@ -27,7 +30,10 @@
         fx.confetti(300);
         sfx.fanfare();
       }
-      if (b.phase === 'done') return onend();
+      if (b.phase === 'done') {
+        recordPinball(profiles.cur, b.hits);
+        return onend();
+      }
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);

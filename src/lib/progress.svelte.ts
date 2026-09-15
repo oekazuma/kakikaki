@@ -1,7 +1,8 @@
 import { computeStats, earnedBadges, badgesOf, type Badge, type Stats } from './badges';
 import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
-import { removeBest } from './balloon.svelte';
+import { removeBest, loadBests } from './balloon.svelte';
+import { secretOf, removeSecret } from './secret';
 import type { Word } from './words';
 import { isObject, loadJSON, saveJSON, removeKey } from './storage';
 import { today } from './today';
@@ -48,6 +49,7 @@ export function deleteProfile(id: string) {
   const wasCur = profiles.cur === id;
   if (!removeProfile(id)) return;
   removeBest(id);
+  removeSecret(id);
   if (wasCur) switchProfile(profiles.cur);
 }
 // 言語の切り替えを使っている人に覚えさせる（次にその人を選んだとき同じ言語で開く）
@@ -123,7 +125,9 @@ export const reset = () => resetRecords(profiles.cur, [lang.v]);
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
 export const allDays = () => [...new Set(LANGS.flatMap((l) => data[l].days))];
 export const streakNow = () => streak(allDays(), today());
-export const stats = () => computeStats(lang.v, charCleared, charGold, days().length, quiz(), streakNow());
+const secretStats = (pid: string) => ({ ...secretOf(pid), balloon: loadBests()[pid]?.score ?? 0 });
+export const stats = () =>
+  computeStats(lang.v, charCleared, charGold, days().length, quiz(), streakNow(), secretStats(profiles.cur));
 
 // にがてな文字: おてほんなし で 2 回以上外したか、じぶんでかく の最高が星 1 のまま。外した回数が多い順
 const weakIn = (progress: Data['progress']) =>
@@ -148,7 +152,9 @@ export function detailOf(pid: string, l: Lang): Detail {
     (c) => clearedIn(g(c)),
     (c) => goldIn(g(c)),
     d.days.length,
-    d.quiz
+    d.quiz,
+    0,
+    secretStats(pid)
   );
   return {
     ...st,

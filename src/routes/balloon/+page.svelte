@@ -4,6 +4,10 @@
   import Icon from '$lib/components/Icon.svelte';
   import Field from '$lib/components/balloon/Field.svelte';
   import Ranking from '$lib/components/balloon/Ranking.svelte';
+  import BadgeToast from '$lib/components/BadgeToast.svelte';
+  import { recordBalloon } from '$lib/secret';
+  import { checkBadges } from '$lib/progress.svelte';
+  import type { Badge } from '$lib/badges';
   import { BalloonGame, MISS_MAX, saveScore, loadBests, type Balloon } from '$lib/balloon.svelte';
   import { profiles } from '$lib/profiles.svelte';
   import { today } from '$lib/today';
@@ -17,6 +21,7 @@
   let settled = false; // 終了処理は 1 回だけ（自己ベスト未更新でも毎フレーム走らせない）
   let floater = $state<{ x: number; y: number; pts: number; id: number } | null>(null);
   let best = $state(loadBests()[profiles.cur]?.score ?? 0);
+  let toast = $state<Badge | null>(null);
 
   function start() {
     isBest = false;
@@ -39,6 +44,17 @@
   function finish() {
     settled = true;
     isBest = saveScore(profiles.cur, g.score, today());
+    recordBalloon(profiles.cur);
+    // かくしメダル（みつけた・100 てん・300 てん）を確定して順に見せる
+    checkBadges().forEach((b, k) =>
+      setTimeout(
+        () => {
+          toast = b;
+          setTimeout(() => (toast = null), 2400);
+        },
+        1200 + k * 2600
+      )
+    );
     if (isBest) {
       best = g.score;
       fx.confetti(200);
@@ -80,6 +96,9 @@
   <Field balloons={g.balloons} onpop={pop} />
   {#if floater}
     {#key floater.id}<span class="pts" style:left="{floater.x}px" style:top="{floater.y}px">+{floater.pts}</span>{/key}
+  {/if}
+  {#if toast}
+    <BadgeToast badge={toast} />
   {/if}
   {#if g.over}
     <Ranking score={g.score} combo={g.maxCombo} {isBest} onretry={start} onback={() => history.back()} />

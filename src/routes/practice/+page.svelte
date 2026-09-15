@@ -61,7 +61,7 @@
   </header>
 
   <div class="left">
-    <WordWithHear {word} />
+    <WordWithHear {word} onegg={() => s.celebrate()} />
     <CharTabs {s} />
   </div>
 
