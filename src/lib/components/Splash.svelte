@@ -4,7 +4,7 @@
   import { fade } from 'svelte/transition';
   import { lang, info } from '$lib/lang.svelte';
   import { vp } from '$lib/viewport.svelte';
-  // 起動画面。見栄えのために出す（最短 500ms）。あわせて、iPad のホーム画面アプリが起動直後に縦向きの座標系で
+  // 起動画面。見栄えのために出す（最短 1 秒）。あわせて、iPad のホーム画面アプリが起動直後に縦向きの座標系で
   // 一度描かれてから横向きに組み替わるのを隠す: 画面サイズが 200ms 変わらなくなり、フォントが読めたら消す（最長約 2.5 秒）。
   // 背景は画面より大きく取り、ずれて描かれても縁が見えないようにする
   let show = $state(true);
@@ -22,7 +22,7 @@
   onMount(async () => {
     const start = Date.now();
     await Promise.all([Promise.race([document.fonts?.ready, sleep(1500)]), settled()]);
-    await sleep(Math.max(0, 500 - (Date.now() - start)));
+    await sleep(Math.max(0, 1000 - (Date.now() - start)));
     show = false;
   });
 </script>
