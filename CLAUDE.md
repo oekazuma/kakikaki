@@ -24,8 +24,6 @@ pnpm images                   # words.ts の emoji から Twemoji SVG を static
 pnpm icon                     # アイコン/ロゴマーク SVG を生成（引数で文字と色を変えれば姉妹アプリ用になる。PNG 化手順は出力に表示）
 ```
 
-`video/` は README の紹介動画（`docs/intro.gif`）を作る Remotion プロジェクトで、本体とは別の pnpm プロジェクト（`cd video && pnpm install`）。`pnpm dev` で Studio、`pnpm render` で MP4（`video/out/`、コミットしない）を描画し、ffmpeg で `docs/intro.gif` に変換する（GitHub の README はリポジトリ内の動画を埋め込めないので GIF だけを使う）。BGM は `video/scripts/make-bgm.ts` がオシレータで合成して `src/bgm.wav`（生成物、コミットしない）に書き、`dev` / `render` の前に自動で作る。イラスト・ロゴ・Klee One は `static/` を `publicDir` として直接参照し、書き順と単語は `src/lib/` を import するので複製しない。UI の丸ゴシックは Mac のシステムフォント（Hiragino Maru Gothic ProN）に頼るため、Linux で描画すると字面が変わる。`video/` を触ったら `pnpm check:video` で型を確認する。
-
 svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので共有向け SEO 規則はオフ、ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。コンポーネントは 200 行未満に保つ（`architecture/component-size`、抑制ファイルは使っていない）。画面の状態遷移はクラス（`tracer.svelte.ts` / `practice.svelte.ts` / `quiz-session.svelte.ts` / `gate.svelte.ts`）に寄せて vitest で検証し、`.svelte` は描画とイベント配線だけにする。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 
 markuplint は `pnpm lint` の中で `src/**/*.svelte` と `src/app.html` を検査する（警告も失敗扱い）。外している規則とその理由は `.markuplintrc.jsonc` のコメントにある。
@@ -64,10 +62,6 @@ SvelteKit の設定は `svelte.config.js` ではなく `vite.config.ts` の `sve
 - `bouncer.svelte.ts` / `components/Bouncer.svelte`: かくし演出「ピンボール」。練習画面の単語カード（`WordWithHear`）を 10 回続けてタップ（2 秒あくと数え直し。判定は `taps.ts` の `TapCounter`）すると、そのイラストがカードから跳び出し（カードには灰色のシルエット `ghost` が残る）、放物線で着地して右へ走り抜ける。走っている間にタップすると弾かれて画面の端で跳ね返りながら飛び回り、タップするたびに速く・回転が増し、最後のタップから 6 秒で戻り始める。右の壁まで走ったあと（弾かれていれば時間切れのあと）は、その場から大きな山なりで 1.4 秒かけてカードの元の場所へ跳んで戻り（`home`）、収まるとカードがぽんと跳ねる（WordWithHear の `in:scale`）。画面の外には出ない。壁に当たった回数を画面上部に出し、`GOAL`（100 回）に届くと紙吹雪とファンファーレ。`Bouncer` は px 座標の純粋な状態機械（`tick(dt)` / `kick()`）で vitest で検証し、描画は rAF。出ている間は透明な覆い（z-index 59）で他の操作を止め、`BackButton` だけ z-index 61 で覆いの上にあるので戻れる。記録・メダルには関係しない。
 - z-index の層（新しい覆い・モーダルはこの表に入れる）: 5 `Egg`（風船ページ内は別途 1〜3 の局所スタック）、50 `+layout` の fx canvas、59 `Bouncer` の覆い、60 `Bouncer` の絵と回数・`DriveBy`・よみクイズの ○、61 `BackButton`、70 `.dim`（`app.css`）・`BadgeToast`、71 `ProfileEditor` / `DangerModal` / `DeleteConfirm` / `QuizHeader` の確認、80 `CompleteModal` / `QuizResult` / `Shredder`、100 `+layout` の画面サイズ案内、110 `Splash`。
 - `fx.ts` / `audio.ts`: 全画面 canvas のパーティクル、WebAudio の効果音、Web Speech の読み上げ。iOS の制約で `unlock()` はユーザー操作のハンドラ内で呼ぶ。
-
-## 単語を増やす
-
-`src/lib/words.ts` のカテゴリ配列に `['id', 'ひらがな', '絵文字', 'english']` を追加し（カードの補助行のカタカナはひらがなから自動変換。英語名は小文字で書き、表示で先頭だけ大文字になる）、`node scripts/fetch-images.ts` で Twemoji の SVG を `static/img/<id>.svg` に取得する。自前のイラストを使うときは同じパスに置く（画像が無い単語は頭文字のカードで表示される）。ひらがな・カタカナ・英語名の全文字が `strokes.ts` / `strokes-kana.ts` / `strokes-en.ts` に存在する必要があり、`words.test.ts` がそれを検証する。
 
 ## 実機で調整する前提の値
 
