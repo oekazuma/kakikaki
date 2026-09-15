@@ -31,7 +31,7 @@
 
   <div class="cols">
     <div class="left">
-      <a class="card link big" href={resolve('/about/progress')}>
+      <a class="card link" href={resolve('/about/progress')}>
         <h2>みんなの進み具合</h2>
         <p>人ごと・ことばごとの達成率、練習した日、クイズの正解数、苦手な文字が見られます。</p>
         <span class="faces">
@@ -114,7 +114,6 @@
     padding: 16px 20px;
     color: inherit;
     text-decoration: none;
-    border: 3px solid var(--blue);
   }
   .link p {
     margin: -4px 0 0;
