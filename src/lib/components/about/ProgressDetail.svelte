@@ -28,13 +28,14 @@
 </div>
 
 <style>
+  /* iPad のホーム画面アプリはステータスバーの帯を内容の上に半透明で重ねるので、安全領域の内側で中央に置く */
   .detail {
     position: fixed;
     left: 50%;
-    top: 50%;
+    top: calc(50% + (env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) / 2);
     transform: translate(-50%, -50%);
     width: min(760px, calc(100vw - 60px));
-    max-height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     display: grid;
     grid-template-rows: auto 1fr;
     z-index: 71;
