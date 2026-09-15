@@ -4,7 +4,7 @@
   import { info, nameOf, lettersOf } from '$lib/lang.svelte';
   import { speaker } from '$lib/audio';
   import type { ReadQ } from '$lib/quiz';
-  // よみクイズの出題部分（形式ごとに見せ方が変わる）
+  // よみクイズの出題部分（形式ごとに見せ方が変わる）。文字→イラスト は読む練習なので読み上げボタンを出さない
   let { q }: { q: ReadQ } = $props();
   let speaking = $state(false);
   const hear = speaker((on) => (speaking = on));
@@ -12,9 +12,6 @@
 
 <div class={['prompt', 'card', q.kind]} data-kind={q.kind}>
   {#if q.kind === 'word'}
-    <button class={['hear', { speaking }]} onclick={() => hear(nameOf(q.answer), info().speech)} aria-label="きく"
-      ><Icon name="speaker" size={26} /></button
-    >
     <b class="word kyokasho">{nameOf(q.answer)}</b>
     <span>は どれ？</span>
   {:else if q.kind === 'listen'}
