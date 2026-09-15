@@ -7,6 +7,7 @@ import {
   charCleared,
   charGold,
   wordStar,
+  wordCrown,
   checkBadges,
   CAP,
   lastWord,
@@ -192,7 +193,8 @@ export class PracticeSession {
     this.busy = true;
     const c = this.c;
     const wasC = charCleared(c),
-      wasW = wordStar(this.word);
+      wasW = wordStar(this.word),
+      wasG = wordCrown(this.word);
     record(c, r.mode);
     const st = r.mode === 'trace' ? 3 : stars(r.score);
     if (r.mode === 'free') recordStar(c, st);
@@ -225,7 +227,8 @@ export class PracticeSession {
       if (next) this.select(this.i, next);
       else if (k >= 0) this.select(k, 'test');
       else if (r.mode !== 'test' && this.i < this.chars.length - 1) this.select(this.i + 1);
-      else this.complete = true;
+      // 完了モーダルは新しく星か王冠を取ったときだけ。クリア済みの単語をやり直したときは出さない
+      else if (!wasW || (!wasG && wordCrown(this.word))) this.complete = true;
     }, wait);
   }
 

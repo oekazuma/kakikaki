@@ -79,6 +79,28 @@ describe('PracticeSession', () => {
     expect(s.complete).toBe(true);
   });
 
+  it('クリア済みの単語をやり直しても完了モーダルは出ない。王冠を新しく取ったときは出る', () => {
+    for (const c of 'ばす') clear(c);
+    const s = new PracticeSession(bus);
+    expect([s.i, s.mode]).toEqual([0, 'trace']);
+    s.select(1, 'free');
+    s.done(ok('free', 0.9));
+    vi.runAllTimers();
+    expect(s.complete).toBe(false);
+    s.select(0, 'test');
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect([s.i, s.mode, s.complete]).toEqual([1, 'test', false]);
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect([s.complete, wordCrown(bus)]).toEqual([true, true]); // 王冠は新しく取ったので出る
+    s.replay();
+    s.select(1, 'test');
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect(s.complete).toBe(false); // 王冠も取り済みなら出ない
+  });
+
   it('途中まで済んだ単語は残りの文字から再開し、クリア済みの単語は最初の なぞる から', () => {
     clear('ば');
     record('ば', 'test');
