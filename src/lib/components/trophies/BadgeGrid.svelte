@@ -24,12 +24,18 @@
         {@const ok = !!date}
         <div class={['card', 'badge', { ok, fresh: ok && isToday(date) }]}>
           {#if ok && isToday(date)}<span class="new">NEW!</span>{/if}
-          <span class="em">{b.emoji}</span>
-          <b>{b.name}</b>
-          <small>{b.desc}</small>
+          {#if b.secret && !ok}
+            <span class="em">❓</span>
+            <b>？？？</b>
+            <small>どこかに かくれているよ</small>
+          {:else}
+            <span class="em">{b.emoji}</span>
+            <b>{b.name}</b>
+            <small>{b.desc}</small>
+          {/if}
           {#if ok}
             <span class="date">{date.replaceAll('-', '/')} ゲット！</span>
-          {:else}
+          {:else if !b.secret}
             <Bar {have} {need} color="var(--teal)" />
             <span class="rest">あと {Math.max(0, need - have)}</span>
           {/if}

@@ -166,6 +166,12 @@ export class PracticeSession {
     return nextWordId(this.word);
   }
 
+  // かくし演出のあとなど、書き取り以外で条件を満たしたメダルを確定してトーストを出す
+  celebrate() {
+    const fresh = checkBadges();
+    if (fresh.length) this.showBadges(fresh, 0);
+  }
+
   done(r: Result) {
     if (this.busy) return;
     if (r.mode === 'test' && !r.ok) {

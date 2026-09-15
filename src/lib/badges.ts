@@ -14,7 +14,14 @@ export type Stats = {
   days: number; // 練習した日数
   streak: number; // 連続で練習した日数（3 ことば をまたいで数える）
   quiz: Record<string, number>; // read1 など → 正解数
+  // かくし要素（ことばをまたいで共有）: ふうせん ぽん の回数と自己ベスト、絵を跳び出させた回数、ピンボールの最高回数
+  balloons: number;
+  balloon: number;
+  eggs: number;
+  pinball: number;
 };
+export type SecretStats = Pick<Stats, 'balloons' | 'balloon' | 'eggs' | 'pinball'>;
+export const NO_SECRET: SecretStats = { balloons: 0, balloon: 0, eggs: 0, pinball: 0 };
 
 type Row = { name: string; chars: string[] };
 const ROWS_JA: Row[] = [
@@ -39,7 +46,8 @@ export function computeStats(
   charGold: (c: string) => boolean,
   dayCount: number,
   quiz: Record<string, number> = {},
-  streak = 0
+  streak = 0,
+  secret: SecretStats = NO_SECRET
 ): Stats {
   const wordStar = (w: Word) => lettersOf(w, l).every(charCleared);
   const wordCrown = (w: Word) => lettersOf(w, l).every(charGold);
@@ -52,7 +60,8 @@ export function computeStats(
     cats: Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c && wordStar(w)).length])),
     days: dayCount,
     quiz,
-    streak
+    streak,
+    ...secret
   };
 }
 
@@ -80,7 +89,8 @@ export const BADGE_GROUPS = [
   'はかせ',
   'おうかん',
   'クイズ',
-  'つづけた ひ'
+  'つづけた ひ',
+  'かくし'
 ] as const;
 export type BadgeGroup = (typeof BADGE_GROUPS)[number];
 
@@ -91,6 +101,7 @@ export type Badge = {
   name: string;
   desc: string;
   need: (s: Stats) => [have: number, need: number];
+  secret?: boolean; // 取るまで名前と条件を伏せる（実績画面では「？？？」、つぎの めだる にも出さない）
 };
 
 type Count = (id: string, group: BadgeGroup, emoji: string, name: string, desc: string, need: Badge['need']) => Badge;
@@ -173,14 +184,40 @@ export function badgesOf(l: Lang): Badge[] {
     count('days-7', 'つづけた ひ', '🗓️', '7にち れんしゅう', '7にち れんしゅうした', (s) => [s.days, 7]),
     count('days-30', 'つづけた ひ', '🎂', '30にち れんしゅう', '30にち れんしゅうした', (s) => [s.days, 30]),
     count('streak-3', 'つづけた ひ', '🔥', '3にち つづけた', '3にち つづけて れんしゅうした', (s) => [s.streak, 3]),
-    count('streak-7', 'つづけた ひ', '🏅', '7にち つづけた', '7にち つづけて れんしゅうした', (s) => [s.streak, 7])
+    count('streak-7', 'つづけた ひ', '🏅', '7にち つづけた', '7にち つづけて れんしゅうした', (s) => [s.streak, 7]),
+    ...[
+      count(
+        'balloon-found',
+        'かくし',
+        '🔍',
+        'かくしゲームを みつけた',
+        'かくれた ふうせんを みつけて あそんだ',
+        (s) => [Math.min(1, s.balloons), 1]
+      ),
+      count('balloon-100', 'かくし', '🎈', 'ふうせん 100てん', 'ふうせん ぽんで 100てん', (s) => [
+        Math.min(100, s.balloon),
+        100
+      ]),
+      count('balloon-300', 'かくし', '🎆', 'ふうせん 300てん', 'ふうせん ぽんで 300てん', (s) => [
+        Math.min(300, s.balloon),
+        300
+      ]),
+      count('egg-jump', 'かくし', '🖼️', 'とびだした！', 'たんごカードの えを 10かい タップして とびださせた', (s) => [
+        Math.min(1, s.eggs),
+        1
+      ]),
+      count('pinball-20', 'かくし', '🏓', 'ピンボール 20かい', 'とびだした えを はじいて かべに 20かい あてた', (s) => [
+        Math.min(20, s.pinball),
+        20
+      ])
+    ].map((b) => ({ ...b, secret: true }))
   ];
 }
 
 // つぎに近いメダル: 未獲得のうち達成率が最も高いもの（同率なら残りが少ないもの）
 export function nextBadge(badges: Badge[], s: Stats, earned: Record<string, string>): Badge | undefined {
   return badges
-    .filter((b) => !earned[b.id])
+    .filter((b) => !earned[b.id] && !b.secret)
     .map((b) => ({ b, r: b.need(s) }))
     .sort((x, y) => y.r[0] / y.r[1] - x.r[0] / x.r[1] || x.r[1] - x.r[0] - (y.r[1] - y.r[0]))[0]?.b;
 }

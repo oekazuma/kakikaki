@@ -64,11 +64,12 @@ describe('badges', () => {
           () => true,
           30,
           quiz,
-          7
+          7,
+          { balloons: 1, balloon: 300, eggs: 1, pinball: 20 }
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
-      expect(badgesOf(l).length).toBe(l === 'en' ? 49 : 54);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 54 : 59);
     }
   });
   it('need は [達成数, 必要数]', () => {
@@ -106,5 +107,29 @@ describe('badges', () => {
     expect(got).not.toHaveProperty(next.id);
     for (const b of badges) if (!(b.id in got)) expect(ratio(next)).toBeGreaterThanOrEqual(ratio(b));
     expect(nextBadge(badges, s, Object.fromEntries(badges.map((b) => [b.id, 'x'])))).toBeUndefined();
+  });
+
+  it('かくしメダル: ことばをまたいだ記録で解放され、取るまで つぎの めだる には出ない', () => {
+    const no = computeStats(
+      'ja',
+      () => false,
+      () => false,
+      0,
+      {},
+      0
+    );
+    expect(earnedBadges('ja', no).map((b) => b.id)).toEqual([]);
+    const s = computeStats(
+      'ja',
+      () => false,
+      () => false,
+      0,
+      {},
+      0,
+      { balloons: 1, balloon: 120, eggs: 1, pinball: 20 }
+    );
+    expect(earnedBadges('ja', s).map((b) => b.id)).toEqual(['balloon-found', 'balloon-100', 'egg-jump', 'pinball-20']);
+    expect(nextBadge(badgesOf('ja'), no, {})?.secret).toBeFalsy();
+    expect(badgesOf('ja').filter((b) => b.secret).length).toBe(5);
   });
 });

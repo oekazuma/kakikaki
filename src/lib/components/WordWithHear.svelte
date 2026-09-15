@@ -8,7 +8,7 @@
   import type { Word } from '$lib/words';
   // 練習画面の左上: 単語カードに、単語全体を読み上げるスピーカーを重ねる（右の きく は 1 文字だけ）。
   // かくし演出: カードを 10 回続けてタップ（2 秒あくと数え直し）するとイラストが画面を走る
-  let { word, size = 240 }: { word: Word; size?: number } = $props();
+  let { word, size = 240, onegg }: { word: Word; size?: number; onegg?: () => void } = $props();
   let speaking = $state(false);
   let taps = 0;
   let lastTap = 0;
@@ -44,7 +44,14 @@
   >
 </div>
 {#if egg}
-  <Bouncer {word} {from} onend={() => (egg = false)} />
+  <Bouncer
+    {word}
+    {from}
+    onend={() => {
+      egg = false;
+      onegg?.();
+    }}
+  />
 {/if}
 
 <style>
