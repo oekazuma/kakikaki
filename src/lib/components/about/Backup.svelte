@@ -39,8 +39,9 @@
     e.preventDefault();
     if (!pending || !gate) return;
     if (!gate.submit(ans)) return void (ans = '');
-    importAll(pending);
-    location.reload();
+    if (importAll(pending)) return location.reload();
+    pending = null;
+    error = '読み込めませんでした（保存できる容量を超えています）。いまの記録は元のままです。';
   }
 </script>
 
