@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PracticeSession, nextMode, nextWordId, resolveWord } from './practice.svelte';
+import { PracticeSession, nextMode, nextWordId, nextOpenWord, resolveWord } from './practice.svelte';
 import { record, reset, get, wordCrown } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
@@ -105,6 +105,12 @@ describe('PracticeSession', () => {
     expect(nextWordId(bus)).toBe('shinkansen');
     // 1 文字練習: あ の次はまだ終わっていない い
     expect(nextWordId(wordById('char-あ')!)).toBe('char-い');
+  });
+
+  it('nextOpenWord: 並び順で最初の未クリア単語', () => {
+    expect(nextOpenWord()?.id).toBe('dog'); // WORDS の先頭
+    for (const c of 'いぬ') clear(c);
+    expect(nextOpenWord()?.id).toBe('cat'); // 次の未クリア（ねこ が先頭から 2 番目）
   });
 
   it('resolveWord: その言語に無い文字の単語は既定の単語に戻す', () => {
