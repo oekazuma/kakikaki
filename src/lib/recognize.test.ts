@@ -48,25 +48,12 @@ describe('recognize', () => {
 
 describe('子どもがよくやる書き方', () => {
   const s = (c: string) => drawn(STROKES, c);
-  it('2 画をつなげて 1 画で書いても合格', () => {
-    const [a, b, ...rest] = s('き');
-    expect(passes('き', recognize([[...a, ...b], ...rest], T_JA))).toBe(true);
-  });
-  it('1 画を途中で離して 2 画にしても合格', () => {
-    const [a, ...rest] = s('し');
-    const h = a.length >> 1;
-    expect(passes('し', recognize([a.slice(0, h), a.slice(h), ...rest], T_JA))).toBe(true);
-  });
-  it('最後の画をなぞり直しても合格', () => {
-    const st = s('あ');
-    expect(passes('あ', recognize([...st, st[st.length - 1]], T_JA))).toBe(true);
-  });
   it('書き順が違っても合格', () => {
     const [a, b, ...rest] = s('た');
     expect(passes('た', recognize([b, a, ...rest], T_JA))).toBe(true);
   });
-  it('濁点や i の点はなぞり直しとして消えない', () => {
-    expect(recognize(s('が'), T_JA)[0].char).toBe('が');
-    expect(recognize(drawn(STROKES_EN, 'i'), T_EN)[0].char).toBe('i');
+  it('2 画をつなげて 1 画で書くと不合格（画数は見る）', () => {
+    const [a, b, ...rest] = s('き');
+    expect(passes('き', recognize([[...a, ...b], ...rest], T_JA))).toBe(false);
   });
 });
