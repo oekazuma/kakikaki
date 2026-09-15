@@ -2,7 +2,9 @@
   import { imageUrl } from '$lib/image';
   import { WORDS } from '$lib/words';
   // スプラッシュのおまけ: 5 回に 1 回くらい、どうぶつ のイラストが画面の下を右から左へ走り抜ける
-  const ANIMALS = WORDS.filter((w) => w.category === 'どうぶつ');
+  // 虫は走らせない（気持ち悪いと言われたため）
+  const BUGS = new Set(['ant', 'beetle', 'bee', 'ladybug', 'butterfly', 'snail']);
+  const ANIMALS = WORDS.filter((w) => w.category === 'どうぶつ' && !BUGS.has(w.id));
   const runner = Math.random() < 1 / 5 ? ANIMALS[Math.floor(Math.random() * ANIMALS.length)] : null;
 </script>
 
