@@ -3,7 +3,7 @@
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
-  import { SEION, GROUPS, ALPHABET, toKatakana } from '$lib/chars';
+  import { SEION, GROUPS, ALPHABET, DIGITS, toKatakana } from '$lib/chars';
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
@@ -55,7 +55,7 @@
     </div>
   {:else}
     <div class="en">
-      {#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)]] as const as [name, rows] (name)}
+      {#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)], ['すうじ', [DIGITS]]] as const as [name, rows] (name)}
         <section class="card group">
           <h2 class="ltr">{name}</h2>
           {#each rows as row (row.join(''))}

@@ -1,4 +1,16 @@
-import { CHARS, CHARS_EN, CHARS_KANA, SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, toKatakana } from './chars';
+import {
+  CHARS,
+  CHARS_EN,
+  CHARS_KANA,
+  SEION,
+  DAKUON,
+  HANDAKUON,
+  KOGAKI,
+  CHOON,
+  ALPHABET,
+  DIGITS,
+  toKatakana
+} from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
 import { LEVEL_NAME } from './quiz';
@@ -30,10 +42,10 @@ const ROWS_JA: Row[] = [
   { name: 'はんだくおん', chars: HANDAKUON.flat().filter(Boolean) },
   { name: 'ちいさいもじ', chars: [...KOGAKI.flat().filter(Boolean), ...CHOON.flat().filter(Boolean)] }
 ];
-const ROWS_EN: Row[] = ALPHABET.flatMap((row) => [row.slice(0, 7), row.slice(7)]).map((chars) => ({
-  name: chars.join(''),
-  chars
-}));
+const ROWS_EN: Row[] = [
+  ...ALPHABET.flatMap((row) => [row.slice(0, 7), row.slice(7)]).map((chars) => ({ name: chars.join(''), chars })),
+  { name: 'すうじ', chars: DIGITS }
+];
 const ROWS_KANA: Row[] = ROWS_JA.map((r) => ({ name: toKatakana(r.name), chars: r.chars.map(toKatakana) }));
 export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, en: ROWS_EN };
 const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, kana: CHARS_KANA, en: CHARS_EN };

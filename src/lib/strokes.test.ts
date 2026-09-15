@@ -20,8 +20,8 @@ describe('STROKES', () => {
     expect(STROKES['ー'].length).toBe(1);
     expect(STROKES['ぱ'].length).toBe(4);
   });
-  it('英語 52 文字は線の太さ（14）を含めて 109 マスに収まり、各画に長さがある', () => {
-    expect(CHARS_EN.length).toBe(52);
+  it('英語 62 文字（アルファベット + 数字）は線の太さ（14）を含めて 109 マスに収まり、各画に長さがある', () => {
+    expect(CHARS_EN.length).toBe(62);
     const m = 7;
     for (const c of CHARS_EN) {
       for (const d of STROKES_EN[c]) {
