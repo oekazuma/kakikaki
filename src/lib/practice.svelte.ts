@@ -8,6 +8,7 @@ import {
   charGold,
   wordStar,
   checkBadges,
+  CAP,
   type Mode
 } from './progress.svelte';
 import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
@@ -58,7 +59,7 @@ export function resolveWord(id: string | null, l: Lang): Word {
 // その文字で次にやるべきモード。クリア（なぞる 2 回 + じぶんでかく）済みなら null。おてほんなし は挑戦として別枠
 export function nextMode(ch: string): Mode | null {
   const p = get(ch);
-  return p.trace < 2 ? 'trace' : p.free < 1 ? 'free' : null;
+  return p.trace < CAP.trace ? 'trace' : p.free < CAP.free ? 'free' : null;
 }
 
 const wordDone = (w: Word) => lettersOf(w).every((ch) => nextMode(ch) === null);

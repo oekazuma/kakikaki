@@ -19,7 +19,7 @@ type Data = {
   quiz: Record<string, number>;
 };
 
-const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
+export const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
 const key = (l: Lang, name: keyof Data) => keyOf(profiles.cur, l, name);
 
 const isDays = (v: unknown) => Array.isArray(v) && v.every((d) => typeof d === 'string');
