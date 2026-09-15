@@ -12,7 +12,7 @@
 
 <header>
   <BackButton onclick={guard ? () => (asking = true) : undefined} />
-  <h1>{title} <small>{LEVEL_NAME[level]}</small></h1>
+  <h1>{title} <span class="sub">{LEVEL_NAME[level]}</span></h1>
   <span class="prog">{Math.min(i + 1, total)} / {total}</span>
 </header>
 
@@ -39,7 +39,7 @@
     font-size: 22px;
     flex: 1;
   }
-  small {
+  .sub {
     font-size: 14px;
     color: var(--sub);
     margin-left: 6px;

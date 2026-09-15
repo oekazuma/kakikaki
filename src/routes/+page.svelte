@@ -1,7 +1,8 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { base, resolve } from '$app/paths';
+  import { resolve } from '$app/paths';
   import { practiceUrl } from '$lib/nav';
+  import { logoUrl } from '$lib/image';
   import { fly } from 'svelte/transition';
   import WordCard from '$lib/components/WordCard.svelte';
   import ContinueCard from '$lib/components/ContinueCard.svelte';
@@ -32,13 +33,7 @@
   <header>
     {#key lang.v}
       <h1 in:fly={{ y: -16, duration: 300 }}>
-        <img
-          src="{base}/logo-mark{lang.v === 'ja' ? '' : `-${lang.v}`}.svg"
-          alt=""
-          width="52"
-          height="52"
-          loading="eager"
-        /><span class="kaki">かきかき</span>
+        <img src={logoUrl(lang.v)} alt="" width="52" height="52" loading="eager" /><span class="kaki">かきかき</span>
         <span class="hira">{info().short}</span>
       </h1>
     {/key}

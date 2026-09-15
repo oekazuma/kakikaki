@@ -91,6 +91,8 @@
     <img
       src={img.src}
       alt=""
+      width={img.naturalWidth}
+      height={img.naturalHeight}
       style:width="{w}px"
       style:height="{h}px"
       style:transform="translate({ox}px, {oy}px)"

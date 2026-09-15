@@ -7,6 +7,7 @@
   import { summaryOf } from '$lib/progress.svelte';
   // 最終確認: 誰の・どのことばの・何が消えるかを数字で見せ、チェックを入れないと削除できない。
   // mode 'records' はことば 1 つの記録、'person' は人ごと（全ことばの記録とアバター）
+  const uid = $props.id();
   let {
     pid,
     langs = LANGS,
@@ -41,8 +42,8 @@
 </script>
 
 <div class="dim" transition:fade={{ duration: 150 }} role="presentation" onclick={oncancel}></div>
-<section class="card confirm" transition:scale={{ duration: 200, start: 0.9 }} aria-labelledby="rc-title">
-  <h2 id="rc-title">
+<section class="card confirm" transition:scale={{ duration: 200, start: 0.9 }} aria-labelledby={uid}>
+  <h2 id={uid}>
     <Icon name="trash" size={24} />
     {mode === 'person' ? 'この人を本当に削除しますか？' : '本当に削除しますか？'}
   </h2>
