@@ -33,7 +33,7 @@ export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string
     id: 'test',
     icon: 'star',
     label: 'おてほんなし',
-    hint: 'おもいだして かいてみよう。こまったら みぎの「みる」',
+    hint: 'おもいだして かいてみよう',
     title: 'おてほんなしで かいてみよう！'
   }
 ];
@@ -87,8 +87,6 @@ export class PracticeSession {
   drive = $state(false);
   toast = $state<Badge | null>(null);
   shaking = $state(-1); // 鍵つきタブを押したとき横に揺らす
-  peek = $state(false); // おてほんなし で「みる」を押して字を見せている間
-  private peekTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     readonly word: Word,
@@ -121,15 +119,7 @@ export class PracticeSession {
     this.stroke = 0;
     this.msg = '';
     this.drawn = false;
-    this.peek = false;
     this.gen++;
-  }
-
-  // おてほんなし で困ったとき、字を 2 秒だけ見せる
-  peekSample(ms = 2000) {
-    this.peek = true;
-    clearTimeout(this.peekTimer);
-    this.peekTimer = setTimeout(() => (this.peek = false), ms);
   }
 
   // 鍵つきタブなら揺らして false

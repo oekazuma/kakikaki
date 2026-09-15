@@ -33,8 +33,6 @@
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const total = $derived(strokes[s.c].length);
-  // みる: なぞる・じぶんでかく では書き順を再生、おてほんなし では字を 2 秒だけ見せる
-  const show = () => (s.mode === 'test' ? s.peekSample() : canvas?.playDemo());
 
   // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
   async function hear() {
@@ -72,7 +70,7 @@
     <ModeBar mode={s.mode} onselect={(m) => s.select(s.i, m)} />
     <div class="board card">
       {#if s.mode === 'test'}
-        <Sample char={s.c} strokes={total} show={s.peek} />
+        <Sample strokes={total} />
       {:else}
         <span class="count">{Math.min(s.stroke + 1, total)} / {total}</span>
       {/if}
@@ -94,7 +92,9 @@
 
   <div class="right">
     <ActionButton icon="speaker" label="きく" active={speaking} onclick={hear} />
-    <ActionButton icon="eye" label="みる" active={s.peek} onclick={show} />
+    {#if s.mode !== 'test'}
+      <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
+    {/if}
     <ActionButton icon="redo" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
     {#if s.mode === 'test'}
       <ActionButton icon="check" label="できた" done ready={s.drawn} onclick={() => canvas?.judge()} />
