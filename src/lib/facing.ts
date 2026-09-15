@@ -1,5 +1,5 @@
 // 横向きに描かれているイラストの向き（Twemoji は左向きが多い）。走る向きと合わないときは左右反転する
-const LEFT = new Set([
+export const LEFT = new Set([
   'giraffe',
   'sheep',
   'horse',
@@ -23,6 +23,6 @@ const LEFT = new Set([
   'elephant',
   'squirrel'
 ]);
-const RIGHT = new Set(['kangaroo']);
+export const RIGHT = new Set(['kangaroo']);
 // dir の向きに進むとき反転が必要か（正面向きの絵はどちらでもそのまま）
 export const flipFor = (id: string, dir: 'left' | 'right') => (dir === 'right' ? LEFT.has(id) : RIGHT.has(id));

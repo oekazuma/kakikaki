@@ -1,13 +1,40 @@
 import { describe, it, expect } from 'vitest';
-import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices } from './quiz';
+import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, type ReadQ } from './quiz';
 import { WORDS, wordById } from './words';
-import { lettersOf } from './lang.svelte';
+import { lettersOf, nameOf, LANGS, type Lang } from './lang.svelte';
 
 // 決定的な乱数
 const seeded =
   (s = 1) =>
   () =>
     (s = (s * 9301 + 49297) % 233280) / 233280;
+
+// 5 形式の性質を検証し、形式ごとの出題数を返す（等価比較は呼び出し側の級に委ねる）
+function checkRead(l: Lang, level: 1 | 2 | 3, qs: ReadQ[]) {
+  expect(qs.length).toBe(10);
+  expect(new Set(qs.map((q) => q.answer.id)).size).toBe(10);
+  const count: Record<string, number> = {};
+  for (const q of qs) {
+    count[q.kind] = (count[q.kind] ?? 0) + 1;
+    if (q.kind === 'blank') {
+      expect(q.letters!.length).toBe(3);
+      expect(new Set(q.letters).size).toBe(3);
+      expect(q.letters).toContain(q.key);
+      expect(lettersOf(q.answer, l)[q.blank!]).toBe(q.key);
+    } else {
+      expect(q.key).toBe(q.answer.id);
+      expect(q.choices.length).toBe(3);
+      expect(q.choices.some((c) => c.id === q.answer.id)).toBe(true);
+      expect(new Set(q.choices.map((c) => c.id)).size).toBe(3);
+      for (const c of q.choices) expect(levelOf(c, l)).toBe(level);
+    }
+    if (q.kind === 'initial') {
+      const first = lettersOf(q.answer, l)[0];
+      for (const c of q.choices) if (c.id !== q.answer.id) expect(lettersOf(c, l)[0]).not.toBe(first);
+    }
+  }
+  return count;
+}
 
 describe('quiz', () => {
   it('級ごとに 50 語以上あり、全単語がどれかの級に入る', () => {
@@ -21,30 +48,23 @@ describe('quiz', () => {
     expect(levelOf(wordById('shinkansen')!, 'ja')).toBe(3);
   });
   it('よみクイズは 10 問、5 形式が 2 回ずつ、3 択で正解を含み、重複なし', () => {
-    const qs = makeReadQuiz('ja', 2, 10, seeded());
-    expect(qs.length).toBe(10);
-    expect(new Set(qs.map((q) => q.answer.id)).size).toBe(10);
-    const count: Record<string, number> = {};
-    for (const q of qs) {
-      count[q.kind] = (count[q.kind] ?? 0) + 1;
-      if (q.kind === 'blank') {
-        expect(q.letters!.length).toBe(3);
-        expect(new Set(q.letters).size).toBe(3);
-        expect(q.letters).toContain(q.key);
-        expect(lettersOf(q.answer, 'ja')[q.blank!]).toBe(q.key);
-      } else {
-        expect(q.key).toBe(q.answer.id);
-        expect(q.choices.length).toBe(3);
-        expect(q.choices.some((c) => c.id === q.answer.id)).toBe(true);
-        expect(new Set(q.choices.map((c) => c.id)).size).toBe(3);
-        for (const c of q.choices) expect(levelOf(c, 'ja')).toBe(2);
-      }
-      if (q.kind === 'initial') {
-        const first = lettersOf(q.answer, 'ja')[0];
-        for (const c of q.choices) if (c.id !== q.answer.id) expect(lettersOf(c, 'ja')[0]).not.toBe(first);
-      }
-    }
+    const count = checkRead('ja', 2, makeReadQuiz('ja', 2, 10, seeded()));
     expect(count).toEqual({ word: 2, picture: 2, listen: 2, initial: 2, blank: 2 });
+  });
+  it('3 ことば × 3 級 とも 10 問・3 択・重複なし・正解を含む', () => {
+    for (const l of LANGS)
+      for (const level of [1, 2, 3] as const)
+        for (const seed of [1, 2, 3]) {
+          const count = checkRead(l, level, makeReadQuiz(l, level, 10, seeded(seed)));
+          if (level === 1) {
+            // ja/kana の級 1 には 1 文字の語があり、blank が word に振り替わる（quiz.test.ts の別テストが検証済み）
+            expect(count.blank ?? 0).toBeLessThanOrEqual(2);
+            expect(count.word).toBeGreaterThanOrEqual(2);
+            expect(Object.values(count).reduce((a, b) => a + b, 0)).toBe(10);
+          } else {
+            expect(count).toEqual({ word: 2, picture: 2, listen: 2, initial: 2, blank: 2 });
+          }
+        }
   });
   it('1 文字の語は穴埋めにせず、英語の穴埋めは大文字小文字を合わせる', () => {
     for (const q of makeReadQuiz('ja', 1, 20, seeded(5)))
@@ -72,5 +92,16 @@ describe('quiz', () => {
     expect(ws.map((q) => q.kind)).toEqual(['picture', 'listen', 'picture', 'listen', 'picture']);
     expect(new Set(ws.map((q) => q.word.id)).size).toBe(5);
     for (const { word } of ws) expect(lettersOf(word, 'en').length).toBeLessThanOrEqual(4);
+  });
+  it('表示名が同じ 2 語は同じカテゴリに置かない（よみクイズの選択肢に並ぶと区別できない）', () => {
+    for (const l of LANGS) {
+      const seen = new Map<string, string>(); // name → category
+      for (const w of WORDS) {
+        const n = nameOf(w, l);
+        const c = seen.get(n);
+        if (c !== undefined) expect(c, `${n} (${l})`).not.toBe(w.category);
+        seen.set(n, w.category);
+      }
+    }
   });
 });

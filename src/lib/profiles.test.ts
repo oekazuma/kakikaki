@@ -108,4 +108,19 @@ describe('profiles', () => {
     expect(p2b.id).toBe(p2.id); // id は再利用される
     expect(b.ranking(m.profiles.list).map((r) => r.id)).toEqual(['p1']);
   });
+
+  it('容量超過で保存できないときは追加・更新を巻き戻す', async () => {
+    const m = await fresh();
+    const spy = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
+      throw new DOMException('quota', 'QuotaExceededError');
+    });
+    try {
+      expect(m.addProfile('はな')).toBeNull();
+      expect(m.profiles.list.length).toBe(1);
+      expect(m.updateProfile('p1', { name: 'たろう' })).toBe(false);
+      expect(m.current().name).toBe('わたし');
+    } finally {
+      spy.mockRestore();
+    }
+  });
 });
