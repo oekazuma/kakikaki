@@ -58,11 +58,13 @@ Status values: TODO | IN PROGRESS | DONE | BLOCKED (理由 1 行) | REJECTED (�
 
 019 の install の非原子化は取り込み後に一部を戻した。build（ハッシュ付き JS/CSS）と prerendered（殻 HTML）は版が揃わないと起動しないので `addAll` でまとめて入れ、1 件でも失敗したら install を失敗させて前の版を残す。`Promise.allSettled` は files（イラスト・フォント・効果音）だけに使う。全部を `allSettled` にすると、デプロイ直後に CDN の古い HTML と新しい JS が混ざった状態でも install が成功して古い正常なキャッシュを消してしまうため。
 
-残っている手作業。
+取り込み後に済んだこと。
 
-- `oekazuma/hitoiki` の Service Worker にも同じ接頭辞フィルタを入れる（019 の Maintenance notes）。片側だけでは かきかき のキャッシュが消され続ける。
-- `docs/intro.gif` の再描画（`cd video && pnpm render` → ffmpeg）。022 で動画ソースのメダル総数を消したが GIF は古いまま。
-- 実機での目視。020 の DriveBy の向き・読み上げの点灯、023 のカードのタップ遷移。
+- `oekazuma/hitoiki` の Service Worker にも同じ接頭辞フィルタ（`hitoiki-`）と install の形（build + prerendered は `addAll`、files だけ `allSettled`）が入った（hitoiki の `05cc8af`）。実ブラウザで `kk-test` が残り `hitoiki-old` だけ消えることを確認済み。
+- `docs/intro.gif` を描画し直した（`faf76f8`）。
+- 023 の「つづきから」は、人 × ことば ごとに最後に練習に入った単語を `kk:<pid>:<lang>:last` に覚え、その単語がやりかけのときだけ出す形に変えた（`24b7cec` / `1fe5fe7`）。
+
+残っている手作業は iPad 実機での目視だけ（020 の走る絵の向きと読み上げの点灯）。
 
 ## Dependency notes
 
