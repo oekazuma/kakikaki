@@ -110,6 +110,10 @@ export class PracticeSession {
   drive = $state(false);
   toast = $state<Badge | null>(null);
   shaking = $state(-1); // 鍵つきタブを押したとき横に揺らす
+  // 演出と自動進行のタイマー。画面を離れたあとに紙吹雪やトーストが他の画面で出ないよう、dispose() で全部止める。
+  // 描画には使わないので反応性は不要
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
+  private timers = new Set<ReturnType<typeof setTimeout>>();
 
   constructor(
     readonly word: Word,
@@ -122,6 +126,19 @@ export class PracticeSession {
         this.chars.findIndex((ch) => nextMode(ch) !== null)
       )
     );
+  }
+
+  private later(fn: () => void, ms: number) {
+    const t = setTimeout(() => {
+      this.timers.delete(t);
+      fn();
+    }, ms);
+    this.timers.add(t);
+  }
+
+  dispose() {
+    for (const t of this.timers) clearTimeout(t);
+    this.timers.clear();
   }
 
   get c() {
@@ -209,24 +226,24 @@ export class PracticeSession {
     if (!wasC && charCleared(c)) {
       this.fx.confetti?.(120);
       this.flyStar = true;
-      setTimeout(() => (this.flyStar = false), 900);
+      this.later(() => (this.flyStar = false), 900);
     }
     let wait = 1200;
     if (!wasW && wordStar(this.word)) {
       wait = 2600;
-      setTimeout(() => {
+      this.later(() => {
         this.drive = true;
         this.fx.confetti?.(300);
         this.fx.fanfare?.();
       }, 600);
-      setTimeout(() => (this.drive = false), 2600);
+      this.later(() => (this.drive = false), 2600);
     }
     const fresh = checkBadges();
     if (fresh.length) {
       this.showBadges(fresh, wait);
       wait += fresh.length * 2600;
     }
-    setTimeout(() => {
+    this.later(() => {
       this.busy = false;
       const next = nextMode(c);
       const k = r.mode === 'test' ? this.chars.findIndex((ch, n) => n > this.i && !charGold(ch)) : -1;
@@ -240,12 +257,12 @@ export class PracticeSession {
 
   private showBadges(list: Badge[], delay: number) {
     list.forEach((b, k) => {
-      setTimeout(
+      this.later(
         () => {
           this.toast = b;
           this.fx.confetti?.(150);
           this.fx.fanfare?.();
-          setTimeout(() => (this.toast = null), 2400);
+          this.later(() => (this.toast = null), 2400);
         },
         delay + k * 2600
       );

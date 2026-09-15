@@ -51,6 +51,20 @@ describe('PracticeSession', () => {
     expect(get('ば').star).toBe(3);
   });
 
+  it('dispose() で待っている演出と自動進行を全部止める（画面を離れたあとに紙吹雪が降らない）', () => {
+    const fx = { confetti: vi.fn(), fanfare: vi.fn() };
+    const s = new PracticeSession(bus, fx);
+    record('ば', 'trace');
+    record('ば', 'trace');
+    s.done(ok('free', 0.9)); // 文字クリア → はじめの いっぽ のメダル
+    expect(fx.confetti).toHaveBeenCalledTimes(1);
+    s.dispose();
+    vi.runAllTimers();
+    expect(fx.confetti).toHaveBeenCalledTimes(1);
+    expect(fx.fanfare).not.toHaveBeenCalled();
+    expect([s.toast, s.busy, s.i]).toEqual([null, true, 0]);
+  });
+
   it('完了モーダルから おてほんなし に挑戦でき、通ると次の文字の おてほんなし へ進んで王冠になる', () => {
     clear('ば');
     const s = new PracticeSession(bus);

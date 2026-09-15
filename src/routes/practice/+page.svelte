@@ -31,6 +31,11 @@
     return untrack(() => new PracticeSession(word, effects));
   });
   $effect(() => rememberWord(word));
+  // 単語が切り替わったときと画面を離れるときに、待っている演出（メダルのトーストと紙吹雪）を止める
+  $effect(() => {
+    const cur = s;
+    return () => cur.dispose();
+  });
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const total = $derived(strokes[s.c].length);
