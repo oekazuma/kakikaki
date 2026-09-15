@@ -8,7 +8,7 @@ const PREFIX = 'kk:';
 
 const keys = () => Object.keys(localStorage).filter((k) => k.startsWith(PREFIX));
 
-// 常識外のファイルを弾く上限（正規の書き出しは写真込みでも 1〜2MB、キーは 130 個程度）
+// 常識外のファイルを弾く上限（正規の書き出しは写真込みでも 1〜2MB、キーは 160 個程度）
 const MAX_KEYS = 400;
 const MAX_BYTES = 8 * 1024 * 1024; // text.length（UTF-16 単位）で比べる。厳密なバイト数ではなく目安の上限
 

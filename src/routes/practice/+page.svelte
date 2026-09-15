@@ -18,6 +18,7 @@
   import DriveBy from '$lib/components/DriveBy.svelte';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { PracticeSession, resolveWord } from '$lib/practice.svelte';
+  import { rememberWord } from '$lib/progress.svelte';
   import { speaker, sfx, readingOf } from '$lib/audio';
   import { fx } from '$lib/fx';
 
@@ -29,6 +30,7 @@
     void word.id;
     return untrack(() => new PracticeSession(word, effects));
   });
+  $effect(() => rememberWord(word));
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const total = $derived(strokes[s.c].length);
