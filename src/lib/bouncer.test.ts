@@ -11,7 +11,8 @@ describe('ピンボール', () => {
     expect(b.phase).toBe('done');
   });
   it('弾くと上へ飛び、端で跳ね返り、LIFE 秒で消える。弾くたびに速くなる', () => {
-    const b = new Bouncer(1000, 700, () => 0.5);
+    let r = 0.5; // 0.5 は真上、0.2 は右上へ
+    const b = new Bouncer(1000, 700, () => r);
     b.tick(1);
     const y0 = b.y;
     b.kick();
@@ -24,11 +25,11 @@ describe('ピンボール', () => {
     b.tick(0.1);
     expect(b.y).toBeGreaterThan(0);
     const x1 = b.x;
+    r = 0.2;
     b.kick();
     b.tick(0.1);
-    const d1 = Math.hypot(b.x - x1, 0);
     expect(b.kicks).toBe(2);
-    expect(d1).toBeGreaterThan(0);
+    expect(b.x).toBeGreaterThan(x1);
     // 何もしないと LIFE 秒で終わる。画面内に留まる
     for (let t = 0; t < LIFE + 0.5; t += 0.05) {
       b.tick(0.05);
