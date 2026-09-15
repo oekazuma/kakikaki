@@ -2,8 +2,6 @@
 
 > 2026-09-13 時点の初期計画。すべて実装済みで、現行仕様は `CLAUDE.md` が正。
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
-
 **Goal:** iPad 横画面用のひらがな書き練習 PWA を SvelteKit で作り、GitHub Pages に公開する。
 
 **Architecture:** 純粋関数（幾何・判定・採点・認識）を `src/lib/*.ts` に置き vitest で守る。UI は Svelte 5 コンポーネント、状態は `localStorage` 直結の `$state`。書き順は KanjiVG から生成した静的データ。

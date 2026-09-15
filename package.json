@@ -18,7 +18,8 @@
     "images": "node scripts/fetch-images.ts",
     "icon": "node scripts/make-icon.ts",
     "vitals": "svelte-vitals .",
-    "verify": "pnpm lint && pnpm check && pnpm test:run && pnpm vitals"
+    "check:video": "pnpm --dir video check",
+    "verify": "pnpm lint && pnpm check && pnpm test:run && pnpm vitals && pnpm build"
   },
   "packageManager": "pnpm@12.3.4",
   "devEngines": {
