@@ -199,6 +199,11 @@ export function summaryOf(pid: string, l: Lang): Summary {
   return { chars, gold, words, crowns, medals, days, quiz: Object.values(quiz).reduce((a, b) => a + b, 0) };
 }
 
+// 削除の最終確認用: かくし要素（ことばをまたいで共有のためことば別ではなく人単位）
+export function secretSummary(pid: string): { balloon: number; pinball: number } {
+  return { balloon: loadBests()[pid]?.score ?? 0, pinball: secretOf(pid).pinball };
+}
+
 // 新しく条件を満たしたメダルを獲得済みにして返す
 export function checkBadges(): Badge[] {
   const fresh = earnedBadges(lang.v, stats()).filter((b) => !earned()[b.id]);

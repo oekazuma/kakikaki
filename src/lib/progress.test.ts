@@ -17,7 +17,8 @@ import {
   streakOf,
   checkBadges,
   earned,
-  summaryOf
+  summaryOf,
+  secretSummary
 } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
@@ -164,5 +165,17 @@ describe('progress', () => {
     expect(summaryOf('p2', 'ja')).toMatchObject({ chars: 2, gold: 1, quiz: 3 });
     expect(summaryOf('p1', 'ja').chars).toBe(0);
     expect(detailOf('p2', 'ja').rows['あいうえお']).toBe(2);
+  });
+  it('secretSummary: ふうせん ぽん の自己ベストとピンボールの最高回数（人単位、ことば非依存）', async () => {
+    try {
+      localStorage.setItem('kk:balloon', JSON.stringify({ p1: { score: 120, date: '2026-09-15' } }));
+      const { recordPinball } = await import('./secret');
+      recordPinball('p1', 42);
+      expect(secretSummary('p1')).toEqual({ balloon: 120, pinball: 42 });
+      expect(secretSummary('p2')).toEqual({ balloon: 0, pinball: 0 });
+    } finally {
+      localStorage.removeItem('kk:balloon');
+      localStorage.removeItem('kk:secret');
+    }
   });
 });

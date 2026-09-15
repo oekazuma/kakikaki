@@ -4,7 +4,7 @@
   import Icon from './Icon.svelte';
   import { LANGS, info, type Lang } from '$lib/lang.svelte';
   import { byId } from '$lib/profiles.svelte';
-  import { summaryOf } from '$lib/progress.svelte';
+  import { summaryOf, secretSummary } from '$lib/progress.svelte';
   // 最終確認: 誰の・どのことばの・何が消えるかを数字で見せ、チェックを入れないと削除できない。
   // mode 'records' はことば 1 つの記録、'person' は人ごと（全ことばの記録とアバター）
   const uid = $props.id();
@@ -38,6 +38,8 @@
     ['練習した日', total('days')],
     ['クイズの正解数', total('quiz')]
   ]);
+  // かくし要素の記録は人単位（resetRecords / deleteProfile が実際に消す条件と揃える）
+  const secret = $derived(mode === 'person' || langs.length === LANGS.length ? secretSummary(pid) : null);
   let agreed = $state(false);
 </script>
 
@@ -61,6 +63,9 @@
       {/each}
     </tbody>
   </table>
+  {#if secret && (secret.balloon > 0 || secret.pinball > 0)}
+    <p>かくし要素: ふうせん ぽん の自己ベスト {secret.balloon} てん・ピンボール {secret.pinball} かい</p>
+  {/if}
   {#if mode === 'person'}
     <p>
       ひらがな・かたかな・えいご の上の記録と、名前・アバターがすべて消えます。<b>元に戻せません。</b
