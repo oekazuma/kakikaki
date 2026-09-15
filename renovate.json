@@ -4,7 +4,8 @@
   "minimumReleaseAge": "3 days",
   "labels": ["renovate"],
   "lockFileMaintenance": {
-    "enabled": true
+    "enabled": true,
+    "automerge": true
   },
   "rangeStrategy": "bump",
   "platformAutomerge": true,
