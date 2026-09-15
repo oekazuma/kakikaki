@@ -21,7 +21,7 @@
   $effect(() => b.resize(vp.w, vp.h));
   let celebrated = false;
   $effect(() => {
-    recordEgg(profiles.cur);
+    untrack(() => recordEgg(profiles.cur));
     let raf = 0;
     let last = performance.now();
     const loop = (t: number) => {
@@ -39,7 +39,11 @@
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    // もどる で離脱しても壁当て回数は残す（recordPinball は Math.max なので冪等）
+    return () => {
+      cancelAnimationFrame(raf);
+      recordPinball(profiles.cur, b.hits);
+    };
   });
   function kick(e: PointerEvent) {
     unlock();

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { imageUrl } from '$lib/image';
+  import { flipFor } from '$lib/facing';
   import type { Word } from '$lib/words';
   // 単語クリア時にイラストが画面下を走り抜ける
   let { word, onend }: { word: Word; onend: () => void } = $props();
@@ -12,6 +13,7 @@
   width="280"
   height="200"
   loading="eager"
+  style:scale={flipFor(word.id, 'right') ? '-1 1' : '1 1'}
   onerror={onend}
   onanimationend={onend}
 />

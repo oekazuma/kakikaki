@@ -106,4 +106,12 @@ describe('Tracer おてほんなし', () => {
     expect(bad.ok).toBe(false);
     expect(bad.top).not.toBe('あ');
   });
+  it('同じ線で二度は判定しない。線を足せばまた判定できる', () => {
+    const t = new Tracer('あ', STROKES, 'test');
+    drag(t, strokePts('あ', 0));
+    expect(t.judge()).not.toBeNull();
+    expect(t.judge()).toBeNull();
+    drag(t, strokePts('あ', 1));
+    expect(t.judge()).not.toBeNull();
+  });
 });

@@ -19,7 +19,7 @@ type Data = {
   quiz: Record<string, number>;
 };
 
-const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
+export const CAP: Record<Mode, number> = { trace: 2, free: 1, test: 1 };
 const key = (l: Lang, name: keyof Data) => keyOf(profiles.cur, l, name);
 
 const isDays = (v: unknown) => Array.isArray(v) && v.every((d) => typeof d === 'string');
@@ -116,6 +116,11 @@ export function resetRecords(pid: string, langs: Lang[]) {
   for (const l of langs) {
     for (const name of DATA_NAMES) removeKey(keyOf(pid, l, name));
     if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {} };
+  }
+  // ことばをまたぐ かくし要素の記録は「すべて」のときだけ消す（1 ことば だけのリセットでは残す）
+  if (langs.length === LANGS.length) {
+    removeSecret(pid);
+    removeBest(pid);
   }
 }
 // 現在の人・言語の記録だけ消す
