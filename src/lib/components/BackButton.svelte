@@ -12,7 +12,10 @@
 {/if}
 
 <style>
+  /* かくし演出（Bouncer）の覆い（z-index 59）より上に置き、演出中も戻れるようにする */
   .back {
+    position: relative;
+    z-index: 61;
     display: flex;
     align-items: center;
     gap: 8px;

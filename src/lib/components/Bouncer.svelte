@@ -6,7 +6,8 @@
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
   import type { Word } from '$lib/words';
-  // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。イラスト以外はポインタを通す
+  // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。
+  // 出ている間は透明な覆いで他の操作を止める（もどる だけは覆いより上に置いてある）
   let { word, from, onend }: { word: Word; from: { x: number; y: number }; onend: () => void } = $props();
   const b = new Bouncer(
     untrack(() => vp.w),
@@ -34,6 +35,7 @@
   }
 </script>
 
+<div class="shield" role="presentation"></div>
 <img
   class="bouncer"
   src={imageUrl(word)}
@@ -47,6 +49,12 @@
 />
 
 <style>
+  .shield {
+    position: fixed;
+    inset: 0;
+    z-index: 59;
+    touch-action: none;
+  }
   .bouncer {
     position: fixed;
     left: 0;
