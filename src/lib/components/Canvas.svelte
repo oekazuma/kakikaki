@@ -11,6 +11,7 @@
     char,
     strokes,
     mode,
+    accept,
     onDone,
     onStroke,
     onDrawn
@@ -18,13 +19,14 @@
     char: string;
     strokes: Record<string, string[]>;
     mode: Mode;
+    accept?: string[]; // おてほんなし で正解にする字（省略時は char だけ）
     onDone: (r: Result) => void;
     onStroke?: (i: number) => void;
     onDrawn?: (has: boolean) => void; // おてほんなし で線が 1 本以上あるか（できた を押せるか）
   } = $props();
 
   // 文字・モードの切替は親が {#key} で再マウントするので、判定器は初期値で 1 回だけ作る
-  const t = untrack(() => new Tracer(char, strokes, mode));
+  const t = untrack(() => new Tracer(char, strokes, mode, accept));
   let board = $state<Board>();
   let shake = $state(false);
   let bounce = $state(-1);
