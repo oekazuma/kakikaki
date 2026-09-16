@@ -107,6 +107,20 @@ describe('PracticeSession', () => {
     expect(openWords()).toEqual([]);
   });
 
+  it('やりかけの単語は、おてほんなし をどの順で通しても全文字が金星になれば星と王冠が付く', () => {
+    for (const c of ['ば', 'す']) for (const m of ['trace', 'trace', 'free'] as const) record(c, m);
+    const s = new PracticeSession(bus);
+    s.done(ok('trace')); // 1 文字でも書けば やりかけ
+    vi.runAllTimers();
+    s.select(1, 'test'); // 最後の文字の おてほんなし を先に
+    record('す', 'test');
+    s.select(0, 'test');
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect([s.complete, wordStar(bus), wordCrown(bus)]).toEqual([true, true, true]);
+    expect(openWords()).toEqual([]);
+  });
+
   it('クリア済みの単語をやり直しても完了モーダルは出ない。王冠を新しく取ったときは出る', () => {
     for (const c of 'ばす') clear(c);
     recordWordDone(bus);

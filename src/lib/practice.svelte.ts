@@ -218,8 +218,9 @@ export class PracticeSession {
       wasG = wordCrown(this.word);
     record(c, r.mode);
     recordWordStart(this.word);
-    // 単語の星: 最後の文字をクリアして単語を通し終えたとき。最後の文字が開いている時点で前の文字は全部クリア済みなので、モードは問わない
-    if (!nextMode(c) && this.i === this.chars.length - 1) recordWordDone(this.word);
+    // 単語の星: 最後の文字をクリアして単語を通し終えたとき（最後の文字が開いている時点で前の文字は全部クリア済み）か、
+    // この単語で書いて全文字が金星になったとき（おてほんなし を最後の文字から先に通すと前者に当たらない）
+    if ((!nextMode(c) && this.i === this.chars.length - 1) || this.chars.every(charGold)) recordWordDone(this.word);
     const st = r.mode === 'trace' ? 3 : stars(r.score);
     if (r.mode === 'free') recordStar(c, st);
     this.msg = r.mode === 'trace' ? 'できた！' : `${'★'.repeat(st)} ${praise(st)}`;
