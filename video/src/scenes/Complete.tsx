@@ -15,7 +15,7 @@ export const Complete = () => {
     <Practice
       mode="trace"
       title="なぞって みよう！"
-      hint="1 の まるから みちに そって ゆっくり"
+      hint="1 の まるから せんに そって ゆっくり"
       chars={['き', 'り', 'ん']}
       active={2}
       done={2}

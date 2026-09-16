@@ -35,14 +35,14 @@ export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string
     id: 'trace',
     icon: 'trace',
     label: 'なぞる',
-    hint: 'の まるから みちに そって ゆっくり',
+    hint: 'の まるから せんに そって ゆっくり',
     title: 'なぞって みよう！'
   },
   {
     id: 'free',
     icon: 'pencil',
     label: 'じぶんで かく',
-    hint: 'いろの みちを ぬろう。なんかいに わけても いいよ',
+    hint: 'おてほんを ぬろう。なんかいに わけても いいよ',
     title: 'じぶんで かいてみよう！'
   },
   {

@@ -18,7 +18,7 @@ export const Trace = () => {
     <Practice
       mode="trace"
       title="なぞって みよう！"
-      hint="1 の まるから みちに そって ゆっくり"
+      hint="1 の まるから せんに そって ゆっくり"
       chars={['き', 'り', 'ん']}
       active={0}
       done={0}
