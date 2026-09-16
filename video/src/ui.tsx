@@ -154,13 +154,7 @@ export const Board = ({
       <line x1="54.5" y1="2" x2="54.5" y2="107" stroke={C.grid} strokeWidth="0.6" strokeDasharray="2 2" />
       <line x1="2" y1="54.5" x2="107" y2="54.5" stroke={C.grid} strokeWidth="0.6" strokeDasharray="2 2" />
       <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-        {mode !== 'test' &&
-          strokes.map((d, i) => (
-            <g key={d}>
-              <path d={d} stroke={C.guide} strokeWidth="14" />
-              {i > si && <path d={d} stroke="#b9c3cc" strokeWidth="1.2" strokeDasharray="3 2.5" />}
-            </g>
-          ))}
+        {mode !== 'test' && strokes.map((d) => <path key={d} d={d} stroke={C.guide} strokeWidth="14" />)}
         {strokes.map((d, i) =>
           i < si || (i === si && finished) ? (
             hand ? (

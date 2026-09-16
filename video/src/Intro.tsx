@@ -19,7 +19,7 @@ export const SCENES = [
   ['Trace', Trace, 176],
   ['Write', Write, 160],
   ['Complete', Complete, 150],
-  ['Langs', Langs, 156],
+  ['Langs', Langs, 196],
   ['Quiz', Quiz, 150],
   ['Trophies', Trophies, 150],
   ['Profiles', Profiles, 110],

@@ -3,14 +3,17 @@ import { toKatakana } from '../../../src/lib/chars';
 import { STROKES } from '../../../src/lib/strokes';
 import { STROKES_EN } from '../../../src/lib/strokes-en';
 import { STROKES_KANA } from '../../../src/lib/strokes-kana';
+import { STROKES_KANJI } from '../../../src/lib/strokes-kanji';
+import { KYOKASHO } from '../theme';
 import { C, THEME, UI, type Lang } from '../theme';
 import { Board, Card, card } from '../ui';
 
-// ホームのトグルで ひらがな → かたかな → えいご と切り替わり、色・単語名・書く文字が変わる
-const AT = [52, 104];
+// ホームのトグルで ひらがな → かたかな → かんじ → えいご と切り替わり、色・単語名・書く文字が変わる。かんじ は単語の代わりに字と読み
+const AT = [44, 88, 132];
 const LANGS: { id: Lang; glyph: string; short: string; strokes: Record<string, string[]> }[] = [
   { id: 'ja', glyph: 'あ', short: 'ひらがな', strokes: STROKES },
   { id: 'kana', glyph: 'ア', short: 'かたかな', strokes: STROKES_KANA },
+  { id: 'kanji', glyph: '漢', short: 'かんじ', strokes: STROKES_KANJI },
   { id: 'en', glyph: 'A', short: 'えいご', strokes: STROKES_EN }
 ];
 const WORDS: [string, string, string][] = [
@@ -18,25 +21,35 @@ const WORDS: [string, string, string][] = [
   ['cat', 'ねこ', 'Cat'],
   ['apple', 'りんご', 'Apple']
 ];
+const KANJI: [string, string][] = [
+  ['犬', 'いぬ'],
+  ['花', 'はな'],
+  ['山', 'やま']
+];
 const nameOf = (l: Lang, ja: string, en: string) => (l === 'ja' ? ja : l === 'kana' ? toKatakana(ja) : en);
 const subOf = (l: Lang, ja: string, en: string) =>
   l === 'ja' ? [toKatakana(ja), en] : l === 'kana' ? [ja, en] : [toKatakana(ja), ja];
 
 export const Langs = () => {
   const frame = useCurrentFrame();
-  const li = frame < AT[0] ? 0 : frame < AT[1] ? 1 : 2;
+  const li = frame < AT[0] ? 0 : frame < AT[1] ? 1 : frame < AT[2] ? 2 : 3;
   const lang = LANGS[li].id;
   const since = li ? frame - AT[li - 1] : frame;
   const mix = (k: 'blue' | 'teal' | 'dark') =>
     interpolateColors(
       frame,
-      [AT[0] - 6, AT[0] + 6, AT[1] - 6, AT[1] + 6],
-      [THEME.ja[k], THEME.kana[k], THEME.kana[k], THEME.en[k]]
+      [AT[0] - 6, AT[0] + 6, AT[1] - 6, AT[1] + 6, AT[2] - 6, AT[2] + 6],
+      [THEME.ja[k], THEME.kana[k], THEME.kana[k], THEME.kanji[k], THEME.kanji[k], THEME.en[k]]
     );
-  const knob = interpolate(frame, [AT[0] - 6, AT[0] + 6, AT[1] - 6, AT[1] + 6], [0, 1, 1, 2], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp'
-  });
+  const knob = interpolate(
+    frame,
+    [AT[0] - 6, AT[0] + 6, AT[1] - 6, AT[1] + 6, AT[2] - 6, AT[2] + 6],
+    [0, 1, 1, 2, 2, 3],
+    {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp'
+    }
+  );
   const swap = interpolate(since, [0, 8], [0, 1], { extrapolateRight: 'clamp' });
   return (
     <AbsoluteFill style={{ background: C.bg, color: C.ink, fontFamily: UI }}>
@@ -89,11 +102,30 @@ export const Langs = () => {
         }}
       >
         {WORDS.map(([id, ja, en], i) => {
-          const name = nameOf(lang, ja, en);
+          const kanji = lang === 'kanji';
+          const name = kanji ? KANJI[i][0] : nameOf(lang, ja, en);
           const strokes = LANGS[li].strokes[name[0]];
           return (
             <div key={id} style={{ display: 'grid', gap: 16, justifyItems: 'center', opacity: 0.5 + swap * 0.5 }}>
-              <Card id={id} name={name} sub={subOf(lang, ja, en)} size={200} star={i < 2} />
+              {kanji ? (
+                <div
+                  style={{
+                    ...card,
+                    width: 200,
+                    height: 156,
+                    display: 'grid',
+                    placeContent: 'center',
+                    gap: 6,
+                    textAlign: 'center',
+                    fontFamily: KYOKASHO
+                  }}
+                >
+                  <b style={{ fontSize: 76, lineHeight: 1.1 }}>{name}</b>
+                  <span style={{ fontSize: 22, color: C.sub, fontFamily: UI }}>{KANJI[i][1]}</span>
+                </div>
+              ) : (
+                <Card id={id} name={name} sub={subOf(lang, ja, en)} size={200} star={i < 2} />
+              )}
               <div style={{ ...card, padding: 6 }}>
                 <Board
                   strokes={strokes}
@@ -122,7 +154,7 @@ export const Langs = () => {
           color: mix('dark')
         }}
       >
-        おなじ たんごを ひらがな・かたかな・えいごで
+        {lang === 'kanji' ? 'かんじは しょうがく 1〜6ねんの 1026じ' : 'おなじ たんごを ひらがな・かたかな・えいごで'}
       </div>
     </AbsoluteFill>
   );
