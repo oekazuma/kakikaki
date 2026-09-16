@@ -1,20 +1,18 @@
 <script lang="ts">
   import Icon from './Icon.svelte';
+  import JumpBar from './JumpBar.svelte';
   import { practiceUrl } from '$lib/nav';
   import { KANJI, kanjiReading, readingLabel } from '$lib/kanji';
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { unlock } from '$lib/audio';
   // 既定は学年ごと（ホーム）。/chars は読みの行ごとの並びを渡す
-  // jump: 行の頭文字を右端に縦に固定して 1 タップで飛べるようにする（/chars の 440 字は縦に長い）。
-  // 上に固定すると iPad のステータスバーのぼかしに重なって読めなくなる
+  // jump: 段の頭文字（学年の数字・読みの行の頭文字）の飛び先バーを出す（440 字は縦に長い）
   let { groups = KANJI, jump = false }: { groups?: { name: string; chars: string[] }[]; jump?: boolean } = $props();
 </script>
 
 {#if jump}
-  <nav class="card jump" aria-label="よみの ぎょう">
-    {#each groups as g (g.name)}<a href="#{g.name}">{g.name[0]}</a>{/each}
-  </nav>
+  <JumpBar items={groups.map((g) => ({ id: g.name, label: g.name[0] }))} label="だんへ とぶ" />
 {/if}
 {#each groups as g (g.name)}
   <h2 id={g.name}>{g.name} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span></h2>
@@ -32,28 +30,6 @@
 {/each}
 
 <style>
-  .jump {
-    position: fixed;
-    right: calc(env(safe-area-inset-right, 0px) + 10px);
-    top: 50%;
-    translate: 0 -50%;
-    z-index: 1;
-    display: grid;
-    gap: 6px;
-    padding: 6px;
-  }
-  .jump a {
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-content: center;
-    border-radius: 50%;
-    font-size: 22px;
-    font-weight: bold;
-    text-decoration: none;
-    color: var(--blue);
-    background: #f3f5f8;
-  }
   h2 {
     scroll-margin-top: calc(var(--sat) + 8px); /* 飛んだ見出しがステータスバーの下に入らないように */
     font-size: 18px;
