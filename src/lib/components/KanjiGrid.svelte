@@ -6,7 +6,8 @@
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { unlock } from '$lib/audio';
   // 既定は学年ごと（ホーム）。/chars は読みの行ごとの並びを渡す
-  // jump: 行の頭文字を上に固定して 1 タップで飛べるようにする（/chars の 440 字は縦に長い）
+  // jump: 行の頭文字を右端に縦に固定して 1 タップで飛べるようにする（/chars の 440 字は縦に長い）。
+  // 上に固定すると iPad のステータスバーのぼかしに重なって読めなくなる
   let { groups = KANJI, jump = false }: { groups?: { name: string; chars: string[] }[]; jump?: boolean } = $props();
 </script>
 
@@ -17,7 +18,7 @@
 {/if}
 {#each groups as g (g.name)}
   <h2 id={g.name}>{g.name} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span></h2>
-  <div class="grid">
+  <div class={['grid', { narrow: jump }]}>
     {#each g.chars as c (c)}
       <a class={['card', 'cell', { done: charCleared(c) }]} href={practiceUrl(charWordId(c))} onclick={unlock}>
         <span class="ch kyokasho">{c}</span>
@@ -32,17 +33,18 @@
 
 <style>
   .jump {
-    position: sticky;
-    top: 8px;
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
+    top: 50%;
+    translate: 0 -50%;
     z-index: 1;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
+    display: grid;
+    gap: 6px;
     padding: 6px;
   }
   .jump a {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     display: grid;
     place-content: center;
     border-radius: 50%;
@@ -53,7 +55,7 @@
     background: #f3f5f8;
   }
   h2 {
-    scroll-margin-top: 76px; /* sticky の飛び先バーの下に隠れないように */
+    scroll-margin-top: calc(var(--sat) + 8px); /* 飛んだ見出しがステータスバーの下に入らないように */
     font-size: 18px;
     color: var(--sub);
     margin: 22px 0 8px;
@@ -62,6 +64,9 @@
     font-size: 14px;
     font-weight: normal;
     margin-left: 6px;
+  }
+  .grid.narrow {
+    margin-right: 64px;
   }
   .grid {
     display: grid;
