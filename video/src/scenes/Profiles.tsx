@@ -5,7 +5,7 @@ import { Icon, Pop, card } from '../ui';
 // つかう人（routes/profiles）: きょうだいも おとなも 10 人まで。指で たろう に切り替える
 const PEOPLE: [string, string, string][] = [
   ['person-girl', 'はな', 'ひらがな'],
-  ['person-boy', 'たろう', 'かたかな'],
+  ['person-boy', 'たろう', 'かんじ'],
   ['person-woman', 'まま', 'えいご'],
   ['person-man', 'ぱぱ', 'ひらがな'],
   ['person-grandma', 'ばあば', 'ひらがな'],

@@ -28,7 +28,7 @@ export const Title = () => {
         >
           <div style={{ fontSize: 130, fontWeight: 700, color: THEME.ja.blue, lineHeight: 1.1 }}>かきかき</div>
           <div style={{ fontSize: 44, fontWeight: 700, color: THEME.ja.teal, letterSpacing: 2 }}>
-            ひらがな・かたかな・えいご
+            ひらがな・かたかな・かんじ・えいご
           </div>
         </div>
       </div>

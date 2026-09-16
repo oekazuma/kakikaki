@@ -9,7 +9,7 @@ export const Outro = () => {
   return (
     <AbsoluteFill style={{ background: C.bg, color: C.ink, fontFamily: UI, alignItems: 'center' }}>
       <div style={{ display: 'flex', gap: 34, marginTop: 100 }}>
-        {(['', '-kana', '-en'] as const).map((s, i) => (
+        {(['', '-kana', '-kanji', '-en'] as const).map((s, i) => (
           <Pop key={s} at={4 + i * 6}>
             <Img src={staticFile(`logo-mark${s}.svg`)} style={{ width: 150, height: 150 }} />
           </Pop>

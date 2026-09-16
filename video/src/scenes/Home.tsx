@@ -5,7 +5,9 @@ import { Card, Icon, Pop, card, subs } from '../ui';
 
 // ホーム（routes/+page）。カテゴリの段が右から流れ込み、きりん を指でえらぶ
 const TAP = 110;
-const rows = CATEGORIES.slice(0, 3).map((c) => ({ c, words: WORDS.filter((w) => w.category === c).slice(0, 7) }));
+const rows = CATEGORIES.slice(0, 3).map((c) => ({ c, words: WORDS.filter((w) => w.category === c).slice(0, 6) }));
+// 右端の飛び先バー（JumpBar）。カテゴリ先頭の絵を目印に、いま見ている段（どうぶつ）にリング
+const JUMP = CATEGORIES.map((c) => WORDS.find((w) => w.category === c)!.id);
 
 export const Home = () => {
   const frame = useCurrentFrame();
@@ -78,6 +80,7 @@ export const Home = () => {
           {[
             ['あ', 'ひらがな'],
             ['ア', 'かたかな'],
+            ['漢', 'かんじ'],
             ['A', 'えいご']
           ].map(([g, s], i) => (
             <span
@@ -125,6 +128,35 @@ export const Home = () => {
           </div>
         </div>
       ))}
+      <div
+        style={{
+          ...card,
+          position: 'absolute',
+          right: 10,
+          top: '50%',
+          translate: '0 -50%',
+          display: 'grid',
+          gap: 6,
+          padding: 6
+        }}
+      >
+        {JUMP.map((id, i) => (
+          <div
+            key={id}
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: '50%',
+              background: '#f3f5f8',
+              display: 'grid',
+              placeContent: 'center',
+              boxShadow: i === 0 ? `0 0 0 3px ${t.blue}` : undefined
+            }}
+          >
+            <Img src={staticFile(`img/${id}.svg`)} style={{ width: 32, height: 32 }} />
+          </div>
+        ))}
+      </div>
       {frame >= TAP - 12 && frame < TAP + 16 && (
         <div
           style={{

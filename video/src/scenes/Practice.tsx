@@ -164,18 +164,22 @@ export const Practice = ({
           color: C.sub
         }}
       >
-        <div style={{ display: 'grid', justifyItems: 'center', gap: 6 }}>
-          <div style={{ ...card, width: 68, height: 68, display: 'grid', placeContent: 'center', color: t.blue }}>
-            <Icon name="speaker" size={32} />
+        {/* どのモードでも同じ並び。おてほんなし の みる は薄く、できた は おてほんなし だけ */}
+        {(
+          [
+            ['speaker', 'きく', false],
+            ['eye', 'みる', mode === 'test'],
+            ['undo', 'ひとつ もどる', false],
+            ['redo', 'やりなおす', false]
+          ] as const
+        ).map(([icon, label, dim]) => (
+          <div key={label} style={{ display: 'grid', justifyItems: 'center', gap: 6, opacity: dim ? 0.3 : 1 }}>
+            <div style={{ ...card, width: 68, height: 68, display: 'grid', placeContent: 'center', color: t.blue }}>
+              <Icon name={icon} size={32} />
+            </div>
+            {label}
           </div>
-          きく
-        </div>
-        <div style={{ display: 'grid', justifyItems: 'center', gap: 6 }}>
-          <div style={{ ...card, width: 68, height: 68, display: 'grid', placeContent: 'center', color: t.blue }}>
-            <Icon name="redo" size={32} />
-          </div>
-          やりなおす
-        </div>
+        ))}
         {mode === 'test' && (
           <div style={{ display: 'grid', justifyItems: 'center', gap: 6 }}>
             <div

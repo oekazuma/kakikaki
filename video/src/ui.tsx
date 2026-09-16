@@ -8,6 +8,7 @@ import { C, CONFETTI, KYOKASHO, SPARK, THEME, type Lang } from './theme';
 const ICONS = {
   speaker: 'M4 9h4l5-4v14l-5-4H4zM16 8.5a4.5 4.5 0 0 1 0 7M18.5 6a8 8 0 0 1 0 12',
   redo: 'M4 11a8 8 0 1 1 2.3 5.7M4 4v7h7',
+  undo: 'M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7',
   back: 'M19 12H5M11 6l-6 6 6 6',
   trace: 'M6 18a1.5 1.5 0 1 0 .01 0M18 6a1.5 1.5 0 1 0 .01 0M7.5 16.5C13 15 11 9 16.5 7.5',
   pencil: 'M4 20l4-1L19 8l-3-3L5 16zM14 7l3 3',
