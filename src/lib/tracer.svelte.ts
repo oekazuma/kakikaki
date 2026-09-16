@@ -1,4 +1,5 @@
 import { pathToPoints, type Pt } from './geometry';
+import type { Sample } from './ribbon';
 import { canStart, advance, traceDone, coverage, JUDGE } from './judge';
 import { strokeScore } from './score';
 import { recognize, passes, testScore, templatesFor } from './recognize';
@@ -12,8 +13,8 @@ type UpEvent = 'stroke' | 'done' | 'fail' | 'pending' | 'drawn' | 'idle';
 export class Tracer {
   si = $state(0);
   cursor = $state(0);
-  trail = $state<Pt[]>([]);
-  trails = $state<Pt[][]>([]);
+  trail = $state<Sample[]>([]);
+  trails = $state<Sample[][]>([]);
   tracing = $state(false);
   readonly samples: Pt[][];
   private scores: number[] = [];
@@ -43,7 +44,7 @@ export class Tracer {
   }
 
   // 指を置いた。なぞるでは始点の近くでないと無視する
-  down(p: Pt, id = 0): boolean {
+  down(p: Sample, id = 0): boolean {
     if (this.finished || this.pointer !== null) return false;
     if (this.mode === 'trace') {
       if (!canStart(this.current, p)) return false;
@@ -56,7 +57,7 @@ export class Tracer {
   }
 
   // 指が動いた。なぞるで線から外れたら 'fail'
-  move(p: Pt, id = 0): 'moved' | 'fail' | 'idle' {
+  move(p: Sample, id = 0): 'moved' | 'fail' | 'idle' {
     if (!this.tracing || id !== this.pointer) return 'idle';
     // なぞる では軌跡を描かず判定にも使わないので溜めない
     if (this.mode !== 'trace') this.trail.push(p);

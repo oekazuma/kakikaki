@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { Pt } from '$lib/geometry';
+  import { ribbon, polyline, type Sample } from '$lib/ribbon';
+  import { info } from '$lib/lang.svelte';
   import type { Mode } from '$lib/progress.svelte';
   import type { Tracer } from '$lib/tracer.svelte';
 
@@ -14,36 +16,42 @@
     mode: Mode;
     ui: { demo: boolean; bounce: number; shake: boolean };
     on: {
-      down: (p: Pt, id: number) => boolean;
-      move: (p: Pt, id: number) => void;
+      down: (p: Sample, id: number) => boolean;
+      move: (p: Sample, id: number) => void;
       up: (id: number) => void;
       demoend: () => void;
     };
   } = $props();
   const ds = $derived(t.strokes[t.char]);
-  // 線の太さ。画数が多い漢字は 14 のままだと線どうしが重なって字が潰れる（暮 など）ので、5 画目から少しずつ細くする
-  // （20 画で半分弱）。ひらがな・カタカナ・英字は 4 画までなのでそのまま
+  // 線の太さ。画数が多い漢字は 14 のままだと線が重なって潰れる（暮 など）ので 5 画目から細くする（20 画で半分弱）
   const k = $derived(Math.max(0.45, Math.min(1, 1 - (ds.length - 4) * 0.045)));
   let svg: SVGSVGElement;
 
   // 画面 ↔ viewBox の行列は指を置いたときに 1 回だけ取る（pointermove ごとに getScreenCTM を呼ぶとレイアウトを強制する）
-  let ctm: DOMMatrix | null = null;
-  let inv: DOMMatrix | null = null;
+  let ctm: DOMMatrix | null = null,
+    inv: DOMMatrix | null = null;
   const refresh = () => {
     ctm = svg.getScreenCTM();
     inv = ctm?.inverse() ?? null;
   };
-  const toView = (e: PointerEvent): Pt => {
+  const toView = (e: PointerEvent): Sample => {
     if (!inv) refresh();
     const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(inv!);
-    return { x: p.x, y: p.y };
+    // 時刻と Pencil の筆圧は毛筆風の太さに使う（指の筆圧は一定値なので入れない）
+    return { x: p.x, y: p.y, t: e.timeStamp, p: e.pointerType === 'pen' ? e.pressure : undefined };
   };
   export const toScreen = (p: Pt) => {
     if (!ctm) refresh();
     return new DOMPoint(p.x, p.y).matrixTransform(ctm!);
   };
-  const poly = (pts: Pt[]) => pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
 </script>
+
+{#snippet ink(tr: Sample[])}
+  {#if info().brush}<path d={ribbon(tr, 14 * k)} style:fill="var(--blue)" />{:else}<polyline
+      points={polyline(tr)}
+      class="ink live"
+    />{/if}
+{/snippet}
 
 <div class={['wrap', { shake: ui.shake }]}>
   <svg
@@ -80,8 +88,8 @@
       />
     {/if}
     {#if mode !== 'trace'}
-      {#each t.trails as tr (tr)}<polyline points={poly(tr)} class="ink live" />{/each}
-      {#if t.tracing}<polyline points={poly(t.trail)} class="ink live" />{/if}
+      {#each t.trails as tr (tr)}{@render ink(tr)}{/each}
+      {#if t.tracing}{@render ink(t.trail)}{/if}
     {/if}
     {#if ui.demo && !t.finished}
       <path d={ds[t.si]} class="demo" pathLength="1" onanimationend={on.demoend} />
