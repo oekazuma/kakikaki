@@ -21,6 +21,9 @@
     };
   } = $props();
   const ds = $derived(t.strokes[t.char]);
+  // 線の太さ。画数が多い漢字は 14 のままだと線どうしが重なって字が潰れる（暮 など）ので、5 画目から少しずつ細くする
+  // （20 画で半分弱）。ひらがな・カタカナ・英字は 4 画までなのでそのまま
+  const k = $derived(Math.max(0.45, Math.min(1, 1 - (ds.length - 4) * 0.045)));
   let svg: SVGSVGElement;
 
   // 画面 ↔ viewBox の行列は指を置いたときに 1 回だけ取る（pointermove ごとに getScreenCTM を呼ぶとレイアウトを強制する）
@@ -48,6 +51,9 @@
     viewBox="0 0 109 109"
     role="img"
     aria-label="かきとりめん"
+    style:--sw={14 * k}
+    style:--si={10 * k}
+    style:--sd={5 * k}
     onpointerdown={(e) => (refresh(), on.down(toView(e), e.pointerId) && svg.setPointerCapture(e.pointerId))}
     onpointermove={(e) => on.move(toView(e), e.pointerId)}
     onpointerup={(e) => on.up(e.pointerId)}
@@ -122,24 +128,24 @@
   }
   .guide {
     stroke: var(--guide);
-    stroke-width: 14;
+    stroke-width: var(--sw);
   }
   /* 書き終えた画は細くして潰れを防ぐ。描いている途中の線はお手本と同じ太さ */
   .ink {
     stroke: var(--blue);
-    stroke-width: 10;
+    stroke-width: var(--si);
     transform-box: fill-box;
     transform-origin: center;
   }
   .ink.live {
-    stroke-width: 14;
+    stroke-width: var(--sw);
   }
   .bounce {
     animation: bounce 0.4s ease-out;
   }
   .demo {
     stroke: var(--star);
-    stroke-width: 5;
+    stroke-width: var(--sd);
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
     animation: draw 1.2s ease-in-out forwards;
