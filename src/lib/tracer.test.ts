@@ -42,6 +42,7 @@ describe('Tracer なぞる', () => {
     const pts = t.current;
     t.down(pts[0]);
     for (const q of pts) t.move(q);
+    expect(t.cursor).toBe(pts.length - 1); // 完成の範囲に入ったあとも線は終点まで指に追従する
     expect(t.move({ x: pts.at(-1)!.x + 30, y: pts.at(-1)!.y + 30 })).toBe('moved');
     expect(t.up()).toBe('stroke');
   });

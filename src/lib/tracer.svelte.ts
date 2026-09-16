@@ -68,13 +68,13 @@ export class Tracer {
     // なぞる では軌跡を描かず判定にも使わないので溜めない
     if (this.mode !== 'trace') this.trail.push(p);
     if (this.mode === 'trace') {
-      // 終点まで来たあとは、少しはみ出しても失敗にしない（離せば完成）
-      if (traceDone(this.current, this.cursor, this.tol.end)) return 'moved';
       // お手本の点は 1.5 単位おき。指が 1 回で動いた距離ぶんは先を探せるようにする
       const k = JUDGE.K + Math.ceil(dist(this.last ?? p, p) / 1.5);
       this.last = p;
       const c = advance(this.current, this.cursor, p, this.tol.r, k);
       if (c === -1) {
+        // 終点まで来たあとは、少しはみ出しても失敗にしない（離せば完成）。線は終点まで指に追従させる
+        if (traceDone(this.current, this.cursor, this.tol.end)) return 'moved';
         this.fail();
         return 'fail';
       }
