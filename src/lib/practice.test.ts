@@ -216,6 +216,7 @@ describe('PracticeSession', () => {
     const s = new PracticeSession(one);
     s.done(ok('trace'));
     vi.runAllTimers();
+    expect(openWords().map((w) => w.id)).toEqual(['char-一']); // かんじ は 1 文字練習も つづきから に出る
     s.done(ok('trace'));
     vi.runAllTimers();
     s.done(ok('free', 0.9));
@@ -223,6 +224,7 @@ describe('PracticeSession', () => {
     expect(s.drive).toBe(false); // 1 文字練習にはイラストが無いので単語の星の演出（ドライブバイ）は出さない
     vi.runAllTimers();
     expect([s.complete, wordStar(one), wordCrown(one)]).toEqual([true, true, false]); // クリアで ほし
+    expect(openWords()).toEqual([]); // クリアしたら つづきから から消える
     s.replay();
     s.done(ok('trace'));
     vi.runAllTimers();
@@ -240,5 +242,9 @@ describe('PracticeSession', () => {
     s.challenge();
     expect(s.complete).toBe(false); // 金星済みなら ちょうせん は何もしない
     setLang('ja');
+    const a = new PracticeSession(charWord('あ'));
+    a.done(ok('trace'));
+    vi.runAllTimers();
+    expect(openWords()).toEqual([]); // 単語のある ことば では 1 文字練習を出さない
   });
 });

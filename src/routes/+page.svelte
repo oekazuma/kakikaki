@@ -62,6 +62,7 @@
   {#key lang.v}
     <div class="words" in:fly={{ x: 80, duration: 350 }}>
       {#if kanji}
+        <ContinueCard />
         <KanjiGrid jump />
       {:else}
         <JumpBar items={cats} label="カテゴリへ とぶ" />

@@ -1,4 +1,4 @@
-import { computeStats, earnedBadges, badgesOf, type Badge, type Stats } from './badges';
+import { computeStats, earnedBadges, badgesOf, TOTAL, type Badge, type Stats } from './badges';
 import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
 import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
 import { removeBest, loadBests } from './balloon.svelte';
@@ -136,15 +136,20 @@ export const openWordIds = () =>
     .filter(([, v]) => v === null)
     .map(([id]) => id)
     .reverse();
+// 1 文字練習は単語の記録に入れない（ひらがな などでは /chars からの脇道）。単語の無い ことば（かんじ）だけは字が単語の代わりなので
+// 同じ記録に入れ、ホームの つづきから に出す。済みの判定は記録そのもので見る（wordStar は 1 文字だと字のクリアを返し、
+// クリアした直後の recordWordDone が空振りするため）
+const aside = (w: Word) => isCharWord(w) && TOTAL(lang.v).words > 0;
+const hasRecord = (w: Word) => cur().words[w.id] != null;
 export function recordWordStart(w: Word) {
-  if (isCharWord(w) || wordStar(w) || Object.keys(cur().words).at(-1) === w.id) return;
+  if (aside(w) || hasRecord(w) || Object.keys(cur().words).at(-1) === w.id) return;
   // $state のプロキシは delete して入れ直してもキー順が変わらないので、並べ直したオブジェクトに置き換える
   const rest = Object.fromEntries(Object.entries(cur().words).filter(([id]) => id !== w.id));
   cur().words = { ...rest, [w.id]: null };
   save(lang.v, 'words');
 }
 export function recordWordDone(w: Word) {
-  if (isCharWord(w) || wordStar(w)) return;
+  if (aside(w) || hasRecord(w)) return;
   cur().words[w.id] = today();
   save(lang.v, 'words');
 }
