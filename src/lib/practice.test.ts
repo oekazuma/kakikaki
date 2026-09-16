@@ -219,6 +219,8 @@ describe('PracticeSession', () => {
     s.done(ok('trace'));
     vi.runAllTimers();
     s.done(ok('free', 0.9));
+    vi.advanceTimersByTime(700);
+    expect(s.drive).toBe(false); // 1 文字練習にはイラストが無いので単語の星の演出（ドライブバイ）は出さない
     vi.runAllTimers();
     expect([s.complete, starOf(one), crownOf(one)]).toEqual([true, true, false]); // クリアで ほし
     s.replay();

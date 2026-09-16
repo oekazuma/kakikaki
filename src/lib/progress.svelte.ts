@@ -163,7 +163,7 @@ export function resetRecords(pid: string, langs: Lang[]) {
 // 現在の人・言語の記録だけ消す
 export const reset = () => resetRecords(profiles.cur, [lang.v]);
 
-// 練習した日は 3 ことば をまたいで 1 つに（連続日数とカレンダー用）。Set は重複除去に使うだけで描画には持ち出さない
+// 練習した日は 全ことば をまたいで 1 つに（連続日数とカレンダー用）。Set は重複除去に使うだけで描画には持ち出さない
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
 export const allDays = () => [...new Set(LANGS.flatMap((l) => data[l].days))];
 export const streakNow = () => streak(allDays(), today());
@@ -216,7 +216,7 @@ export function detailOf(pid: string, l: Lang): Detail {
     weak: weakIn(d.progress)
   };
 }
-// その人が練習した日付（3 ことば の union）と連続日数
+// その人が練習した日付（全ことば の union）と連続日数
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
 export const daysOf = (pid: string) => [...new Set(LANGS.flatMap((l) => loadOf(pid, l).days))];
 export const streakOf = (pid: string) => streak(daysOf(pid), today());

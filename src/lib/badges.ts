@@ -13,7 +13,7 @@ import {
 } from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
-import { KANJI } from './kanji';
+import { KANJI, KANJI_ALL } from './kanji';
 import { levelName } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
@@ -25,7 +25,7 @@ export type Stats = {
   rows: Record<string, number>; // 行グループ名 → クリア数
   cats: Record<string, number>; // カテゴリ → 星のついた単語数
   days: number; // 練習した日数
-  streak: number; // 連続で練習した日数（3 ことば をまたいで数える）
+  streak: number; // 連続で練習した日数（全ことば をまたいで数える）
   quiz: Record<string, number>; // read1 など → 正解数
   // かくし要素（ことばをまたいで共有）: ふうせん ぽん の回数と自己ベスト、絵を跳び出させた回数、ピンボールの最高回数
   balloons: number;
@@ -53,7 +53,7 @@ export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, kanji: 
 const ALL_CHARS: Record<Lang, string[]> = {
   ja: CHARS,
   kana: CHARS_KANA,
-  kanji: KANJI.flatMap((k) => k.chars),
+  kanji: KANJI_ALL,
   en: CHARS_EN
 };
 export const CAT_TOTAL = Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c).length]));

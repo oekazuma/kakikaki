@@ -5,7 +5,6 @@
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { unlock } from '$lib/audio';
-  // ホーム（かんじ）: 学年ごとに字のマスを並べる。単語カードの代わり
 </script>
 
 {#each KANJI as g (g.grade)}

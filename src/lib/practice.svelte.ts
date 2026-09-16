@@ -237,7 +237,8 @@ export class PracticeSession {
       this.later(() => (this.flyStar = false), 900);
     }
     let wait = 1200;
-    if (!wasW && starOf(this.word)) {
+    // 1 文字練習にはイラストが無いので単語の星の演出（ドライブバイ）は出さない
+    if (!wasW && !isCharWord(this.word) && starOf(this.word)) {
       wait = 2600;
       this.later(() => {
         this.drive = true;

@@ -9,7 +9,7 @@
   import { profiles, byId } from '$lib/profiles.svelte';
   import { detailOf, daysOf, streakOf } from '$lib/progress.svelte';
 
-  // 保護者向け: 人ごとに 3 ことば の達成率・カレンダー・行ごとのクリア・クイズ・苦手な文字。保存値を直接読む
+  // 保護者向け: 人ごとに 全ことば の達成率・カレンダー・行ごとのクリア・クイズ・苦手な文字。保存値を直接読む
   let pid = $state(profiles.cur);
   let sel = $state<Lang>(lang.v);
   const p = $derived(byId(pid) ?? profiles.list[0]);
@@ -86,7 +86,7 @@
   }
   .top {
     display: grid;
-    grid-template-columns: repeat(3, 1fr) 300px;
+    grid-template-columns: repeat(4, 1fr) 260px;
     gap: 12px;
     align-items: stretch;
   }

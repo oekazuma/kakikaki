@@ -3,7 +3,7 @@
   import { imageUrl } from '$lib/image';
   import { starOf, crownOf } from '$lib/practice.svelte';
   import { nameOf, subOf, lang } from '$lib/lang.svelte';
-  import { kanjiReading } from '$lib/kanji';
+  import { READINGS } from '$lib/kanji';
   import Icon from './Icon.svelte';
   // ghost: イラストを灰色のシルエットにする（かくし演出でイラストが跳び出している間）。
   // fill: 親のグリッドのマス幅に合わせる（ホームの一覧。画面幅で右に余白が残らないように）
@@ -39,7 +39,7 @@
     />
   {/if}
   {#if isCharWord(word) && lang.v === 'kanji'}
-    <span class="name kyokasho">{kanjiReading(word.name)}</span>
+    <span class="name kyokasho">{READINGS[word.name].join('・')}</span>
   {:else}
     <span class="name kyokasho">{nameOf(word)}</span>
   {/if}
