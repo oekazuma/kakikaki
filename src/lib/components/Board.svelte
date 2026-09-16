@@ -57,7 +57,7 @@
     <line x1="54.5" y1="2" x2="54.5" y2="107" class="grid" />
     <line x1="2" y1="54.5" x2="107" y2="54.5" class="grid" />
     {#if mode !== 'test'}
-      {#each ds as d, i (d)}
+      {#each ds as d (d)}
         <path {d} class="guide" />
       {/each}
     {/if}
