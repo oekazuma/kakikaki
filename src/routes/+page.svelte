@@ -140,6 +140,16 @@
     text-decoration: none;
     color: var(--teal);
   }
+  /* 幅 1024 の iPad では 4 ことば のトグルぶん足りず 2 段になるので、余白と隙間を詰めて 1 行に保つ */
+  @media (max-width: 1130px) {
+    header,
+    nav {
+      gap: 8px;
+    }
+    .btn {
+      padding: 12px 10px;
+    }
+  }
   .help {
     position: relative;
   }

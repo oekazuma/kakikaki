@@ -64,4 +64,10 @@
       display: none;
     }
   }
+  /* 幅 1024 の iPad（4 ことば でヘッダーが 2 段になる）はさらに詰める */
+  @media (max-width: 1130px) {
+    .toggle {
+      --step: 52px;
+    }
+  }
 </style>
