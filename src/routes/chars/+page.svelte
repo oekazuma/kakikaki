@@ -44,7 +44,7 @@
     <h1>{title}</h1>
   </header>
   {#if lang.v === 'kanji'}
-    <KanjiGrid groups={kanjiByReading()} />
+    <KanjiGrid groups={kanjiByReading()} jump />
   {:else if lang.v !== 'en'}
     {@const k = lang.v === 'kana' ? toKatakana : (s: string) => s}
     <div class="ja">

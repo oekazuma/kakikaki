@@ -6,11 +6,17 @@
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { unlock } from '$lib/audio';
   // 既定は学年ごと（ホーム）。/chars は読みの行ごとの並びを渡す
-  let { groups = KANJI }: { groups?: { name: string; chars: string[] }[] } = $props();
+  // jump: 行の頭文字を上に固定して 1 タップで飛べるようにする（/chars の 440 字は縦に長い）
+  let { groups = KANJI, jump = false }: { groups?: { name: string; chars: string[] }[]; jump?: boolean } = $props();
 </script>
 
+{#if jump}
+  <nav class="card jump" aria-label="よみの ぎょう">
+    {#each groups as g (g.name)}<a href="#{g.name}">{g.name[0]}</a>{/each}
+  </nav>
+{/if}
 {#each groups as g (g.name)}
-  <h2>{g.name} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span></h2>
+  <h2 id={g.name}>{g.name} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span></h2>
   <div class="grid">
     {#each g.chars as c (c)}
       <a class={['card', 'cell', { done: charCleared(c) }]} href={practiceUrl(charWordId(c))} onclick={unlock}>
@@ -25,7 +31,29 @@
 {/each}
 
 <style>
+  .jump {
+    position: sticky;
+    top: 8px;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px;
+  }
+  .jump a {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-content: center;
+    border-radius: 50%;
+    font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+    color: var(--blue);
+    background: #f3f5f8;
+  }
   h2 {
+    scroll-margin-top: 76px; /* sticky の飛び先バーの下に隠れないように */
     font-size: 18px;
     color: var(--sub);
     margin: 22px 0 8px;
