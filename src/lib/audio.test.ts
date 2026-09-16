@@ -15,6 +15,7 @@ describe('speechOf', () => {
   it('かんじ は代表の読み、それ以外は文字そのもの（小書き文字は説明）', () => {
     expect(speechOf('花', 'kanji')).toBe('はな');
     expect(speechOf('一', 'kanji')).toBe('いち');
+    expect(speechOf('休', 'kanji')).toBe('やすむ');
     expect(speechOf('あ', 'ja')).toBe('あ');
     expect(speechOf('っ', 'ja')).toBe('ちいさい つ');
     expect(speechOf('ア', 'kana')).toBe('ア');

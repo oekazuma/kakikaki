@@ -1,4 +1,4 @@
-import { kanjiReading } from './kanji';
+import { kanjiReading, readingSpeech } from './kanji';
 import { lang, type Lang } from './lang.svelte';
 
 let ctx: AudioContext | null = null;
@@ -46,7 +46,8 @@ const SPECIAL: Record<string, string> = {
 const toHira = (s: string) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 export const readingOf = (c: string) => SPECIAL[toHira(c)] ?? c;
 // 「きく」で読む文字列。かんじ は字ではなく代表の読み（一 → いち）を読む
-export const speechOf = (c: string, l: Lang = lang.v) => (l === 'kanji' ? kanjiReading(c) : readingOf(c));
+export const speechOf = (c: string, l: Lang = lang.v) =>
+  l === 'kanji' ? readingSpeech(kanjiReading(c)) : readingOf(c);
 
 // 複数渡すと順番に読む（文字 → 単語 など）。読み終わり（または別の読み上げによる中断）で resolve する。
 // 中断された方の Promise も解決するので、呼び出し側は自分が最新かを見て表示を戻す（speaker）

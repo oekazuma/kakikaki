@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from './Icon.svelte';
   import { practiceUrl } from '$lib/nav';
-  import { KANJI, kanjiReading } from '$lib/kanji';
+  import { KANJI, kanjiReading, readingLabel } from '$lib/kanji';
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { unlock } from '$lib/audio';
@@ -13,7 +13,7 @@
     {#each g.chars as c (c)}
       <a class={['card', 'cell', { done: charCleared(c) }]} href={practiceUrl(charWordId(c))} onclick={unlock}>
         <span class="ch kyokasho">{c}</span>
-        <span class="yomi">{kanjiReading(c)}</span>
+        <span class="yomi">{readingLabel(kanjiReading(c))}</span>
         {#if charGold(c)}<span class="s gold"><Icon name="crown" size={16} fill /></span>{:else if charCleared(c)}<span
             class="s"><Icon name="star" size={16} fill /></span
           >{/if}

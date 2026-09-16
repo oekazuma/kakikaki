@@ -9,7 +9,7 @@
   import ActionButton from '$lib/components/ActionButton.svelte';
   import LetterSlots from '$lib/components/LetterSlots.svelte';
   import { imageUrl } from '$lib/image';
-  import { kanjiReading } from '$lib/kanji';
+  import { kanjiReading, readingLabel, readingSpeech } from '$lib/kanji';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { WriteQuiz, levelFromParam } from '$lib/quiz-session.svelte';
   import { levelName } from '$lib/quiz';
@@ -35,6 +35,7 @@
     return () => q.dispose();
   });
   const strokes = $derived(strokesOf());
+  const yomi = $derived(w.word && w.kind === 'kanji' ? kanjiReading(w.word.name) : '');
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const hear = speaker((on) => (speaking = on));
@@ -51,8 +52,8 @@
     <div class="left">
       <div class="card pic">
         {#if w.kind === 'kanji'}
-          <b class="yomi kyokasho">{kanjiReading(w.word.name)}</b>
-          <button class={['hear', { speaking }]} onclick={() => hear(kanjiReading(w.word.name), info().speech)}
+          <b class="yomi kyokasho">{readingLabel(yomi)}</b>
+          <button class={['hear', { speaking }]} onclick={() => hear(readingSpeech(yomi), info().speech)}
             ><Icon name="speaker" size={22} /> きく</button
           >
         {:else if w.kind === 'listen'}

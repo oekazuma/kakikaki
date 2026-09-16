@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { readingLabel } from '$lib/kanji';
   import ReadPrompt from './ReadPrompt.svelte';
   import { imageUrl } from '$lib/image';
   import { nameOf } from '$lib/lang.svelte';
@@ -12,7 +13,7 @@
   const texts = $derived(q.kind === 'blank' || q.kind === 'kanji-read');
   const items: { key: string; label: string; word?: Word }[] = $derived(
     texts
-      ? q.letters!.map((c) => ({ key: c, label: c }))
+      ? q.letters!.map((c) => ({ key: c, label: q.kind === 'kanji-read' ? readingLabel(c) : c }))
       : q.choices.map((w) => ({ key: w.id, label: nameOf(w), word: w }))
   );
 </script>
