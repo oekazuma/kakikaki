@@ -78,18 +78,20 @@ describe('badges', () => {
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
-      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : l === 'kanji' ? 42 : 66);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : l === 'kanji' ? 47 : 66);
     }
   });
 
-  it('かんじ: 単語系のメダルが無く、段は がくねん、しきい値は 440 字向け', () => {
+  it('かんじ: 単語系のメダルが無く、段は がくねん、しきい値は 1026 字向け', () => {
     const ids = badgesOf('kanji').map((b) => b.id);
     for (const id of ids) expect(id).not.toMatch(/^(first-word|first-crown|words-|cat-|crowns-)/);
     expect(ids).toEqual(
-      expect.arrayContaining(['chars-10', 'chars-50', 'chars-100', 'chars-200', 'chars-300', 'chars-all'])
+      expect.arrayContaining(['chars-10', 'chars-50', 'chars-100', 'chars-200', 'chars-300', 'chars-500', 'chars-all'])
     );
-    expect(ids).toEqual(expect.arrayContaining(['gold-10', 'gold-50', 'gold-100', 'gold-200', 'gold-300', 'gold-all']));
-    expect(ids).toEqual(expect.arrayContaining(['row-1ねんせい', 'row-2ねんせい', 'row-3ねんせい']));
+    expect(ids).toEqual(
+      expect.arrayContaining(['gold-10', 'gold-50', 'gold-100', 'gold-200', 'gold-300', 'gold-500', 'gold-all'])
+    );
+    expect(ids).toEqual(expect.arrayContaining(['row-1ねんせい', 'row-3ねんせい', 'row-6ねんせい']));
     expect(badgesOf('kanji').find((b) => b.id === 'row-1ねんせい')?.group).toBe('がくねん');
     expect(badgesOf('kanji').find((b) => b.id === 'chars-all')?.name).toBe('かんじ マスター');
     expect(badgesOf('ja').map((b) => b.id)).toEqual(

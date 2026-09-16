@@ -10,25 +10,23 @@
   import LetterSlots from '$lib/components/LetterSlots.svelte';
   import { imageUrl } from '$lib/image';
   import { kanjiReading, readingLabel, readingSpeech } from '$lib/kanji';
-  import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
+  import { lang, info, nameOf, strokesOf, strokesReady } from '$lib/lang.svelte';
   import { WriteQuiz, levelFromParam } from '$lib/quiz-session.svelte';
   import { levelName } from '$lib/quiz';
   import { sfx, speaker } from '$lib/audio';
   import { fx } from '$lib/fx';
 
   const level = $derived(levelFromParam(page.url.searchParams.get('level')));
+  const effects = {
+    buu: sfx.buu,
+    pon: sfx.pon,
+    kira: sfx.kira,
+    fanfare: sfx.fanfare,
+    confetti: (n: number) => fx.confetti(n)
+  };
   const w = $derived.by(() => {
     void level;
-    return untrack(
-      () =>
-        new WriteQuiz(level, {
-          buu: sfx.buu,
-          pon: sfx.pon,
-          kira: sfx.kira,
-          fanfare: sfx.fanfare,
-          confetti: (n) => fx.confetti(n)
-        })
-    );
+    return untrack(() => new WriteQuiz(level, effects));
   });
   $effect(() => {
     const q = w;
@@ -73,17 +71,19 @@
 
     <section class="center">
       <div class="board card">
-        {#key `${w.i}-${w.k}-${w.mode}-${w.gen}`}
-          <Canvas
-            bind:this={canvas}
-            char={w.c}
-            {strokes}
-            mode={w.mode}
-            accept={w.accept}
-            onDone={(r) => w.onDone(r)}
-            onStroke={(n) => (w.drawn = n > 0)}
-          />
-        {/key}
+        {#if strokesReady()}
+          {#key `${w.i}-${w.k}-${w.mode}-${w.gen}`}
+            <Canvas
+              bind:this={canvas}
+              char={w.c}
+              {strokes}
+              mode={w.mode}
+              accept={w.accept}
+              onDone={(r) => w.onDone(r)}
+              onStroke={(n) => (w.drawn = n > 0)}
+            />
+          {/key}
+        {/if}
       </div>
       <p class="hint">
         {w.msg ||

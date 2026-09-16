@@ -6,7 +6,7 @@
   import { lang, info } from '$lib/lang.svelte';
   import { quiz } from '$lib/progress.svelte';
   import { levelName, QUESTIONS, type Kind, type Level } from '$lib/quiz';
-  import { KANJI } from '$lib/kanji';
+  import { gradesOf } from '$lib/quiz-kanji';
 
   const kanji = $derived(lang.v === 'kanji');
   const KINDS = $derived<{ id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[]>([
@@ -25,7 +25,7 @@
   ]);
   const LEVELS = $derived<{ lv: Level; hint: string }[]>(
     kanji
-      ? KANJI.map((k) => ({ lv: k.grade, hint: `${k.chars.length} じ` }))
+      ? ([1, 2, 3] as const).map((lv) => ({ lv, hint: `${gradesOf(lv).reduce((n, g) => n + g.chars.length, 0)} じ` }))
       : [
           { lv: 1, hint: 'みじかい ことば' },
           { lv: 2, hint: 'ふつうの ことば' },

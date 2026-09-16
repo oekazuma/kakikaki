@@ -2,7 +2,7 @@
   import { fx } from '$lib/fx';
   import Icon from '$lib/components/Icon.svelte';
   import Splash from '$lib/components/Splash.svelte';
-  import { lang } from '$lib/lang.svelte';
+  import { lang, loadStrokes } from '$lib/lang.svelte';
   import { rememberLang } from '$lib/progress.svelte';
   import { updated } from '$app/state';
   import { vp, watchViewport } from '$lib/viewport.svelte';
@@ -17,6 +17,7 @@
   $effect(() => {
     document.documentElement.dataset.lang = lang.v;
     rememberLang(lang.v);
+    loadStrokes(lang.v);
   });
 
   // 練習画面（左 240 + 書き取り面 + 右 120）が操作できる最小サイズ。iPad 横向きはすべて満たす

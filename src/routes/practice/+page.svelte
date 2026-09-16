@@ -16,13 +16,14 @@
   import BadgeToast from '$lib/components/BadgeToast.svelte';
   import Hint from '$lib/components/Hint.svelte';
   import DriveBy from '$lib/components/DriveBy.svelte';
-  import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
+  import { lang, info, nameOf, strokesOf, strokesReady } from '$lib/lang.svelte';
   import { PracticeSession, resolveWord } from '$lib/practice.svelte';
   import { speaker, sfx, speechOf } from '$lib/audio';
   import { fx } from '$lib/fx';
 
   const word = $derived(resolveWord(page.url.searchParams.get('w'), lang.v));
   const strokes = $derived(strokesOf());
+  const ready = $derived(strokesReady());
   // 単語が切り替わったときだけセッションを作り直す。コンストラクタが読む進捗ストアには反応させない
   const effects = { buu: sfx.buu, kira: sfx.kira, fanfare: sfx.fanfare, confetti: (n: number) => fx.confetti(n) };
   const s = $derived.by(() => {
@@ -36,7 +37,7 @@
   });
   let canvas = $state<Canvas>();
   let speaking = $state(false);
-  const total = $derived(strokes[s.c].length);
+  const total = $derived(ready ? strokes[s.c].length : 0);
 
   // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
   const hear = speaker((on) => (speaking = on));
@@ -72,16 +73,18 @@
       {#if s.mode !== 'test'}
         <span class="count">{Math.min(s.stroke + 1, total)} / {total}</span>
       {/if}
-      {#key `${lang.v}-${s.c}-${s.mode}-${s.gen}`}
-        <Canvas
-          bind:this={canvas}
-          char={s.c}
-          {strokes}
-          mode={s.mode}
-          onDone={(r) => s.done(r)}
-          onStroke={(n) => ((s.stroke = n), (s.drawn = n > 0))}
-        />
-      {/key}
+      {#if ready}
+        {#key `${lang.v}-${s.c}-${s.mode}-${s.gen}`}
+          <Canvas
+            bind:this={canvas}
+            char={s.c}
+            {strokes}
+            mode={s.mode}
+            onDone={(r) => s.done(r)}
+            onStroke={(n) => ((s.stroke = n), (s.drawn = n > 0))}
+          />
+        {/key}
+      {/if}
       {#if s.flyStar}<div class="flystar"><Icon name="star" size={90} fill /></div>{/if}
     </div>
     <Hint {s} {total} />

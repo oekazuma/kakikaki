@@ -3,7 +3,6 @@ import { KANJI_ALL } from './kanji';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
-import { STROKES_KANJI } from './strokes-kanji';
 import { isCharWord, type Word } from './words';
 import { getRaw, setRaw } from './storage';
 
@@ -20,17 +19,13 @@ export function setLang(v: Lang) {
   setRaw(KEY, v);
 }
 
-const LANG_INFO: Record<
-  Lang,
-  { title: string; short: string; glyph: string; speech: string; strokes: Record<string, string[]>; chars: string[] }
-> = {
-  ja: { title: 'かきかき ひらがな', short: 'ひらがな', glyph: 'あ', speech: 'ja-JP', strokes: STROKES, chars: CHARS },
+const LANG_INFO: Record<Lang, { title: string; short: string; glyph: string; speech: string; chars: string[] }> = {
+  ja: { title: 'かきかき ひらがな', short: 'ひらがな', glyph: 'あ', speech: 'ja-JP', chars: CHARS },
   kana: {
     title: 'かきかき かたかな',
     short: 'かたかな',
     glyph: 'ア',
     speech: 'ja-JP',
-    strokes: STROKES_KANA,
     chars: CHARS_KANA
   },
   kanji: {
@@ -38,14 +33,36 @@ const LANG_INFO: Record<
     short: 'かんじ',
     glyph: '漢',
     speech: 'ja-JP',
-    strokes: STROKES_KANJI,
     chars: KANJI_ALL
   },
-  en: { title: 'かきかき えいご', short: 'えいご', glyph: 'A', speech: 'en-US', strokes: STROKES_EN, chars: CHARS_EN }
+  en: { title: 'かきかき えいご', short: 'えいご', glyph: 'A', speech: 'en-US', chars: CHARS_EN }
 };
 
 export const info = (l: Lang = lang.v) => LANG_INFO[l];
-export const strokesOf = (l: Lang = lang.v) => LANG_INFO[l].strokes;
+
+// 書き順。かんじ（1026 字、gzip で約 330KB）は起動時の JS に入れず、書く画面が必要になってから読む（+layout が loadStrokes を呼ぶ）。
+// 読み込み前は空なので、書く画面は strokesReady で盤面を出し分ける
+const STROKE_TABLES: Partial<Record<Lang, Record<string, string[]>>> = {
+  ja: STROKES,
+  kana: STROKES_KANA,
+  en: STROKES_EN
+};
+const loaded = $state({ kanji: false });
+export const strokesOf = (l: Lang = lang.v) => (void loaded.kanji, STROKE_TABLES[l] ?? {});
+export const strokesReady = (l: Lang = lang.v) => (void loaded.kanji, l in STROKE_TABLES);
+export async function loadStrokes(l: Lang = lang.v) {
+  if (l in STROKE_TABLES) return;
+  STROKE_TABLES[l] = (await import('./strokes-kanji')).STROKES_KANJI;
+  loaded.kanji = true;
+}
+// その ことば で書ける字（書き順を持つ字。えいご は数字も含む）。かんじ は読み込み前でも判定できるよう字の一覧で持つ
+const WRITABLE: Record<Lang, Set<string>> = {
+  ja: new Set(Object.keys(STROKES)),
+  kana: new Set(Object.keys(STROKES_KANA)),
+  kanji: new Set(KANJI_ALL),
+  en: new Set(Object.keys(STROKES_EN))
+};
+export const canWrite = (c: string, l: Lang = lang.v) => WRITABLE[l].has(c);
 export const charsOf = (l: Lang = lang.v) => LANG_INFO[l].chars;
 
 // 英語名は Dog のように先頭だけ大文字で見せる（大文字が単語の 1 文字目として練習に入る。1 文字練習はそのまま）

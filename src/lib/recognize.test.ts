@@ -51,7 +51,7 @@ describe('recognize', () => {
     expect(templatesFor(STROKES).length).toBe(81);
     expect(templatesFor(STROKES)).toBe(templatesFor(STROKES));
   });
-  it('漢字: お手本そのものは 440 字のお手本の中で合格する（10 字おきに確認）', () => {
+  it('漢字: お手本そのものは 1026 字のお手本の中で合格する（10 字おきに確認）', () => {
     for (const c of KANJI_ALL.filter((_, i) => i % 10 === 0))
       expect(passes([c], recognize(drawn(STROKES_KANJI, c), T_KANJI)), c).toBe(true);
   });

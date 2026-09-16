@@ -15,7 +15,7 @@ import {
   CAP,
   type Mode
 } from './progress.svelte';
-import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
+import { lettersOf, charsOf, canWrite, type Lang } from './lang.svelte';
 import type { Badge } from './badges';
 import { stars, praise } from './score';
 import type { Result } from './tracer.svelte';
@@ -57,8 +57,7 @@ export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string
 // かんじ は単語を持たないので既定も 1 文字（学年順の先頭）
 export function resolveWord(id: string | null, l: Lang): Word {
   const w = id ? wordById(id) : undefined;
-  const strokes = strokesOf(l);
-  if (w && lettersOf(w, l).every((c) => c in strokes)) return w;
+  if (w && lettersOf(w, l).every((c) => canWrite(c, l))) return w;
   return l === 'kanji' ? charWord(charsOf(l)[0]) : wordById('patocar')!;
 }
 

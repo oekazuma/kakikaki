@@ -113,21 +113,21 @@ export type Badge = {
 type Count = (id: string, group: BadgeGroup, emoji: string, name: string, desc: string, need: Badge['need']) => Badge;
 const count: Count = (id, group, emoji, name, desc, need) => ({ id, group, emoji, name, desc, need });
 
-// もじ・きんのほし の刻み。かんじ は 440 字なので段を多くする
+// もじ・きんのほし の刻み。かんじ は 1026 字なので段を多くする
 const STEPS: Record<Lang, number[]> = {
   ja: [10, 30, 50],
   kana: [10, 30, 50],
-  kanji: [10, 50, 100, 200, 300],
+  kanji: [10, 50, 100, 200, 300, 500],
   en: [10, 30, 50]
 };
 const GOLD_STEPS: Record<Lang, number[]> = {
   ja: [10, 30],
   kana: [10, 30],
-  kanji: [10, 50, 100, 200, 300],
+  kanji: [10, 50, 100, 200, 300, 500],
   en: [10, 30]
 };
-const STEP_EMOJI = ['🔟', '📘', '📗', '📙', '📕'];
-const GOLD_EMOJI = ['⭐', '🌟', '✨', '🌠', '☀️'];
+const STEP_EMOJI = ['🔟', '📘', '📗', '📙', '📕', '📚'];
+const GOLD_EMOJI = ['⭐', '🌟', '✨', '🌠', '☀️', '🌈'];
 const ALL_NAME: Record<Lang, string> = { ja: 'ひらがな', kana: 'かたかな', kanji: 'かんじ', en: 'あるふぁべっと' };
 // 行メダルの段・絵文字・説明の接尾。かんじ は学年ごとで、絵文字は行の先頭文字ではなく本
 const ROW_STYLE = (l: Lang, r: Row): [BadgeGroup, string, string] =>

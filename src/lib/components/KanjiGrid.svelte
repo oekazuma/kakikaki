@@ -4,7 +4,7 @@
   import { KANJI } from '$lib/kanji';
   import { charCleared } from '$lib/progress.svelte';
   // 既定は学年ごと（ホーム）。/chars は読みの行ごとの並びを渡す
-  // jump: 段の頭文字（学年の数字・読みの行の頭文字）の飛び先バーを出す（440 字は縦に長い）
+  // jump: 段の頭文字（学年の数字・読みの行の頭文字）の飛び先バーを出す（1026 字は縦に長い）
   let { groups = KANJI, jump = false }: { groups?: { name: string; chars: string[] }[]; jump?: boolean } = $props();
 </script>
 

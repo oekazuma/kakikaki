@@ -131,6 +131,10 @@ describe('quiz', () => {
   });
   it('級の名前は かんじ だけ学年', () => {
     expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'ja'))).toEqual(['かんたん', 'ふつう', 'むずかしい']);
-    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'kanji'))).toEqual(['1ねんせい', '2ねんせい', '3ねんせい']);
+    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'kanji'))).toEqual([
+      '1・2ねんせい',
+      '3・4ねんせい',
+      '5・6ねんせい'
+    ]);
   });
 });
