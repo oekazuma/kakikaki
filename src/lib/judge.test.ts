@@ -15,6 +15,7 @@ describe('なぞる', () => {
   });
   it('先へ飛びすぎても K を超えては進まない', () => {
     expect(advance(line, 0, { x: 60, y: 50 })).toBe(-1);
+    expect(advance(line, 0, { x: 60, y: 50 }, JUDGE.R_TRACE, 40)).toBeGreaterThan(JUDGE.K); // 先読みを広げれば届く
   });
   it('線から外れると -1', () => {
     expect(advance(line, 5, { x: 25, y: 50 + JUDGE.R_TRACE + 5 })).toBe(-1);

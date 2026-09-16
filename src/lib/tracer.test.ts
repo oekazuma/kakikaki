@@ -73,6 +73,13 @@ describe('Tracer なぞる', () => {
     expect(t.si).toBe(0);
     expect(t.cursor).toBe(0);
   });
+  it('指が速く動いて 1 回で先読み 8 点を越えても、動いた距離ぶんは追いつく', () => {
+    const t = new Tracer('あ', STROKES, 'trace');
+    const pts = t.current;
+    t.down(pts[0]);
+    expect(t.move(pts[20])).toBe('moved'); // 20 点（30 単位）先へ一気に
+    expect(t.cursor).toBe(20);
+  });
   it('途中で離すと fail', () => {
     const t = new Tracer('あ', STROKES, 'trace');
     const pts = strokePts('あ', 0);

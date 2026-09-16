@@ -8,14 +8,15 @@ export const TOL: Tolerance = { r: JUDGE.R_TRACE, end: 0 };
 
 export const canStart = (samples: Pt[], p: Pt) => dist(samples[0], p) <= JUDGE.R_START;
 
-// cursor から K 点先までで、指に最も近い点へ進める（R_TRACE 以内）。届く点が無ければ -1（逸脱）。
-export function advance(samples: Pt[], cursor: number, p: Pt, r = JUDGE.R_TRACE): number {
+// cursor から k 点先までで、指に最も近い点へ進める（r 以内）。届く点が無ければ -1（逸脱）。
+// k は既定で K だが、指が速く動いたときは 1 回の移動で K 点を超えるので、動いた距離ぶん広げて呼ぶ（線が止まって見えないように）
+export function advance(samples: Pt[], cursor: number, p: Pt, r = JUDGE.R_TRACE, k = JUDGE.K): number {
   let best = -1,
     bd = r;
-  for (let k = cursor; k <= Math.min(cursor + JUDGE.K, samples.length - 1); k++) {
-    const d = dist(samples[k], p);
+  for (let i = cursor; i <= Math.min(cursor + k, samples.length - 1); i++) {
+    const d = dist(samples[i], p);
     if (d <= bd) {
-      best = k;
+      best = i;
       bd = d;
     }
   }

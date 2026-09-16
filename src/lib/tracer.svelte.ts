@@ -1,4 +1,4 @@
-import { pathToPoints, type Pt } from './geometry';
+import { pathToPoints, dist, type Pt } from './geometry';
 import type { Sample } from './ribbon';
 import { canStart, advance, traceDone, coverage, JUDGE, TOL, type Tolerance } from './judge';
 import { strokeScore } from './score';
@@ -16,6 +16,7 @@ export class Tracer {
   trail = $state<Sample[]>([]);
   trails = $state<Sample[][]>([]);
   pr = $state<number[]>([]); // なぞる で通ったお手本の点ごとの筆圧（Pencil のときだけ。線の太さに使う）
+  private last: Pt | null = null; // 直前の指の位置（なぞる の先読み幅を動いた距離で決める）
   tracing = $state(false);
   readonly samples: Pt[][];
   private scores: number[] = [];
@@ -57,6 +58,7 @@ export class Tracer {
     this.tracing = true;
     this.trail = [p];
     this.pr = p.p != null ? [p.p] : [];
+    this.last = p;
     return true;
   }
 
@@ -68,7 +70,10 @@ export class Tracer {
     if (this.mode === 'trace') {
       // 終点まで来たあとは、少しはみ出しても失敗にしない（離せば完成）
       if (traceDone(this.current, this.cursor, this.tol.end)) return 'moved';
-      const c = advance(this.current, this.cursor, p, this.tol.r);
+      // お手本の点は 1.5 単位おき。指が 1 回で動いた距離ぶんは先を探せるようにする
+      const k = JUDGE.K + Math.ceil(dist(this.last ?? p, p) / 1.5);
+      this.last = p;
+      const c = advance(this.current, this.cursor, p, this.tol.r, k);
       if (c === -1) {
         this.fail();
         return 'fail';
