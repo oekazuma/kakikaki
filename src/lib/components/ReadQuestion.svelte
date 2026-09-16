@@ -8,8 +8,10 @@
   let { r, onpick }: { r: ReadQuiz; onpick: (key: string, e: MouseEvent) => void } = $props();
   const q = $derived(r.q);
   const pictures = $derived(q.kind === 'word' || q.kind === 'listen' || q.kind === 'initial');
+  // 文字列の選択肢: 穴埋めは文字、かんじ の「字を見て読み」は読み。どちらも letters に入っている
+  const texts = $derived(q.kind === 'blank' || q.kind === 'kanji-read');
   const items: { key: string; label: string; word?: Word }[] = $derived(
-    q.kind === 'blank'
+    texts
       ? q.letters!.map((c) => ({ key: c, label: c }))
       : q.choices.map((w) => ({ key: w.id, label: nameOf(w), word: w }))
   );
@@ -24,7 +26,12 @@
           'card',
           'choice',
           'kyokasho',
-          { text: !pictures, letter: q.kind === 'blank', hit: r.hit === it.key, wrong: r.wrong.includes(it.key) }
+          {
+            text: !pictures,
+            letter: q.kind === 'blank' || q.kind === 'kanji-listen',
+            hit: r.hit === it.key,
+            wrong: r.wrong.includes(it.key)
+          }
         ]}
         disabled={r.wrong.includes(it.key)}
         onclick={(e) => onpick(it.key, e)}

@@ -7,15 +7,34 @@
   import { quiz } from '$lib/progress.svelte';
   import { levelName, QUESTIONS, type Kind, type Level } from '$lib/quiz';
 
-  const KINDS: { id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[] = [
-    { id: 'read', icon: 'eye', name: 'よみクイズ', desc: 'もじを よんで えを えらぼう' },
-    { id: 'write', icon: 'pencil', name: 'かきクイズ', desc: 'えを みて もじを かこう' }
-  ];
-  const LEVELS: { lv: Level; hint: string }[] = [
-    { lv: 1, hint: 'みじかい ことば' },
-    { lv: 2, hint: 'ふつうの ことば' },
-    { lv: 3, hint: 'ながい ことば' }
-  ];
+  const kanji = $derived(lang.v === 'kanji');
+  const KINDS = $derived<{ id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[]>([
+    {
+      id: 'read',
+      icon: 'eye',
+      name: 'よみクイズ',
+      desc: kanji ? 'かんじの よみを こたえよう' : 'もじを よんで えを えらぼう'
+    },
+    {
+      id: 'write',
+      icon: 'pencil',
+      name: 'かきクイズ',
+      desc: kanji ? 'よみを みて かんじを かこう' : 'えを みて もじを かこう'
+    }
+  ]);
+  const LEVELS = $derived<{ lv: Level; hint: string }[]>(
+    kanji
+      ? [
+          { lv: 1, hint: '80 じ' },
+          { lv: 2, hint: '160 じ' },
+          { lv: 3, hint: '200 じ' }
+        ]
+      : [
+          { lv: 1, hint: 'みじかい ことば' },
+          { lv: 2, hint: 'ふつうの ことば' },
+          { lv: 3, hint: 'ながい ことば' }
+        ]
+  );
 </script>
 
 <svelte:head>

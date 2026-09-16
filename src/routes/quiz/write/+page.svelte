@@ -9,6 +9,7 @@
   import ActionButton from '$lib/components/ActionButton.svelte';
   import LetterSlots from '$lib/components/LetterSlots.svelte';
   import { imageUrl } from '$lib/image';
+  import { kanjiReading } from '$lib/kanji';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { WriteQuiz, levelFromParam } from '$lib/quiz-session.svelte';
   import { levelName } from '$lib/quiz';
@@ -49,7 +50,12 @@
   {#if w.word}
     <div class="left">
       <div class="card pic">
-        {#if w.kind === 'listen'}
+        {#if w.kind === 'kanji'}
+          <b class="yomi kyokasho">{kanjiReading(w.word.name)}</b>
+          <button class={['hear', { speaking }]} onclick={() => hear(kanjiReading(w.word.name), info().speech)}
+            ><Icon name="speaker" size={22} /> きく</button
+          >
+        {:else if w.kind === 'listen'}
           <button class={['hear', 'big', { speaking }]} onclick={() => hear(nameOf(w.word), info().speech)}
             ><Icon name="speaker" size={40} /> きく</button
           >
@@ -72,6 +78,7 @@
             char={w.c}
             {strokes}
             mode={w.mode}
+            accept={w.accept}
             onDone={(r) => w.onDone(r)}
             onStroke={(n) => (w.drawn = n > 0)}
           />
@@ -82,7 +89,9 @@
           (w.mode === 'test'
             ? w.kind === 'blank'
               ? '？ の もじを かこう'
-              : `${w.k + 1} もじめを かいてみよう`
+              : w.kind === 'kanji'
+                ? 'よみを みて かんじを かこう'
+                : `${w.k + 1} もじめを かいてみよう`
             : 'まるから せんに そって なぞろう')}
       </p>
     </section>
@@ -124,6 +133,10 @@
   }
   .pic img {
     height: 150px;
+  }
+  .yomi {
+    font-size: 56px;
+    color: var(--blue);
   }
   .hear {
     display: flex;
