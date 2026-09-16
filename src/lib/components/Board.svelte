@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Pt } from '$lib/geometry';
-  import { ribbon, polyline, hasPressure, type Sample } from '$lib/ribbon';
+  import { ribbonOf, traceRibbon, polyline, hasPressure, type Sample } from '$lib/ribbon';
   import type { Mode } from '$lib/progress.svelte';
   import type { Tracer } from '$lib/tracer.svelte';
 
@@ -45,7 +45,7 @@
 </script>
 
 {#snippet ink(tr: Sample[])}
-  {#if hasPressure(tr)}<path d={ribbon(tr, 14 * k)} style:fill="var(--blue)" />{:else}<polyline
+  {#if hasPressure(tr)}<path d={ribbonOf(tr, tr, 14 * k)} style:fill="var(--blue)" />{:else}<polyline
       points={polyline(tr)}
       class="ink live"
     />{/if}
@@ -77,7 +77,7 @@
       {#if i < t.si}<path {d} class={['ink', { bounce: ui.bounce === i }]} />{/if}
     {/each}
     {#if mode === 'trace' && !t.finished && t.pr.length}
-      {@render ink(t.current.slice(0, t.cursor + 1).map((q, i) => ({ ...q, p: t.pr[i] })))}
+      <path d={traceRibbon(ds[t.si], t.current, t.pr, t.cursor, 14 * k)} style:fill="var(--blue)" />
     {:else if mode === 'trace' && !t.finished}
       <path
         d={ds[t.si]}
