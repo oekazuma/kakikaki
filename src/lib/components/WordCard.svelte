@@ -3,7 +3,6 @@
   import { imageUrl } from '$lib/image';
   import { wordStar, wordCrown } from '$lib/progress.svelte';
   import { nameOf, subOf, lang } from '$lib/lang.svelte';
-  import { READINGS, readingLabel } from '$lib/kanji';
   import Icon from './Icon.svelte';
   // ghost: イラスト（1 文字練習は字）を灰色のシルエットにする（かくし演出で跳び出している間）。
   // fill: 親のグリッドのマス幅に合わせる（ホームの一覧。画面幅で右に余白が残らないように）
@@ -18,9 +17,8 @@
   let missing = $state(false);
   // 1 文字練習にはイラストが無いので、取りに行かずに字を大きく出す
   const plain = $derived(missing || isCharWord(word));
-  const label = $derived(
-    isCharWord(word) && lang.v === 'kanji' ? READINGS[word.name].map(readingLabel).join('・') : nameOf(word)
-  );
+  // かんじ の読みは WordWithHear が読みごとの きく として出すので、カードは字だけ
+  const label = $derived(isCharWord(word) && lang.v === 'kanji' ? '' : nameOf(word));
 </script>
 
 <button class="card" style:width={fill ? '100%' : `${size}px`} {onclick}>
@@ -40,7 +38,7 @@
       onerror={() => (missing = true)}
     />
   {/if}
-  <span class="name kyokasho">{label}</span>
+  {#if label}<span class="name kyokasho">{label}</span>{/if}
   {#each subOf(word) as line (line)}<span class="desc">{line}</span>{/each}
 </button>
 
