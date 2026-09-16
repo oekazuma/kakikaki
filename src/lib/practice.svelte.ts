@@ -218,8 +218,8 @@ export class PracticeSession {
       wasG = wordCrown(this.word);
     record(c, r.mode);
     recordWordStart(this.word);
-    // 単語の星: 最後の文字をクリアして単語を通し終えたとき（おてほんなし は別枠）
-    if (r.mode !== 'test' && !nextMode(c) && this.i === this.chars.length - 1) recordWordDone(this.word);
+    // 単語の星: 最後の文字をクリアして単語を通し終えたとき。最後の文字が開いている時点で前の文字は全部クリア済みなので、モードは問わない
+    if (!nextMode(c) && this.i === this.chars.length - 1) recordWordDone(this.word);
     const st = r.mode === 'trace' ? 3 : stars(r.score);
     if (r.mode === 'free') recordStar(c, st);
     this.msg = r.mode === 'trace' ? 'できた！' : `${'★'.repeat(st)} ${praise(st)}`;

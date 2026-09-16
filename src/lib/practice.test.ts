@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PracticeSession, nextMode, nextWordId, openWords, resolveWord } from './practice.svelte';
-import { record, reset, get, wordCrown, recordWordDone } from './progress.svelte';
+import { record, reset, get, wordStar, wordCrown, recordWordDone } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 import type { Result } from './tracer.svelte';
@@ -91,6 +91,20 @@ describe('PracticeSession', () => {
     expect([s.complete, wordCrown(bus)]).toEqual([true, true]);
     s.challenge(); // 全部金星なら何も起きない
     expect(s.complete).toBe(true);
+  });
+
+  it('最後の文字を おてほんなし で通しても単語の星が付き、やりかけ から消える', () => {
+    // 文字は他の単語でクリア済み（単語の星はまだ無い）
+    for (const c of ['ば', 'す']) for (const m of ['trace', 'trace', 'free'] as const) record(c, m);
+    const s = new PracticeSession(bus);
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    expect([s.i, s.mode]).toEqual([1, 'trace']);
+    s.select(1, 'test'); // ModeBar で おてほんなし を選ぶ
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect([s.complete, wordStar(bus)]).toEqual([true, true]);
+    expect(openWords()).toEqual([]);
   });
 
   it('クリア済みの単語をやり直しても完了モーダルは出ない。王冠を新しく取ったときは出る', () => {
