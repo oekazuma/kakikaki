@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PracticeSession, nextMode, nextWordId, openWords, resolveWord } from './practice.svelte';
+import { PracticeSession, nextMode, nextWordId, openWords, resolveWord, starOf, crownOf } from './practice.svelte';
 import { record, reset, get, wordStar, wordCrown, recordWordDone } from './progress.svelte';
 import { setLang } from './lang.svelte';
-import { wordById } from './words';
+import { wordById, charWord } from './words';
 import type { Result } from './tracer.svelte';
 
 const bus = wordById('bus')!;
@@ -203,5 +203,40 @@ describe('PracticeSession', () => {
     expect(resolveWord('char-あ', 'en').id).toBe('patocar');
     expect(resolveWord('nope', 'ja').id).toBe('patocar');
     expect(resolveWord(null, 'ja').id).toBe('patocar');
+    expect(resolveWord(null, 'kanji').id).toBe('char-一');
+    expect(resolveWord('bus', 'kanji').id).toBe('char-一'); // 単語は かんじ では書けない
+    expect(resolveWord('char-花', 'kanji').id).toBe('char-花');
+    expect(resolveWord('char-花', 'ja').id).toBe('patocar');
+  });
+
+  it('1 文字練習: 星・王冠は字のクリア・金星で決まり、完了モーダルは新しく取ったときだけ出る', () => {
+    setLang('kanji');
+    const one = charWord('一');
+    expect([starOf(one), crownOf(one)]).toEqual([false, false]);
+    const s = new PracticeSession(one);
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    s.done(ok('free', 0.9));
+    vi.runAllTimers();
+    expect([s.complete, starOf(one), crownOf(one)]).toEqual([true, true, false]); // クリアで ほし
+    s.replay();
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    s.done(ok('trace'));
+    vi.runAllTimers();
+    s.done(ok('free', 0.9));
+    vi.runAllTimers();
+    expect(s.complete).toBe(false); // クリア済みのやり直しでは出ない
+    s.challenge();
+    expect(s.mode).toBe('test');
+    s.done(ok('test'));
+    vi.runAllTimers();
+    expect([s.complete, crownOf(one)]).toEqual([true, true]); // 金星で おうかん
+    s.complete = false;
+    s.challenge();
+    expect(s.complete).toBe(false); // 金星済みなら ちょうせん は何もしない
+    setLang('ja');
   });
 });

@@ -1,12 +1,19 @@
 <script lang="ts">
   import { practiceUrl } from '$lib/nav';
   import { fly } from 'svelte/transition';
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import { SEION, GROUPS, ALPHABET, DIGITS, toKatakana } from '$lib/chars';
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
+
+  // かんじ ではホームが字の一覧を兼ねる。この画面は ひらがな の表を出してしまい、押すと書けない字で練習画面が落ちる
+  $effect(() => {
+    if (lang.v === 'kanji') goto(resolve('/'), { replaceState: true });
+  });
 </script>
 
 <svelte:head>

@@ -1,4 +1,4 @@
-import { WORDS, wordById, charWordId, isCharWord, type Word } from './words';
+import { WORDS, wordById, charWordId, charWord, isCharWord, type Word } from './words';
 import {
   get,
   record,
@@ -53,12 +53,18 @@ export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string
   }
 ];
 
-// URL の w= から練習する単語を決める。その言語に書き順の無い文字を含む（例: 言語が en のときの char-あ）なら既定の単語に戻す
+// URL の w= から練習する単語を決める。その言語に書き順の無い文字を含む（例: 言語が en のときの char-あ）なら既定に戻す
+// かんじ は単語を持たないので既定も 1 文字（学年順の先頭）
 export function resolveWord(id: string | null, l: Lang): Word {
   const w = id ? wordById(id) : undefined;
   const strokes = strokesOf(l);
-  return w && lettersOf(w, l).every((c) => c in strokes) ? w : wordById('patocar')!;
+  if (w && lettersOf(w, l).every((c) => c in strokes)) return w;
+  return l === 'kanji' ? charWord(charsOf(l)[0]) : wordById('patocar')!;
 }
+
+// 星・王冠。1 文字練習は単語の記録を持たないので、字のクリア・金星で決める
+export const starOf = (w: Word) => (isCharWord(w) ? charCleared(w.name) : wordStar(w));
+export const crownOf = (w: Word) => (isCharWord(w) ? charGold(w.name) : wordCrown(w));
 
 // その文字で次にやるべきモード。クリア（なぞる 2 回 + じぶんでかく）済みなら null。おてほんなし は挑戦として別枠
 export function nextMode(ch: string): Mode | null {
@@ -214,8 +220,8 @@ export class PracticeSession {
     this.busy = true;
     const c = this.c;
     const wasC = charCleared(c),
-      wasW = wordStar(this.word),
-      wasG = wordCrown(this.word);
+      wasW = starOf(this.word),
+      wasG = crownOf(this.word);
     record(c, r.mode);
     recordWordStart(this.word);
     // 単語の星: 最後の文字をクリアして単語を通し終えたとき（最後の文字が開いている時点で前の文字は全部クリア済み）か、
@@ -231,7 +237,7 @@ export class PracticeSession {
       this.later(() => (this.flyStar = false), 900);
     }
     let wait = 1200;
-    if (!wasW && wordStar(this.word)) {
+    if (!wasW && starOf(this.word)) {
       wait = 2600;
       this.later(() => {
         this.drive = true;
@@ -253,7 +259,7 @@ export class PracticeSession {
       else if (k >= 0) this.select(k, 'test');
       else if (r.mode !== 'test' && this.i < this.chars.length - 1) this.select(this.i + 1);
       // 完了モーダルは新しく星か王冠を取ったときだけ。クリア済みの単語をやり直したときは出さない
-      else if (!wasW || (!wasG && wordCrown(this.word))) this.complete = true;
+      else if (!wasW || (!wasG && crownOf(this.word))) this.complete = true;
     }, wait);
   }
 
