@@ -21,6 +21,10 @@ describe('なぞる', () => {
   });
   it('末尾付近で完了', () => {
     expect(traceDone(line, 20)).toBe(true);
+    // かんじ: 線から 15 まで許し、画の 2 割手前で離しても完成
+    expect(advance(line, 5, { x: 25, y: 50 + 14 }, 15)).not.toBe(-1);
+    expect(traceDone(line, line.length - 1 - Math.round((line.length - 1) * 0.2), 0.2)).toBe(true);
+    expect(traceDone(line, line.length - 1 - Math.round((line.length - 1) * 0.2) - 1, 0.2)).toBe(false);
     expect(traceDone(line, 18)).toBe(true);
     expect(traceDone(line, 10)).toBe(false);
   });

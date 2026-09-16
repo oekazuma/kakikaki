@@ -37,6 +37,28 @@ describe('Tracer なぞる', () => {
     expect(t.tracing).toBe(false);
     expect(t.up()).toBe('idle');
   });
+  it('終点まで来たあとは、はみ出しても fail にならず、離せば完成', () => {
+    const t = new Tracer('あ', STROKES, 'trace');
+    const pts = t.current;
+    t.down(pts[0]);
+    for (const q of pts) t.move(q);
+    expect(t.move({ x: pts.at(-1)!.x + 30, y: pts.at(-1)!.y + 30 })).toBe('moved');
+    expect(t.up()).toBe('stroke');
+  });
+  it('Pencil の筆圧は なぞる で通った点ごとに残り、指では残らない', () => {
+    const t = new Tracer('あ', STROKES, 'trace');
+    const pts = t.current;
+    t.down({ ...pts[0], p: 0.4 });
+    t.move({ ...pts[3], p: 0.8 });
+    expect(t.pr.length).toBe(t.cursor + 1);
+    expect(t.pr[0]).toBe(0.4);
+    expect(t.pr[t.cursor]).toBe(0.8);
+    t.up();
+    const f = new Tracer('あ', STROKES, 'trace');
+    f.down(f.current[0]);
+    f.move(f.current[3]);
+    expect(f.pr).toEqual([]);
+  });
   it('途中で離すと fail', () => {
     const t = new Tracer('あ', STROKES, 'trace');
     const pts = strokePts('あ', 0);

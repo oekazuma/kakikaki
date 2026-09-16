@@ -1,6 +1,6 @@
 import { pathToPoints, type Pt } from './geometry';
 import type { Sample } from './ribbon';
-import { canStart, advance, traceDone, coverage, JUDGE } from './judge';
+import { canStart, advance, traceDone, coverage, JUDGE, TOL, type Tolerance } from './judge';
 import { strokeScore } from './score';
 import { recognize, passes, testScore, templatesFor } from './recognize';
 import type { Mode } from './progress.svelte';
@@ -15,6 +15,7 @@ export class Tracer {
   cursor = $state(0);
   trail = $state<Sample[]>([]);
   trails = $state<Sample[][]>([]);
+  pr = $state<number[]>([]); // なぞる で通ったお手本の点ごとの筆圧（Pencil のときだけ。線の太さに使う）
   tracing = $state(false);
   readonly samples: Pt[][];
   private scores: number[] = [];
@@ -28,7 +29,9 @@ export class Tracer {
     readonly strokes: Record<string, string[]>,
     readonly mode: Mode,
     // おてほんなし で正解にする字（かんじ のかきクイズは同じ読みの字をどれも通す）
-    private accept: string[] = [char]
+    private accept: string[] = [char],
+    // なぞる の緩さ（ことば ごと）
+    private tol: Tolerance = TOL
   ) {
     this.samples = strokes[char].map((d) => pathToPoints(d));
   }
@@ -53,6 +56,7 @@ export class Tracer {
     this.pointer = id;
     this.tracing = true;
     this.trail = [p];
+    this.pr = p.p != null ? [p.p] : [];
     return true;
   }
 
@@ -62,11 +66,14 @@ export class Tracer {
     // なぞる では軌跡を描かず判定にも使わないので溜めない
     if (this.mode !== 'trace') this.trail.push(p);
     if (this.mode === 'trace') {
-      const c = advance(this.current, this.cursor, p);
+      // 終点まで来たあとは、少しはみ出しても失敗にしない（離せば完成）
+      if (traceDone(this.current, this.cursor, this.tol.end)) return 'moved';
+      const c = advance(this.current, this.cursor, p, this.tol.r);
       if (c === -1) {
         this.fail();
         return 'fail';
       }
+      if (p.p != null) for (let k = this.pr.length; k <= c; k++) this.pr[k] = p.p;
       this.cursor = c;
     }
     return 'moved';
@@ -77,7 +84,7 @@ export class Tracer {
     this.pointer = null;
     this.tracing = false;
     if (this.mode === 'trace') {
-      if (traceDone(this.current, this.cursor)) return this.complete(1);
+      if (traceDone(this.current, this.cursor, this.tol.end)) return this.complete(1);
       this.fail();
       return 'fail';
     }
@@ -113,12 +120,14 @@ export class Tracer {
     this.tracing = false;
     this.cursor = 0;
     this.trail = [];
+    this.pr = [];
   }
 
   private complete(score: number): 'stroke' | 'done' {
     this.scores.push(score);
     this.trail = [];
     this.trails = [];
+    this.pr = [];
     this.cursor = 0;
     this.si += 1;
     return this.finished ? 'done' : 'stroke';

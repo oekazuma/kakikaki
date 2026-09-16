@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { info } from '$lib/lang.svelte';
   import { untrack } from 'svelte';
   import type { Pt } from '$lib/geometry';
   import type { Mode } from '$lib/progress.svelte';
@@ -25,7 +26,7 @@
   } = $props();
 
   // 文字・モードの切替は親が {#key} で再マウントするので、判定器は初期値で 1 回だけ作る
-  const t = untrack(() => new Tracer(char, strokes, mode, accept));
+  const t = untrack(() => new Tracer(char, strokes, mode, accept, info().trace));
   let board = $state<Board>();
   let shake = $state(false);
   let bounce = $state(-1);

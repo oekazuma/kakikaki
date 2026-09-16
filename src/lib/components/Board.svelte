@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Pt } from '$lib/geometry';
-  import { ribbon, polyline, type Sample } from '$lib/ribbon';
-  import { info } from '$lib/lang.svelte';
+  import { ribbon, polyline, hasPressure, type Sample } from '$lib/ribbon';
   import type { Mode } from '$lib/progress.svelte';
   import type { Tracer } from '$lib/tracer.svelte';
 
@@ -37,8 +36,7 @@
   const toView = (e: PointerEvent): Sample => {
     if (!inv) refresh();
     const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(inv!);
-    // 時刻と Pencil の筆圧は毛筆風の太さに使う（指の筆圧は一定値なので入れない）
-    return { x: p.x, y: p.y, t: e.timeStamp, p: e.pointerType === 'pen' ? e.pressure : undefined };
+    return { x: p.x, y: p.y, p: e.pointerType === 'pen' ? e.pressure : undefined };
   };
   export const toScreen = (p: Pt) => {
     if (!ctm) refresh();
@@ -47,7 +45,7 @@
 </script>
 
 {#snippet ink(tr: Sample[])}
-  {#if info().brush}<path d={ribbon(tr, 14 * k)} style:fill="var(--blue)" />{:else}<polyline
+  {#if hasPressure(tr)}<path d={ribbon(tr, 14 * k)} style:fill="var(--blue)" />{:else}<polyline
       points={polyline(tr)}
       class="ink live"
     />{/if}
@@ -78,7 +76,9 @@
     {#each ds as d, i (d)}
       {#if i < t.si}<path {d} class={['ink', { bounce: ui.bounce === i }]} />{/if}
     {/each}
-    {#if mode === 'trace' && !t.finished}
+    {#if mode === 'trace' && !t.finished && t.pr.length}
+      {@render ink(t.current.slice(0, t.cursor + 1).map((q, i) => ({ ...q, p: t.pr[i] })))}
+    {:else if mode === 'trace' && !t.finished}
       <path
         d={ds[t.si]}
         class="ink live"

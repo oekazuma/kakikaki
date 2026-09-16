@@ -5,6 +5,7 @@ import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
 import { isCharWord, type Word } from './words';
 import { getRaw, setRaw } from './storage';
+import { TOL, type Tolerance } from './judge';
 
 export type Lang = 'ja' | 'kana' | 'kanji' | 'en';
 export const LANGS: Lang[] = ['ja', 'kana', 'kanji', 'en'];
@@ -19,19 +20,19 @@ export function setLang(v: Lang) {
   setRaw(KEY, v);
 }
 
-// brush: 書いた線を毛筆風（速さと Pencil の筆圧で太さが変わり、止め・はらい の形が出る）に描く
+// trace: なぞる の緩さ。かんじ は画が細かく、少しはみ出す・少し足りないが起きやすいので線から 15、画の 2 割手前で可
 const LANG_INFO: Record<
   Lang,
-  { title: string; short: string; glyph: string; speech: string; chars: string[]; brush: boolean }
+  { title: string; short: string; glyph: string; speech: string; chars: string[]; trace: Tolerance }
 > = {
-  ja: { title: 'かきかき ひらがな', short: 'ひらがな', glyph: 'あ', speech: 'ja-JP', chars: CHARS, brush: false },
+  ja: { title: 'かきかき ひらがな', short: 'ひらがな', glyph: 'あ', speech: 'ja-JP', chars: CHARS, trace: TOL },
   kana: {
     title: 'かきかき かたかな',
     short: 'かたかな',
     glyph: 'ア',
     speech: 'ja-JP',
     chars: CHARS_KANA,
-    brush: false
+    trace: TOL
   },
   kanji: {
     title: 'かきかき かんじ',
@@ -39,9 +40,9 @@ const LANG_INFO: Record<
     glyph: '漢',
     speech: 'ja-JP',
     chars: KANJI_ALL,
-    brush: true
+    trace: { r: 15, end: 0.2 }
   },
-  en: { title: 'かきかき えいご', short: 'えいご', glyph: 'A', speech: 'en-US', chars: CHARS_EN, brush: false }
+  en: { title: 'かきかき えいご', short: 'えいご', glyph: 'A', speech: 'en-US', chars: CHARS_EN, trace: TOL }
 };
 
 export const info = (l: Lang = lang.v) => LANG_INFO[l];
