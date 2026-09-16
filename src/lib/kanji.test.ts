@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { KANJI, KANJI_ALL, READINGS, kanjiReading, readingLabel, readingSpeech } from './kanji';
+import { KANJI, KANJI_ALL, READINGS, kanjiReading, readingLabel, readingSpeech, kanjiByReading } from './kanji';
 import { STROKES_KANJI } from './strokes-kanji';
 
 describe('kanji', () => {
@@ -22,6 +22,32 @@ describe('kanji', () => {
     expect(kanjiReading('花')).toBe('はな');
     expect(READINGS['一']).toEqual(['いち', 'ひと']);
     expect(kanjiReading('休')).toBe('やす.む');
+  });
+  it('よみから さがす: 五十音の行ごとに 440 字を過不足なく分け、行の中は読みの順', () => {
+    const rows = kanjiByReading();
+    expect(rows.map((r) => r.name)).toEqual([
+      'あいうえお',
+      'かきくけこ',
+      'さしすせそ',
+      'たちつてと',
+      'なにぬねの',
+      'はひふへほ',
+      'まみむめも',
+      'やゆよ',
+      'らりるれろ',
+      'わをん'
+    ]);
+    const all = rows.flatMap((r) => r.chars);
+    expect(all.length).toBe(440);
+    expect(new Set(all).size).toBe(440);
+    for (const r of rows) {
+      const ks = r.chars.map((c) => readingSpeech(kanjiReading(c)));
+      expect(ks, r.name).toEqual([...ks].sort((a, b) => a.localeCompare(b, 'ja')));
+    }
+    expect(rows[1].chars.slice(0, 3)).toEqual(['火', '科', '画']);
+    expect(rows[1].chars).toContain('学');
+    expect(rows[5].chars).toContain('場'); // ば は は行
+    expect(rows[6].chars).toContain('麦');
   });
   it('送り仮名は表示では（ ）、読み上げでは続けて読む', () => {
     expect(readingLabel('やす.む')).toBe('やす（む）');

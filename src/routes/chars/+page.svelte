@@ -8,10 +8,12 @@
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
+  import { kanjiByReading } from '$lib/kanji';
+  const title = $derived(lang.v === 'kanji' ? 'よみから さがす' : 'もじから えらぶ');
 </script>
 
 <svelte:head>
-  <title>もじから えらぶ | {info().title}</title>
+  <title>{title} | {info().title}</title>
   <meta name="description" content="練習したい文字をえらぶページ。" />
 </svelte:head>
 
@@ -39,10 +41,10 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1>もじから えらぶ</h1>
+    <h1>{title}</h1>
   </header>
   {#if lang.v === 'kanji'}
-    <KanjiGrid />
+    <KanjiGrid groups={kanjiByReading()} />
   {:else if lang.v !== 'en'}
     {@const k = lang.v === 'kana' ? toKatakana : (s: string) => s}
     <div class="ja">

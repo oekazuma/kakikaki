@@ -44,7 +44,7 @@
     <nav>
       <ProgressCard {s} {total} {badgeCount} />
       <a class="card btn quiz" href={resolve('/quiz')}><Icon name="bulb" size={22} /> クイズ</a>
-      <a class="card btn" href={resolve('/chars')}>もじから えらぶ</a>
+      <a class="card btn" href={resolve('/chars')}>{kanji ? 'よみから さがす' : 'もじから えらぶ'}</a>
       <a
         class="card btn help"
         href={resolve('/about')}

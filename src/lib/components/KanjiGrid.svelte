@@ -5,9 +5,11 @@
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { unlock } from '$lib/audio';
+  // 既定は学年ごと（ホーム）。/chars は読みの行ごとの並びを渡す
+  let { groups = KANJI }: { groups?: { name: string; chars: string[] }[] } = $props();
 </script>
 
-{#each KANJI as g (g.grade)}
+{#each groups as g (g.name)}
   <h2>{g.name} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span></h2>
   <div class="grid">
     {#each g.chars as c (c)}

@@ -473,3 +473,24 @@ export const kanjiReading = (c: string) => READINGS[c][0];
 // やす.む → やす（む）／やすむ
 export const readingLabel = (r: string) => r.replace(/\.(.+)$/, '（$1）');
 export const readingSpeech = (r: string) => r.replace('.', '');
+
+// よみから さがす: 代表の読みの頭文字で五十音の行に分け、行の中は読みの順。濁音・半濁音は清音の行に入れる
+const GOJUON = [
+  'あいうえお',
+  'かきくけこがぎぐげご',
+  'さしすせそざじずぜぞ',
+  'たちつてとだぢづでど',
+  'なにぬねの',
+  'はひふへほばびぶべぼぱぴぷぺぽ',
+  'まみむめも',
+  'やゆよ',
+  'らりるれろ',
+  'わをん'
+];
+export const kanjiByReading = (): { name: string; chars: string[] }[] =>
+  GOJUON.map((row) => ({
+    name: row.slice(0, 5),
+    chars: KANJI_ALL.filter((c) => row.includes(kanjiReading(c)[0])).sort((a, b) =>
+      readingSpeech(kanjiReading(a)).localeCompare(readingSpeech(kanjiReading(b)), 'ja')
+    )
+  })).filter((g) => g.chars.length);
