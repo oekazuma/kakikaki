@@ -58,16 +58,10 @@
   /* iPad（〜1240）ではトグルを文字だけにして、名前（6 文字）に幅を譲る */
   @media (max-width: 1240px) {
     .toggle {
-      --step: 56px;
+      --step: 52px;
     }
     .toggle button small {
       display: none;
-    }
-  }
-  /* 幅 1024 の iPad（4 ことば でヘッダーが 2 段になる）はさらに詰める */
-  @media (max-width: 1130px) {
-    .toggle {
-      --step: 52px;
     }
   }
 </style>

@@ -140,8 +140,8 @@
     text-decoration: none;
     color: var(--teal);
   }
-  /* 幅 1024 の iPad では 4 ことば のトグルぶん足りず 2 段になるので、余白と隙間を詰めて 1 行に保つ */
-  @media (max-width: 1130px) {
+  /* iPad（〜1240。mini は 1133、旧型は 1024）では 4 ことば のトグルぶん足りず 2 段になるので、余白と隙間を詰めて 1 行に保つ */
+  @media (max-width: 1240px) {
     header,
     nav {
       gap: 8px;
