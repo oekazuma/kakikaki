@@ -28,6 +28,11 @@
   --teal: #c95f2e;
   --dark: #b8502c;
 }
+[data-lang='kanji'] {
+  --blue: #c2495f;
+  --teal: #a63b4f;
+  --dark: #962e44;
+}
 main,
 .card,
 h1,

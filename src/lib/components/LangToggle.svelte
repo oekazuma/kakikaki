@@ -6,7 +6,7 @@
   <span class="knob" style:--i={LANGS.indexOf(lang.v)}></span>
   {#each LANGS as l (l)}
     <button role="tab" aria-selected={lang.v === l} class={{ on: lang.v === l }} onclick={() => setLang(l)}>
-      {info(l).glyph} <small>{info(l).short}</small>
+      <span class={{ kyokasho: l === 'kanji' }}>{info(l).glyph}</span> <small>{info(l).short}</small>
     </button>
   {/each}
 </div>
