@@ -11,6 +11,8 @@ const KEY = 'kk:profiles';
 export const DATA_NAMES = ['progress', 'earned', 'days', 'quiz', 'words'] as const;
 type DataName = (typeof DATA_NAMES)[number];
 export const keyOf = (pid: string, l: Lang, name: DataName) => `kk:${pid}:${l}:${name}`;
+// ことば をまたいで共有するメダルの獲得記録（メダル id → 獲得日）
+export const sharedKey = (pid: string) => `kk:${pid}:earned`;
 type Saved = { list: Profile[]; cur: string };
 
 const move = (from: string, to: string) => {
@@ -92,5 +94,6 @@ export function removeProfile(id: string): boolean {
   if (profiles.cur === id) profiles.cur = profiles.list[0].id;
   save();
   for (const l of LANGS) for (const n of DATA_NAMES) removeKey(keyOf(id, l, n));
+  removeKey(sharedKey(id));
   return true;
 }

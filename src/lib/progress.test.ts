@@ -19,9 +19,10 @@ import {
   checkBadges,
   earned,
   summaryOf,
-  secretSummary
+  secretSummary,
+  resetRecords
 } from './progress.svelte';
-import { setLang } from './lang.svelte';
+import { setLang, LANGS } from './lang.svelte';
 import { wordById } from './words';
 
 const bus = wordById('bus')!;
@@ -143,7 +144,7 @@ describe('progress', () => {
     record('あ', 'trace');
     expect(days().length).toBe(1);
   });
-  it('checkBadges: 新規獲得は一度だけ、ことばをまたがず、かくし要素も対象', async () => {
+  it('checkBadges: 新規獲得は一度だけ、ことばをまたがず、かくし要素は共有で 1 回だけ', async () => {
     vi.useFakeTimers();
     try {
       vi.setSystemTime(new Date(2026, 8, 15, 10));
@@ -162,10 +163,42 @@ describe('progress', () => {
       recordBalloon('p1');
       const balloon = checkBadges().find((b) => b.id === 'balloon-found');
       expect(balloon?.secret).toBe(true);
+      expect(JSON.parse(localStorage.getItem('kk:p1:earned')!)).toEqual({ 'balloon-found': '2026-09-15' });
+      expect(JSON.parse(localStorage.getItem('kk:p1:ja:earned')!)['balloon-found']).toBeUndefined();
+      setLang('en');
+      expect(earned()['balloon-found']).toBe('2026-09-15'); // 他の ことば でも獲得済み
+      expect(checkBadges().some((b) => b.id === 'balloon-found')).toBe(false); // 通知は 1 回だけ
+      resetRecords('p1', ['en']);
+      expect(earned()['balloon-found']).toBe('2026-09-15'); // 1 ことば のリセットでは残る
+      resetRecords('p1', [...LANGS]);
+      expect(earned()['balloon-found']).toBeUndefined(); // すべて のリセットで消える
     } finally {
       vi.useRealTimers();
       localStorage.removeItem('kk:secret');
       localStorage.removeItem('kk:balloon');
+      localStorage.removeItem('kk:p1:earned');
+    }
+  });
+  it('共有メダル: ことば ごとに取ってしまった記録は人単位へ寄せ、いちばん早い日付を残す', () => {
+    localStorage.setItem(
+      'kk:p2:ja:earned',
+      JSON.stringify({ 'balloon-found': '2026-09-01', 'first-char': '2026-09-02' })
+    );
+    localStorage.setItem(
+      'kk:p2:kana:earned',
+      JSON.stringify({ 'balloon-found': '2026-08-30', 'streak-3': '2026-09-03' })
+    );
+    try {
+      expect(detailOf('p2', 'ja').medals).toBe(3); // first-char + 共有 2 枚
+      expect(detailOf('p2', 'en').medals).toBe(2); // 共有 2 枚
+      expect(JSON.parse(localStorage.getItem('kk:p2:earned')!)).toEqual({
+        'balloon-found': '2026-08-30',
+        'streak-3': '2026-09-03'
+      });
+      expect(JSON.parse(localStorage.getItem('kk:p2:ja:earned')!)).toEqual({ 'first-char': '2026-09-02' });
+      expect(JSON.parse(localStorage.getItem('kk:p2:kana:earned')!)).toEqual({});
+    } finally {
+      for (const k of ['kk:p2:earned', 'kk:p2:ja:earned', 'kk:p2:kana:earned']) localStorage.removeItem(k);
     }
   });
   it('summaryOf: 使用中でない人の集計は他の人と混ざらない', () => {

@@ -1,6 +1,15 @@
-import { computeStats, earnedBadges, badgesOf, TOTAL, type Badge, type Stats } from './badges';
+import { computeStats, earnedBadges, badgesOf, TOTAL, SHARED_IDS, type Badge, type Stats } from './badges';
 import { lang, lettersOf, setLang, LANGS, type Lang } from './lang.svelte';
-import { profiles, byId, setCurrent, removeProfile, updateProfile, keyOf, DATA_NAMES } from './profiles.svelte';
+import {
+  profiles,
+  byId,
+  setCurrent,
+  removeProfile,
+  updateProfile,
+  keyOf,
+  sharedKey,
+  DATA_NAMES
+} from './profiles.svelte';
 import { removeBest, loadBests } from './balloon.svelte';
 import { secretOf, removeSecret } from './secret';
 import { WORDS, isCharWord, type Word } from './words';
@@ -52,9 +61,28 @@ const loadOf = (pid: string, l: Lang): Data => {
   };
 };
 const load = (l: Lang) => loadOf(profiles.cur, l);
+// ことば をまたいで共有するメダルの獲得記録。以前は ことば ごとに記録していたので、残っていれば人単位へ寄せる（いちばん早い日付を残す）
+function loadShared(pid: string): Record<string, string> {
+  const shared = loadJSON<Record<string, string>>(sharedKey(pid), {}, isObject);
+  let moved = false;
+  for (const l of LANGS) {
+    const e = loadJSON<Data['earned']>(keyOf(pid, l, 'earned'), {}, isObject);
+    const ids = Object.keys(e).filter((id) => SHARED_IDS.has(id));
+    if (!ids.length) continue;
+    for (const id of ids) {
+      if (!shared[id] || e[id] < shared[id]) shared[id] = e[id];
+      delete e[id];
+    }
+    saveJSON(keyOf(pid, l, 'earned'), e);
+    moved = true;
+  }
+  if (moved) saveJSON(sharedKey(pid), shared);
+  return shared;
+}
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
 const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
 
+const shared = $state({ v: loadShared(profiles.cur) });
 const data = $state<Record<Lang, Data>>(Object.fromEntries(LANGS.map((l) => [l, load(l)])) as Record<Lang, Data>);
 const cur = () => data[lang.v];
 
@@ -64,6 +92,7 @@ export function switchProfile(id: string) {
   if (!p) return;
   setCurrent(id);
   setLang(p.lang);
+  shared.v = loadShared(id);
   for (const l of LANGS) data[l] = load(l);
 }
 export function deleteProfile(id: string) {
@@ -77,7 +106,8 @@ export function deleteProfile(id: string) {
 export const rememberLang = (l: Lang) => updateProfile(profiles.cur, { lang: l });
 
 export const get = (c: string): CharProgress => cur().progress[c] ?? { trace: 0, free: 0, test: 0 };
-export const earned = () => cur().earned;
+// 獲得済みのメダル: ことば ごとの記録と、ことば をまたいで共有する記録を合わせて見る
+export const earned = () => ({ ...shared.v, ...cur().earned });
 export const days = () => cur().days;
 export const quiz = () => cur().quiz;
 
@@ -120,6 +150,11 @@ export function record(c: string, mode: Mode) {
 }
 
 function earn(id: string) {
+  if (SHARED_IDS.has(id)) {
+    shared.v[id] = today();
+    saveJSON(sharedKey(profiles.cur), shared.v);
+    return;
+  }
   data[lang.v].earned[id] = today();
   save(lang.v, 'earned');
 }
@@ -164,6 +199,8 @@ export function resetRecords(pid: string, langs: Lang[]) {
   if (langs.length === LANGS.length) {
     removeSecret(pid);
     removeBest(pid);
+    removeKey(sharedKey(pid));
+    if (pid === profiles.cur) shared.v = {};
   }
 }
 // 現在の人・言語の記録だけ消す
@@ -216,7 +253,7 @@ export function detailOf(pid: string, l: Lang): Detail {
   );
   return {
     ...st,
-    medals: badgesOf(l).filter((b) => d.earned[b.id]).length,
+    medals: badgesOf(l).filter((b) => (b.shared ? loadShared(pid) : d.earned)[b.id]).length,
     medalTotal: badgesOf(l).length,
     last: d.days.length ? [...d.days].sort().at(-1)! : null,
     weak: weakIn(d.progress)

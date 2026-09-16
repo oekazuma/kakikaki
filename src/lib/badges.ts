@@ -106,6 +106,8 @@ export type Badge = {
   desc: string;
   need: (s: Stats) => [have: number, need: number];
   secret?: boolean; // 取るまで名前と条件を伏せる（実績画面では「？？？」、つぎの めだる にも出さない）
+  // 判定が ことば をまたぐ（連続日数・かくし要素）ので、獲得も人単位の kk:<pid>:earned に 1 回だけ記録して 4 つの ことば で共有する
+  shared?: boolean;
 };
 
 type Count = (id: string, group: BadgeGroup, emoji: string, name: string, desc: string, need: Badge['need']) => Badge;
@@ -228,8 +230,10 @@ export function badgesOf(l: Lang): Badge[] {
     count('days-3', 'つづけた ひ', '📅', '3にち れんしゅう', '3にち れんしゅうした', (s) => [s.days, 3]),
     count('days-7', 'つづけた ひ', '🗓️', '7にち れんしゅう', '7にち れんしゅうした', (s) => [s.days, 7]),
     count('days-30', 'つづけた ひ', '🎂', '30にち れんしゅう', '30にち れんしゅうした', (s) => [s.days, 30]),
-    count('streak-3', 'つづけた ひ', '🔥', '3にち つづけた', '3にち つづけて れんしゅうした', (s) => [s.streak, 3]),
-    count('streak-7', 'つづけた ひ', '🏅', '7にち つづけた', '7にち つづけて れんしゅうした', (s) => [s.streak, 7]),
+    ...[
+      count('streak-3', 'つづけた ひ', '🔥', '3にち つづけた', '3にち つづけて れんしゅうした', (s) => [s.streak, 3]),
+      count('streak-7', 'つづけた ひ', '🏅', '7にち つづけた', '7にち つづけて れんしゅうした', (s) => [s.streak, 7])
+    ].map((b) => ({ ...b, shared: true })),
     ...[
       count(
         'balloon-found',
@@ -263,9 +267,15 @@ export function badgesOf(l: Lang): Badge[] {
           (s) => [Math.min(n, s.pinball), n]
         )
       )
-    ].map((b) => ({ ...b, secret: true }))
+    ].map((b) => ({ ...b, secret: true, shared: true }))
   ];
 }
+// ことば をまたいで共有するメダルの id（どの ことば でも同じ定義）
+export const SHARED_IDS = new Set(
+  badgesOf('ja')
+    .filter((b) => b.shared)
+    .map((b) => b.id)
+);
 
 // つぎに近いメダル: 未獲得のうち達成率が最も高いもの（同率なら残りが少ないもの）
 export function nextBadge(badges: Badge[], s: Stats, earned: Record<string, string>): Badge | undefined {
