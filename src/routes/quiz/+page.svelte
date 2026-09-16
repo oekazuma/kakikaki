@@ -3,9 +3,9 @@
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
-  import { info } from '$lib/lang.svelte';
+  import { lang, info } from '$lib/lang.svelte';
   import { quiz } from '$lib/progress.svelte';
-  import { LEVEL_NAME, QUESTIONS, type Kind, type Level } from '$lib/quiz';
+  import { levelName, QUESTIONS, type Kind, type Level } from '$lib/quiz';
 
   const KINDS: { id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[] = [
     { id: 'read', icon: 'eye', name: 'よみクイズ', desc: 'もじを よんで えを えらぼう' },
@@ -42,7 +42,7 @@
           {#each LEVELS as { lv, hint } (lv)}
             <a class={['lv', `l${lv}`]} href="{resolve(`/quiz/${k.id}`)}?level={lv}">
               <span class="stars">{'★'.repeat(lv)}</span>
-              <span class="name">{LEVEL_NAME[lv]}<small>{hint}</small></span>
+              <span class="name">{levelName(lv, lang.v)}<small>{hint}</small></span>
               <span class="n">せいかい<b>{quiz()[`${k.id}${lv}`] ?? 0}</b></span>
             </a>
           {/each}

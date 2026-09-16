@@ -2,7 +2,8 @@
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
   import Stars from './Stars.svelte';
-  import { LEVEL_NAME, type Kind, type Level } from '$lib/quiz';
+  import { levelName, type Kind, type Level } from '$lib/quiz';
+  import { lang } from '$lib/lang.svelte';
   // 次の級があればそちらを主ボタンにする（クリア後は もういちど より次へ進みたくなるため）
   let {
     correct,
@@ -28,7 +29,7 @@
   <p>{msg}</p>
   <div class="btns">
     {#if next}
-      <a class="main" href="{resolve(`/quiz/${kind}`)}?level={next}">つぎは {LEVEL_NAME[next]}</a>
+      <a class="main" href="{resolve(`/quiz/${kind}`)}?level={next}">つぎは {levelName(next, lang.v)}</a>
     {/if}
     <button class={next ? 'sub' : 'main'} onclick={onRetry}>もういちど</button>
     <a class="sub" href={resolve('/quiz')}>クイズを えらぶ</a>

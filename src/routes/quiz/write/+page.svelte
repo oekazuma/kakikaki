@@ -9,9 +9,9 @@
   import ActionButton from '$lib/components/ActionButton.svelte';
   import LetterSlots from '$lib/components/LetterSlots.svelte';
   import { imageUrl } from '$lib/image';
-  import { info, nameOf, strokesOf } from '$lib/lang.svelte';
+  import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { WriteQuiz, levelFromParam } from '$lib/quiz-session.svelte';
-  import { LEVEL_NAME } from '$lib/quiz';
+  import { levelName } from '$lib/quiz';
   import { sfx, speaker } from '$lib/audio';
   import { fx } from '$lib/fx';
 
@@ -40,7 +40,7 @@
 </script>
 
 <svelte:head>
-  <title>かきクイズ {LEVEL_NAME[level]} | {info().title}</title>
+  <title>かきクイズ {levelName(level, lang.v)} | {info().title}</title>
   <meta name="description" content="えを みて もじを かく クイズ。" />
 </svelte:head>
 

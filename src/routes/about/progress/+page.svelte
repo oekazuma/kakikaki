@@ -60,7 +60,7 @@
     </section>
     <section class="card">
       <h2>{info(sel).short} の クイズの正解数（累計）</h2>
-      <QuizBars quiz={d.quiz} />
+      <QuizBars quiz={d.quiz} l={sel} />
       <p class="how">
         練習した日 {d.days} 日 · 最後に練習 {d.last?.replaceAll('-', '/') ?? '—'}
       </p>

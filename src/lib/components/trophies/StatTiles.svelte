@@ -4,7 +4,7 @@
   import { CAT_TOTAL, TOTAL, type Stats } from '$lib/badges';
   import { CATEGORIES } from '$lib/words';
   import { quiz } from '$lib/progress.svelte';
-  import { LEVEL_NAME } from '$lib/quiz';
+  import { levelName } from '$lib/quiz';
   import { lang } from '$lib/lang.svelte';
 
   let { s }: { s: Stats } = $props();
@@ -47,7 +47,8 @@
     <div class="qrow">
       <b>{name}</b>
       {#each [1, 2, 3] as lv (lv)}
-        <span class="qc"><small>{LEVEL_NAME[lv as 1 | 2 | 3]}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> もん</span>
+        <span class="qc"><small>{levelName(lv as 1 | 2 | 3, lang.v)}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> もん</span
+        >
       {/each}
     </div>
   {/each}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, type ReadQ } from './quiz';
+import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, levelName, type ReadQ } from './quiz';
 import { WORDS, wordById } from './words';
 import { lettersOf, nameOf, LANGS, type Lang } from './lang.svelte';
 import { DIGITS } from './chars';
@@ -127,5 +127,9 @@ describe('quiz', () => {
         seen.set(n, w.category);
       }
     }
+  });
+  it('級の名前は かんじ だけ学年', () => {
+    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'ja'))).toEqual(['かんたん', 'ふつう', 'むずかしい']);
+    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'kanji'))).toEqual(['1ねんせい', '2ねんせい', '3ねんせい']);
   });
 });

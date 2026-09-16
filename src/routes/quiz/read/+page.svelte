@@ -5,9 +5,9 @@
   import QuizHeader from '$lib/components/QuizHeader.svelte';
   import QuizResult from '$lib/components/QuizResult.svelte';
   import ReadQuestion from '$lib/components/ReadQuestion.svelte';
-  import { info } from '$lib/lang.svelte';
+  import { lang, info } from '$lib/lang.svelte';
   import { ReadQuiz, levelFromParam } from '$lib/quiz-session.svelte';
-  import { LEVEL_NAME } from '$lib/quiz';
+  import { levelName } from '$lib/quiz';
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
 
@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-  <title>よみクイズ {LEVEL_NAME[level]} | {info().title}</title>
+  <title>よみクイズ {levelName(level, lang.v)} | {info().title}</title>
   <meta name="description" content="もじを よんで えを えらぶ クイズ。" />
 </svelte:head>
 

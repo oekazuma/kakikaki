@@ -14,7 +14,7 @@ import {
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
 import { KANJI } from './kanji';
-import { LEVEL_NAME } from './quiz';
+import { levelName } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
 export type Stats = {
@@ -219,8 +219,8 @@ export function badgesOf(l: Lang): Badge[] {
             `${k}-${lv}`,
             'クイズ',
             em,
-            `${kn} ${LEVEL_NAME[lv]}`,
-            `${kn}の ${LEVEL_NAME[lv]}で 10もん せいかい`,
+            `${kn} ${levelName(lv, l)}`,
+            `${kn}の ${levelName(lv, l)}で 10もん せいかい`,
             (s) => [Math.min(10, s.quiz[`${k}${lv}`] ?? 0), 10]
           )
         ),

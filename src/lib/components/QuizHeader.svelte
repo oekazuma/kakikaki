@@ -2,7 +2,8 @@
   import { resolve } from '$app/paths';
   import { fade, scale } from 'svelte/transition';
   import BackButton from './BackButton.svelte';
-  import { LEVEL_NAME, type Level } from '$lib/quiz';
+  import { levelName, type Level } from '$lib/quiz';
+  import { lang } from '$lib/lang.svelte';
   let { title, level, i, total, done }: { title: string; level: Level; i: number; total: number; done: boolean } =
     $props();
   // 2 問目からは、うっかり もどる を押しても進みが消えないように一度きく
@@ -12,7 +13,7 @@
 
 <header>
   <BackButton onclick={guard ? () => (asking = true) : undefined} />
-  <h1>{title} <span class="sub">{LEVEL_NAME[level]}</span></h1>
+  <h1>{title} <span class="sub">{levelName(level, lang.v)}</span></h1>
   <span class="prog">{Math.min(i + 1, total)} / {total}</span>
 </header>
 
