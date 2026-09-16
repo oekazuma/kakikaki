@@ -106,6 +106,7 @@ export const BADGE_GROUPS = [
   'もじ',
   'きんのほし',
   'ぎょう マスター',
+  'がくねん',
   'たんご',
   'はかせ',
   'おうかん',
@@ -128,26 +129,68 @@ export type Badge = {
 type Count = (id: string, group: BadgeGroup, emoji: string, name: string, desc: string, need: Badge['need']) => Badge;
 const count: Count = (id, group, emoji, name, desc, need) => ({ id, group, emoji, name, desc, need });
 
+// もじ・きんのほし の刻み。かんじ は 440 字なので段を多くする
+const STEPS: Record<Lang, number[]> = {
+  ja: [10, 30, 50],
+  kana: [10, 30, 50],
+  kanji: [10, 50, 100, 200, 300],
+  en: [10, 30, 50]
+};
+const STEP_EMOJI = ['🔟', '📘', '📗', '📙', '📕'];
+const GOLD_EMOJI = ['⭐', '🌟', '✨', '🌠', '☀️'];
+const ALL_NAME: Record<Lang, string> = { ja: 'ひらがな', kana: 'かたかな', kanji: 'かんじ', en: 'あるふぁべっと' };
+
 export function badgesOf(l: Lang): Badge[] {
   const T = TOTAL(l);
-  const all = l === 'ja' ? 'ひらがな' : l === 'kana' ? 'かたかな' : 'あるふぁべっと';
+  const all = ALL_NAME[l];
+  const words: Badge[] =
+    T.words === 0
+      ? []
+      : [
+          count('first-word', 'はじめて', '🎈', 'はじめての たんご', 'たんごに はじめて ほしが ついた', (s) => [
+            s.words,
+            1
+          ]),
+          count('first-crown', 'はじめて', '👑', 'はじめての おうかん', 'たんごの ぜんぶの もじが きんのほし', (s) => [
+            s.crowns,
+            1
+          ]),
+          count('words-10', 'たんご', '🎒', 'たんご 10', '10この たんごに ほし', (s) => [s.words, 10]),
+          count('words-50', 'たんご', '🚌', 'たんご 50', '50この たんごに ほし', (s) => [s.words, 50]),
+          count('words-100', 'たんご', '🚀', 'たんご 100', '100この たんごに ほし', (s) => [s.words, 100]),
+          count('words-all', 'たんご', '🎖️', 'たんご マスター', 'ぜんぶの たんごに ほし', (s) => [s.words, T.words]),
+          ...CATEGORIES.map((c) =>
+            count(`cat-${c}`, 'はかせ', CAT_EMOJI[c] ?? '🏅', `${c} はかせ`, `${c}の たんごに ぜんぶ ほし`, (s) => [
+              s.cats[c],
+              CAT_TOTAL[c]
+            ])
+          ),
+          count('crowns-10', 'おうかん', '👸', 'おうかん 10', '10この たんごに おうかん', (s) => [s.crowns, 10]),
+          count('crowns-all', 'おうかん', '🏰', 'おうかん マスター', 'ぜんぶの たんごに おうかん', (s) => [
+            s.crowns,
+            T.words
+          ])
+        ];
   return [
     count('first-char', 'はじめて', '🌱', 'はじめの いっぽ', 'もじを 1つ クリア', (s) => [s.chars, 1]),
-    count('first-word', 'はじめて', '🎈', 'はじめての たんご', 'たんごに はじめて ほしが ついた', (s) => [s.words, 1]),
+    ...words.filter((b) => b.id === 'first-word'),
     count('first-gold', 'はじめて', '✨', 'はじめての きんのほし', 'おてほんなしで はじめて ごうかく', (s) => [
       s.gold,
       1
     ]),
-    count('first-crown', 'はじめて', '👑', 'はじめての おうかん', 'たんごの ぜんぶの もじが きんのほし', (s) => [
-      s.crowns,
-      1
-    ]),
-    count('chars-10', 'もじ', '🔟', 'もじ 10', 'もじを 10こ クリア', (s) => [s.chars, 10]),
-    count('chars-30', 'もじ', '📘', 'もじ 30', 'もじを 30こ クリア', (s) => [s.chars, 30]),
-    count('chars-50', 'もじ', '📗', 'もじ 50', 'もじを 50こ クリア', (s) => [s.chars, 50]),
+    ...words.filter((b) => b.id === 'first-crown'),
+    ...STEPS[l].map((n, k) =>
+      count(`chars-${n}`, 'もじ', STEP_EMOJI[k], `もじ ${n}`, `もじを ${n}こ クリア`, (s) => [s.chars, n])
+    ),
     count('chars-all', 'もじ', '🏆', `${all} マスター`, `${T.chars}もじ ぜんぶ クリア`, (s) => [s.chars, T.chars]),
-    count('gold-10', 'きんのほし', '⭐', 'きんのほし 10', 'おてほんなしで 10もじ ごうかく', (s) => [s.gold, 10]),
-    count('gold-30', 'きんのほし', '🌟', 'きんのほし 30', 'おてほんなしで 30もじ ごうかく', (s) => [s.gold, 30]),
+    ...STEPS[l]
+      .slice(0, l === 'kanji' ? 5 : 2)
+      .map((n, k) =>
+        count(`gold-${n}`, 'きんのほし', GOLD_EMOJI[k], `きんのほし ${n}`, `おてほんなしで ${n}もじ ごうかく`, (s) => [
+          s.gold,
+          n
+        ])
+      ),
     count(
       'gold-all',
       'きんのほし',
@@ -157,26 +200,16 @@ export function badgesOf(l: Lang): Badge[] {
       (s) => [s.gold, T.chars]
     ),
     ...ROWS[l].map((r) =>
-      count(`row-${r.name}`, 'ぎょう マスター', r.chars[0], `${r.name} マスター`, `${r.name}を ぜんぶ クリア`, (s) => [
-        s.rows[r.name],
-        r.chars.length
-      ])
+      count(
+        `row-${r.name}`,
+        l === 'kanji' ? 'がくねん' : 'ぎょう マスター',
+        l === 'kanji' ? '📖' : r.chars[0],
+        `${r.name} マスター`,
+        `${r.name}${l === 'kanji' ? 'の かんじ' : ''}を ぜんぶ クリア`,
+        (s) => [s.rows[r.name], r.chars.length]
+      )
     ),
-    count('words-10', 'たんご', '🎒', 'たんご 10', '10この たんごに ほし', (s) => [s.words, 10]),
-    count('words-50', 'たんご', '🚌', 'たんご 50', '50この たんごに ほし', (s) => [s.words, 50]),
-    count('words-100', 'たんご', '🚀', 'たんご 100', '100この たんごに ほし', (s) => [s.words, 100]),
-    count('words-all', 'たんご', '🎖️', 'たんご マスター', 'ぜんぶの たんごに ほし', (s) => [s.words, T.words]),
-    ...CATEGORIES.map((c) =>
-      count(`cat-${c}`, 'はかせ', CAT_EMOJI[c] ?? '🏅', `${c} はかせ`, `${c}の たんごに ぜんぶ ほし`, (s) => [
-        s.cats[c],
-        CAT_TOTAL[c]
-      ])
-    ),
-    count('crowns-10', 'おうかん', '👸', 'おうかん 10', '10この たんごに おうかん', (s) => [s.crowns, 10]),
-    count('crowns-all', 'おうかん', '🏰', 'おうかん マスター', 'ぜんぶの たんごに おうかん', (s) => [
-      s.crowns,
-      T.words
-    ]),
+    ...words.filter((b) => b.group !== 'はじめて'),
     ...(['read', 'write'] as const).flatMap((k) => {
       const kn = k === 'read' ? 'よみクイズ' : 'かきクイズ';
       const em = k === 'read' ? '👀' : '✍️';

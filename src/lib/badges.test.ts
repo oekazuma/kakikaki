@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { badgesOf, ROWS, computeStats, earnedBadges, nextBadge, BADGE_GROUPS } from './badges';
 import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
+import { KANJI_ALL } from './kanji';
 import { wordById } from './words';
-import { lettersOf, type Lang } from './lang.svelte';
+import { lettersOf, LANGS, type Lang } from './lang.svelte';
 
 // テストでは「全文字クリア = 単語も練習済み」とみなす
 const byChars = (l: Lang, cleared: (c: string) => boolean) => (id: string) =>
@@ -10,10 +11,10 @@ const byChars = (l: Lang, cleared: (c: string) => boolean) => (id: string) =>
 
 describe('badges', () => {
   it('id は一意で、行グループは全文字を過不足なく分ける', () => {
-    for (const l of ['ja', 'kana', 'en'] as const) {
+    for (const l of LANGS) {
       const B = badgesOf(l);
       expect(new Set(B.map((b) => b.id)).size).toBe(B.length);
-      const all = l === 'ja' ? CHARS : l === 'kana' ? CHARS_KANA : CHARS_EN;
+      const all = l === 'ja' ? CHARS : l === 'kana' ? CHARS_KANA : l === 'en' ? CHARS_EN : KANJI_ALL;
       expect(ROWS[l].flatMap((r) => r.chars).sort()).toEqual([...all].sort());
     }
   });
@@ -63,7 +64,7 @@ describe('badges', () => {
     expect(ids).not.toContain('row-HIJKLM');
   });
   it('全部クリアで全メダル', () => {
-    for (const l of ['ja', 'kana', 'en'] as const) {
+    for (const l of LANGS) {
       const quiz = { read1: 10, read2: 10, read3: 10, write1: 10, write2: 10, write3: 10 };
       const ids = earnedBadges(
         l,
@@ -79,8 +80,23 @@ describe('badges', () => {
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
-      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : 66);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : l === 'kanji' ? 42 : 66);
     }
+  });
+
+  it('かんじ: 単語系のメダルが無く、段は がくねん、しきい値は 440 字向け', () => {
+    const ids = badgesOf('kanji').map((b) => b.id);
+    for (const id of ids) expect(id).not.toMatch(/^(first-word|first-crown|words-|cat-|crowns-)/);
+    expect(ids).toEqual(
+      expect.arrayContaining(['chars-10', 'chars-50', 'chars-100', 'chars-200', 'chars-300', 'chars-all'])
+    );
+    expect(ids).toEqual(expect.arrayContaining(['gold-10', 'gold-50', 'gold-100', 'gold-200', 'gold-300', 'gold-all']));
+    expect(ids).toEqual(expect.arrayContaining(['row-1ねんせい', 'row-2ねんせい', 'row-3ねんせい']));
+    expect(badgesOf('kanji').find((b) => b.id === 'row-1ねんせい')?.group).toBe('がくねん');
+    expect(badgesOf('kanji').find((b) => b.id === 'chars-all')?.name).toBe('かんじ マスター');
+    expect(badgesOf('ja').map((b) => b.id)).toEqual(
+      expect.arrayContaining(['chars-10', 'chars-30', 'chars-50', 'chars-all'])
+    );
   });
   it('need は [達成数, 必要数]', () => {
     const s = computeStats(
