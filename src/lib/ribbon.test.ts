@@ -15,9 +15,14 @@ describe('ribbon', () => {
   it('1 点だけなら丸', () => {
     expect(ribbon([{ x: 10, y: 10, p: 0.5 }], 10)).toMatch(/^M\d+\.\d,10\.0a.*Z$/);
   });
-  it('両端が丸い閉じた帯になる', () => {
-    const d = ribbon(line(20, 0.5), 10);
-    expect(d).toMatch(/^M.*A.*A.*Z$/);
-    expect((d.match(/A/g) ?? []).length).toBe(2);
+  it('区間ごとに両端が丸いカプセルを重ねた path になり、弧は外側へ膨らむ', () => {
+    const d = ribbon(line(3, 0.5), 10);
+    expect((d.match(/Z/g) ?? []).length).toBe(2);
+    expect((d.match(/A/g) ?? []).length).toBe(4);
+    // 右向きの区間 (10,50)→(12,50)、半径 r: 終端の弧は (12,50+r) から (12,50-r) へ sweep 0（外側 x>12 を通る）
+    const r = (10 * (PEN.MIN + PEN.GAIN * 0.5)) / 2;
+    expect(d).toContain(
+      `L12.0,${(50 + r).toFixed(1)}A${r.toFixed(1)},${r.toFixed(1)} 0 0 0 12.0,${(50 - r).toFixed(1)}`
+    );
   });
 });

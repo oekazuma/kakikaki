@@ -13,7 +13,8 @@ const f1 = (x: number) => x.toFixed(1);
 // 折れ線（筆圧の無い線）の points 属性
 export const polyline = (pts: Pt[]) => pts.map((p) => `${f1(p.x)},${f1(p.y)}`).join(' ');
 
-// 筆圧で点ごとに太さが変わる線を、両端が丸い帯（塗りつぶす閉じた path）にする
+// 筆圧で点ごとに太さが変わる線。区間ごとに両端が半円のカプセルを重ねた path にする（1 本の多角形だと曲がり角の外側に
+// 隙間が出る）。弧は進行方向の外側へ膨らむよう sweep を 0 にし、すべて同じ向きに描いて重なりが塗り抜けないようにする
 export function ribbon(input: Sample[], width: number): string {
   const pts = input.filter((p, i) => i === 0 || dist(p, input[i - 1]) > 0.05);
   if (pts.length === 0) return '';
@@ -22,19 +23,17 @@ export function ribbon(input: Sample[], width: number): string {
     const r = penWidth(width, p) / 2;
     return `M${f1(x - r)},${f1(y)}a${f1(r)},${f1(r)} 0 1,0 ${f1(2 * r)},0a${f1(r)},${f1(r)} 0 1,0 ${f1(-2 * r)},0Z`;
   }
-  const n = pts.length;
-  const h = pts.map((q) => penWidth(width, q.p) / 2);
-  const L: string[] = [];
-  const R: string[] = [];
-  for (let i = 0; i < n; i++) {
-    const a = pts[Math.max(0, i - 1)];
-    const b = pts[Math.min(n - 1, i + 1)];
-    const d = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-    const nx = -(b.y - a.y) / d;
-    const ny = (b.x - a.x) / d;
-    L.push(`${f1(pts[i].x + nx * h[i])},${f1(pts[i].y + ny * h[i])}`);
-    R.push(`${f1(pts[i].x - nx * h[i])},${f1(pts[i].y - ny * h[i])}`);
+  let d = '';
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[i + 1];
+    const ha = penWidth(width, a.p) / 2;
+    const hb = penWidth(width, b.p) / 2;
+    const len = dist(a, b);
+    const nx = -(b.y - a.y) / len;
+    const ny = (b.x - a.x) / len;
+    const P = (q: Pt, h: number, sgn: number) => `${f1(q.x + sgn * nx * h)},${f1(q.y + sgn * ny * h)}`;
+    d += `M${P(a, ha, 1)}L${P(b, hb, 1)}A${f1(hb)},${f1(hb)} 0 0 0 ${P(b, hb, -1)}L${P(a, ha, -1)}A${f1(ha)},${f1(ha)} 0 0 0 ${P(a, ha, 1)}Z`;
   }
-  const cap = (r: number, to: string) => `A${f1(r)},${f1(r)} 0 0 1 ${to}`;
-  return `M${L.join('L')}${cap(h[n - 1], R[n - 1])}L${R.slice().reverse().join('L')}${cap(h[0], L[0])}Z`;
+  return d;
 }
