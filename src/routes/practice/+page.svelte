@@ -91,18 +91,14 @@
   </section>
 
   <div class="right">
-    <!-- どのモードでも同じ並び。使えないボタンは薄く残す（おてほんなし の みる はお手本を見せないので使えない） -->
+    <!-- どのモードでも同じ並び。途中のボタンは薄く残して位置を保つ（おてほんなし の みる はお手本を見せない）。一番下の できた は おてほんなし だけ -->
     <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(speechOf(s.c), info().speech)} />
     <ActionButton icon="eye" label="みる" disabled={s.mode === 'test'} onclick={() => canvas?.playDemo()} />
     <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
     <ActionButton icon="refresh" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
-    <ActionButton
-      icon="check"
-      label="できた"
-      ready={s.drawn}
-      disabled={s.mode !== 'test'}
-      onclick={() => canvas?.judge()}
-    />
+    {#if s.mode === 'test'}
+      <ActionButton icon="check" label="できた" ready={s.drawn} onclick={() => canvas?.judge()} />
+    {/if}
   </div>
 
   {#if s.drive}
