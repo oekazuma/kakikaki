@@ -55,6 +55,8 @@
     const r = t.undo();
     if (!r) return;
     if (r === 'stroke') onStroke?.(t.si);
+    // なぞる で画を戻したら、その画のお手本をもう一度見せる
+    if (r === 'stroke' && mode === 'trace') playDemo();
     if (mode !== 'test') return armIdle();
     onStroke?.(t.trails.length);
     armJudge();

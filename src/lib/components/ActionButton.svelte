@@ -1,24 +1,26 @@
 <script lang="ts">
   import Icon from './Icon.svelte';
-  // 練習・かきクイズの右側に並ぶ大きなボタン。done は「できた」用、active は読み上げ中の点灯
+  // 練習・かきクイズの右側に並ぶ大きなボタン。できた（check）は大きく目立たせ、active は読み上げ中の点灯。
+  // disabled はそのモードで使えないボタン。モードが変わってもボタンの位置がずれないよう、消さずに薄く残す
   let {
     icon,
     label,
     onclick,
-    done = false,
     ready = false,
-    active = false
+    active = false,
+    disabled = false
   }: {
     icon: 'speaker' | 'refresh' | 'undo' | 'check' | 'eye';
     label: string;
     onclick: () => void;
-    done?: boolean;
     ready?: boolean;
     active?: boolean;
+    disabled?: boolean;
   } = $props();
+  const done = $derived(icon === 'check');
 </script>
 
-<button class={['rb', { done, ready, active }]} {onclick}>
+<button class={['rb', { done, ready, active }]} {onclick} {disabled}>
   <span class="card ic"><Icon name={icon} size={done ? 36 : 32} /></span>{label}
 </button>
 
@@ -30,6 +32,9 @@
     font-size: 13px;
     font-weight: bold;
     color: var(--sub);
+  }
+  .rb:disabled {
+    opacity: 0.3;
   }
   .ic {
     width: 68px;

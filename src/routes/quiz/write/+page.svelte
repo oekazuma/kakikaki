@@ -34,6 +34,7 @@
   });
   const strokes = $derived(strokesOf());
   const yomi = $derived(w.word && w.kind === 'kanji' ? kanjiReading(w.word.name) : '');
+  const say = $derived(w.kind === 'kanji' ? readingSpeech(yomi) : w.word ? nameOf(w.word) : '');
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const hear = speaker((on) => (speaking = on));
@@ -49,14 +50,10 @@
   {#if w.word}
     <div class="left">
       <div class="card pic">
-        {#if w.kind === 'kanji'}
-          <b class="yomi kyokasho">{readingLabel(yomi)}</b>
-          <button class={['hear', { speaking }]} onclick={() => hear(readingSpeech(yomi), info().speech)}
-            ><Icon name="speaker" size={22} /> きく</button
-          >
-        {:else if w.kind === 'listen'}
-          <button class={['hear', 'big', { speaking }]} onclick={() => hear(nameOf(w.word), info().speech)}
-            ><Icon name="speaker" size={40} /> きく</button
+        {#if w.kind === 'kanji'}<b class="yomi kyokasho">{readingLabel(yomi)}</b>{/if}
+        {#if w.kind === 'kanji' || w.kind === 'listen'}
+          <button class={['hear', { big: w.kind === 'listen', speaking }]} onclick={() => hear(say, info().speech)}
+            ><Icon name="speaker" size={w.kind === 'listen' ? 40 : 22} /> きく</button
           >
           <small>きこえた ことばを かこう</small>
         {:else}
@@ -98,13 +95,15 @@
     </section>
 
     <div class="right">
-      {#if w.mode === 'test'}
-        <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
-      {/if}
+      <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
       <ActionButton icon="refresh" label="やりなおす" onclick={() => w.nextLetter(w.k)} />
-      {#if w.mode === 'test'}
-        <ActionButton icon="check" label="できた" done ready={w.drawn} onclick={() => canvas?.judge()} />
-      {/if}
+      <ActionButton
+        icon="check"
+        label="できた"
+        ready={w.drawn}
+        disabled={w.mode !== 'test'}
+        onclick={() => canvas?.judge()}
+      />
     </div>
   {/if}
   {#if w.done}

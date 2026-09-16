@@ -59,6 +59,20 @@ describe('Tracer なぞる', () => {
     f.move(f.current[3]);
     expect(f.pr).toEqual([]);
   });
+  it('なぞる の ひとつ もどる は直前の画へ戻る（なぞっている最中と最初の画では戻れない）', () => {
+    const t = new Tracer('い', STROKES, 'trace');
+    expect(t.undo()).toBeNull();
+    t.down(t.current[0]);
+    for (const q of t.current) t.move(q);
+    expect(t.up()).toBe('stroke');
+    expect(t.si).toBe(1);
+    t.down(t.current[0]);
+    expect(t.undo()).toBeNull(); // なぞっている最中
+    t.up();
+    expect(t.undo()).toBe('stroke');
+    expect(t.si).toBe(0);
+    expect(t.cursor).toBe(0);
+  });
   it('途中で離すと fail', () => {
     const t = new Tracer('あ', STROKES, 'trace');
     const pts = strokePts('あ', 0);
