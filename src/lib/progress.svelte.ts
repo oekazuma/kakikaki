@@ -210,7 +210,7 @@ export function detailOf(pid: string, l: Lang): Detail {
   );
   return {
     ...st,
-    medals: Object.keys(d.earned).length,
+    medals: badgesOf(l).filter((b) => d.earned[b.id]).length,
     medalTotal: badgesOf(l).length,
     last: d.days.length ? [...d.days].sort().at(-1)! : null,
     weak: weakIn(d.progress)

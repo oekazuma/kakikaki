@@ -44,7 +44,7 @@
   function finish() {
     isBest = saveScore(profiles.cur, g.score, today());
     recordBalloon(profiles.cur);
-    // かくしメダル（みつけた・100 てん・300 てん）を確定して順に見せる
+    // かくしメダル（みつけた・てんすう）を確定して順に見せる
     checkBadges().forEach((b, k) =>
       setTimeout(
         () => {

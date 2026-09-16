@@ -75,11 +75,11 @@ describe('badges', () => {
           30,
           quiz,
           7,
-          { balloons: 1, balloon: 300, eggs: 1, pinball: 200 }
+          { balloons: 1, balloon: 5000, eggs: 1, pinball: 1000 }
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
-      expect(badgesOf(l).length).toBe(l === 'en' ? 56 : 60);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : 66);
     }
   });
   it('need は [達成数, 必要数]', () => {
@@ -140,10 +140,18 @@ describe('badges', () => {
       0,
       {},
       0,
-      { balloons: 1, balloon: 120, eggs: 1, pinball: 120 }
+      { balloons: 1, balloon: 1200, eggs: 1, pinball: 350 }
     );
-    expect(earnedBadges('ja', s).map((b) => b.id)).toEqual(['balloon-found', 'balloon-100', 'egg-jump', 'pinball-100']);
+    expect(earnedBadges('ja', s).map((b) => b.id)).toEqual([
+      'balloon-found',
+      'balloon-500',
+      'balloon-1000',
+      'egg-jump',
+      'pinball-100',
+      'pinball-200',
+      'pinball-300'
+    ]);
     expect(nextBadge(badgesOf('ja'), no, {})?.secret).toBeFalsy();
-    expect(badgesOf('ja').filter((b) => b.secret).length).toBe(6);
+    expect(badgesOf('ja').filter((b) => b.secret).length).toBe(12);
   });
 });
