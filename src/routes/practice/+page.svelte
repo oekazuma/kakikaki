@@ -79,8 +79,7 @@
           {strokes}
           mode={s.mode}
           onDone={(r) => s.done(r)}
-          onStroke={(k) => (s.stroke = k + 1)}
-          onDrawn={(v) => (s.drawn = v)}
+          onStroke={(n) => ((s.stroke = n), (s.drawn = n > 0))}
         />
       {/key}
       {#if s.flyStar}<div class="flystar"><Icon name="star" size={90} fill /></div>{/if}

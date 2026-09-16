@@ -73,7 +73,7 @@
             {strokes}
             mode={w.mode}
             onDone={(r) => w.onDone(r)}
-            onDrawn={(v) => (w.drawn = v)}
+            onStroke={(n) => (w.drawn = n > 0)}
           />
         {/key}
       </div>
