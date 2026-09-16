@@ -1,6 +1,8 @@
 import { WORDS, type Word } from './words';
 import { charsOf, lettersOf, type Lang } from './lang.svelte';
 import { DIGITS } from './chars';
+import { shuffle } from './shuffle';
+import { makeKanjiReadQuiz, makeKanjiWriteQuiz } from './quiz-kanji';
 
 export type Level = 1 | 2 | 3;
 export type Kind = 'read' | 'write';
@@ -20,18 +22,11 @@ export const wordsOf = (l: Lang, level: Level) => WORDS.filter((w) => levelOf(w,
 // よみクイズの出題形式
 //   word: 文字を見てイラストを選ぶ / picture: イラストを見て文字を選ぶ / listen: 聞いてイラストを選ぶ
 //   initial: 「り」で はじまる のは？ → イラスト / blank: り？ご の ？ に入る文字を選ぶ（letters が選択肢、key が正解）
-type ReadKind = 'word' | 'picture' | 'listen' | 'initial' | 'blank';
+//   kanji-read: 字を見て読みを選ぶ（letters が読み、key が代表の読み）/ kanji-listen: 読みを聞いて字を選ぶ（choices が字）
+type ReadKind = 'word' | 'picture' | 'listen' | 'initial' | 'blank' | 'kanji-read' | 'kanji-listen';
+// 単語の 5 形式の割り当て。かんじ の 2 形式は quiz-kanji.ts が組むのでここには入れない
 export const READ_KINDS: ReadKind[] = ['word', 'picture', 'listen', 'initial', 'blank'];
 export type ReadQ = { kind: ReadKind; answer: Word; choices: Word[]; key: string; letters?: string[]; blank?: number };
-
-export function shuffle<T>(arr: T[], rnd = Math.random): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // 選択肢: 同じカテゴリ優先。むずかしい（Level 3）はさらに同じ文字数を優先して紛らわしくする
 export function pickChoices(
@@ -71,6 +66,7 @@ function blankLetters(correct: string, l: Lang, rnd: () => number): string[] {
 }
 
 export function makeReadQuiz(l: Lang, level: Level, n = QUESTIONS.read, rnd = Math.random): ReadQ[] {
+  if (l === 'kanji') return makeKanjiReadQuiz(level, n, rnd);
   const pool = wordsOf(l, level);
   // 5 形式を混ぜる。10 問なら各形式 2 回ずつ、順番は毎回変わる
   const order = Array.from({ length: n }, (_, i) => i).flatMap((i) =>
@@ -107,10 +103,12 @@ export function makeReadQuiz(l: Lang, level: Level, n = QUESTIONS.read, rnd = Ma
 }
 
 // かきクイズの出題形式。picture: イラストを見て書く / listen: 聞いて書く（絵なし）/ blank: 1 文字だけ ？ にして書く。順に出す
-type WriteKind = 'picture' | 'listen' | 'blank';
+// kanji: 読みを見て（聞いて）字を書く。accept は正解にする字（同じ読みの字をまとめる）
+type WriteKind = 'picture' | 'listen' | 'blank' | 'kanji';
 export const WRITE_KINDS: WriteKind[] = ['picture', 'listen', 'blank'];
-export type WriteQ = { word: Word; kind: WriteKind; blank?: number };
+export type WriteQ = { word: Word; kind: WriteKind; blank?: number; accept?: string[] };
 export function makeWriteQuiz(l: Lang, level: Level, n = QUESTIONS.write, rnd = Math.random): WriteQ[] {
+  if (l === 'kanji') return makeKanjiWriteQuiz(level, n, rnd);
   return shuffle(wordsOf(l, level), rnd)
     .slice(0, n)
     .map((word, i) => {
