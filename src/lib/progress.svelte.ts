@@ -55,7 +55,7 @@ const load = (l: Lang) => loadOf(profiles.cur, l);
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
 const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
 
-const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
+const data = $state<Record<Lang, Data>>(Object.fromEntries(LANGS.map((l) => [l, load(l)])) as Record<Lang, Data>);
 const cur = () => data[lang.v];
 
 // 使う人を切り替える: その人の言語に戻し、記録を読み直す

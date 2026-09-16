@@ -13,6 +13,7 @@ import {
 } from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
 import { lettersOf, type Lang } from './lang.svelte';
+import { KANJI } from './kanji';
 import { LEVEL_NAME } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
@@ -47,10 +48,17 @@ const ROWS_EN: Row[] = [
   { name: 'すうじ', chars: DIGITS }
 ];
 const ROWS_KANA: Row[] = ROWS_JA.map((r) => ({ name: toKatakana(r.name), chars: r.chars.map(toKatakana) }));
-export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, en: ROWS_EN };
-const ALL_CHARS: Record<Lang, string[]> = { ja: CHARS, kana: CHARS_KANA, en: CHARS_EN };
+const ROWS_KANJI: Row[] = KANJI.map((k) => ({ name: k.name, chars: k.chars }));
+export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, kanji: ROWS_KANJI, en: ROWS_EN };
+const ALL_CHARS: Record<Lang, string[]> = {
+  ja: CHARS,
+  kana: CHARS_KANA,
+  kanji: KANJI.flatMap((k) => k.chars),
+  en: CHARS_EN
+};
 export const CAT_TOTAL = Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c).length]));
-export const TOTAL = (l: Lang) => ({ chars: ALL_CHARS[l].length, words: WORDS.length });
+// かんじ は単語を持たない（1 文字練習だけ）。単語の合計が 0 の ことば では単語系のメダル・表示を出さない
+export const TOTAL = (l: Lang) => ({ chars: ALL_CHARS[l].length, words: l === 'kanji' ? 0 : WORDS.length });
 
 export function computeStats(
   l: Lang,
