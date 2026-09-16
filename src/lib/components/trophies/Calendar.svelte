@@ -1,7 +1,7 @@
 <script lang="ts">
   import Icon from '../Icon.svelte';
   import { today } from '$lib/today';
-  // 今月のカレンダー。3 ことば をまたいで練習した日に印。連続した日数を上に出す（切れたことは言わない）
+  // 今月のカレンダー。全ことば をまたいで練習した日に印。連続した日数を上に出す（切れたことは言わない）
   let { days, streak }: { days: string[]; streak: number } = $props();
   const t = today();
   const [y, m] = t.split('-').map(Number);

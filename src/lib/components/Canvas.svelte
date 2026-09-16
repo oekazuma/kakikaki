@@ -11,20 +11,21 @@
     char,
     strokes,
     mode,
+    accept,
     onDone,
-    onStroke,
-    onDrawn
+    onStroke
   }: {
     char: string;
     strokes: Record<string, string[]>;
     mode: Mode;
+    accept?: string[]; // おてほんなし で正解にする字（省略時は char だけ）
     onDone: (r: Result) => void;
-    onStroke?: (i: number) => void;
-    onDrawn?: (has: boolean) => void; // おてほんなし で線が 1 本以上あるか（できた を押せるか）
+    // 盤面にある画の数。なぞる／じぶんでかく は完成した画の数、おてほんなし は引いた線の数（0 なら できた を押せない）
+    onStroke?: (n: number) => void;
   } = $props();
 
   // 文字・モードの切替は親が {#key} で再マウントするので、判定器は初期値で 1 回だけ作る
-  const t = untrack(() => new Tracer(char, strokes, mode));
+  const t = untrack(() => new Tracer(char, strokes, mode, accept));
   let board = $state<Board>();
   let shake = $state(false);
   let bounce = $state(-1);
@@ -47,15 +48,15 @@
     const r = t.judge();
     if (r) onDone(r);
   }
-  // ひとつ もどる。画を取り消したら画数の表示も戻し、おてほんなし の線が無くなれば親に知らせる
+  // ひとつ もどる。画を取り消したら画数の表示も戻し、おてほんなし では線の数を親に知らせる
   export function undo() {
     clearTimeout(idle);
     const r = t.undo();
     if (!r) return;
-    if (r === 'stroke') onStroke?.(t.si - 1);
+    if (r === 'stroke') onStroke?.(t.si);
     if (mode !== 'test') return armIdle();
-    if (t.trails.length === 0) onDrawn?.(false);
-    else idle = setTimeout(judge, 4000);
+    onStroke?.(t.trails.length);
+    if (t.trails.length > 0) idle = setTimeout(judge, 4000);
   }
   // 書き順の再生。なぞる では自動で、他のモードでは右の「みる」から
   export function playDemo() {
@@ -92,7 +93,7 @@
     if (ev === 'fail') failed();
     else if (ev === 'stroke' || ev === 'done') completed(i, ev === 'done');
     else if (ev === 'drawn') {
-      onDrawn?.(true);
+      onStroke?.(t.trails.length);
       clearTimeout(idle);
       idle = setTimeout(judge, 4000);
     }
@@ -111,7 +112,7 @@
       const q = board!.toScreen(p);
       fx.burst(q.x, q.y, 3);
     }
-    onStroke?.(i);
+    onStroke?.(t.si);
     if (all) later(() => onDone(t.result()), 400);
     else {
       if (mode === 'trace') playDemo();

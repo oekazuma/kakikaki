@@ -61,8 +61,9 @@ export function recognize(strokes: Pt[][], templates: Template[]) {
   return templates.map((t) => ({ char: t.char, dist: distance(input, t.strokes) })).sort((p, q) => p.dist - q.dist);
 }
 
-export function passes(target: string, results: { char: string; dist: number }[]) {
-  const i = results.findIndex((r) => r.char === target);
+// 候補は普通 1 字だが、かきクイズでは同じ読みの字（工・公 など）をまとめて渡す
+export function passes(targets: string[], results: { char: string; dist: number }[]) {
+  const i = results.findIndex((r) => targets.includes(r.char));
   if (i === 0) return results[0].dist < RECOG.D_MAX * 2;
   return i === 1 && results[1].dist - results[0].dist < RECOG.MARGIN;
 }

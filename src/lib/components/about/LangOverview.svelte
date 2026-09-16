@@ -7,6 +7,10 @@
   let { l, d, on, onselect }: { l: Lang; d: Detail; on: boolean; onselect: () => void } = $props();
   const total = $derived(TOTAL(l));
   const empty = $derived(d.chars + d.words + d.medals + d.days + Object.keys(d.quiz).length === 0);
+  // {#if} の中を「· 王冠」で始めると、フラグメント先頭の空白が Svelte に刈られて「·王冠」とくっつくため文字列で組む
+  const sub = $derived(
+    `金の星 ${d.gold}${total.words ? ` · 王冠 ${d.crowns}` : ''} · メダル ${d.medals}/${d.medalTotal}`
+  );
 </script>
 
 <button class={['card', 'lang', { on }]} onclick={onselect} aria-pressed={on}>
@@ -14,11 +18,12 @@
   {#if empty}
     <span class="none">まだ記録がありません</span>
   {:else}
-    <Ring chars={[d.chars, total.chars]} words={[d.words, total.words]} />
+    <Ring chars={[d.chars, total.chars]} words={total.words ? [d.words, total.words] : undefined} />
     <span
-      ><span class="c">●</span> 文字 {d.chars}/{total.chars} <span class="w">●</span> 単語 {d.words}/{total.words}</span
+      ><span class="c">●</span> 文字 {d.chars}/{total.chars}
+      {#if total.words}<span class="w">●</span> 単語 {d.words}/{total.words}{/if}</span
     >
-    <span class="sub">金の星 {d.gold} · 王冠 {d.crowns} · メダル {d.medals}/{d.medalTotal}</span>
+    <span class="sub">{sub}</span>
   {/if}
 </button>
 

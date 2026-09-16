@@ -3,19 +3,38 @@
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
-  import { info } from '$lib/lang.svelte';
+  import { lang, info } from '$lib/lang.svelte';
   import { quiz } from '$lib/progress.svelte';
-  import { LEVEL_NAME, QUESTIONS, type Kind, type Level } from '$lib/quiz';
+  import { levelName, QUESTIONS, type Kind, type Level } from '$lib/quiz';
 
-  const KINDS: { id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[] = [
-    { id: 'read', icon: 'eye', name: 'よみクイズ', desc: 'もじを よんで えを えらぼう' },
-    { id: 'write', icon: 'pencil', name: 'かきクイズ', desc: 'えを みて もじを かこう' }
-  ];
-  const LEVELS: { lv: Level; hint: string }[] = [
-    { lv: 1, hint: 'みじかい ことば' },
-    { lv: 2, hint: 'ふつうの ことば' },
-    { lv: 3, hint: 'ながい ことば' }
-  ];
+  const kanji = $derived(lang.v === 'kanji');
+  const KINDS = $derived<{ id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[]>([
+    {
+      id: 'read',
+      icon: 'eye',
+      name: 'よみクイズ',
+      desc: kanji ? 'かんじの よみを こたえよう' : 'もじを よんで えを えらぼう'
+    },
+    {
+      id: 'write',
+      icon: 'pencil',
+      name: 'かきクイズ',
+      desc: kanji ? 'よみを みて かんじを かこう' : 'えを みて もじを かこう'
+    }
+  ]);
+  const LEVELS = $derived<{ lv: Level; hint: string }[]>(
+    kanji
+      ? [
+          { lv: 1, hint: '80 じ' },
+          { lv: 2, hint: '160 じ' },
+          { lv: 3, hint: '200 じ' }
+        ]
+      : [
+          { lv: 1, hint: 'みじかい ことば' },
+          { lv: 2, hint: 'ふつうの ことば' },
+          { lv: 3, hint: 'ながい ことば' }
+        ]
+  );
 </script>
 
 <svelte:head>
@@ -42,7 +61,7 @@
           {#each LEVELS as { lv, hint } (lv)}
             <a class={['lv', `l${lv}`]} href="{resolve(`/quiz/${k.id}`)}?level={lv}">
               <span class="stars">{'★'.repeat(lv)}</span>
-              <span class="name">{LEVEL_NAME[lv]}<small>{hint}</small></span>
+              <span class="name">{levelName(lv, lang.v)}<small>{hint}</small></span>
               <span class="n">せいかい<b>{quiz()[`${k.id}${lv}`] ?? 0}</b></span>
             </a>
           {/each}

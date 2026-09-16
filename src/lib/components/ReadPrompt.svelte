@@ -3,6 +3,7 @@
   import { imageUrl } from '$lib/image';
   import { info, nameOf, lettersOf } from '$lib/lang.svelte';
   import { speaker } from '$lib/audio';
+  import { kanjiReading } from '$lib/kanji';
   import type { ReadQ } from '$lib/quiz';
   // よみクイズの出題部分（形式ごとに見せ方が変わる）。文字→イラスト は読む練習なので読み上げボタンを出さない
   let { q }: { q: ReadQ } = $props();
@@ -22,6 +23,15 @@
   {:else if q.kind === 'initial'}
     <b class="target kyokasho">{lettersOf(q.answer)[0]}</b>
     <span>で はじまる ものは どれ？</span>
+  {:else if q.kind === 'kanji-read'}
+    <b class="target kyokasho">{nameOf(q.answer)}</b>
+    <span>の よみかたは？</span>
+  {:else if q.kind === 'kanji-listen'}
+    <button class={['hear', 'big', { speaking }]} onclick={() => hear(kanjiReading(q.answer.name), info().speech)}
+      ><Icon name="speaker" size={40} /> きく</button
+    >
+    <b class="target kyokasho">{kanjiReading(q.answer.name)}</b>
+    <span>と よむ かんじは どれ？</span>
   {:else if q.kind === 'blank'}
     <img src={imageUrl(q.answer)} alt="" width="200" height="140" loading="eager" />
     <div class="fill">

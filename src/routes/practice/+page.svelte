@@ -18,7 +18,7 @@
   import DriveBy from '$lib/components/DriveBy.svelte';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { PracticeSession, resolveWord } from '$lib/practice.svelte';
-  import { speaker, sfx, readingOf } from '$lib/audio';
+  import { speaker, sfx, speechOf } from '$lib/audio';
   import { fx } from '$lib/fx';
 
   const word = $derived(resolveWord(page.url.searchParams.get('w'), lang.v));
@@ -79,8 +79,7 @@
           {strokes}
           mode={s.mode}
           onDone={(r) => s.done(r)}
-          onStroke={(k) => (s.stroke = k + 1)}
-          onDrawn={(v) => (s.drawn = v)}
+          onStroke={(n) => ((s.stroke = n), (s.drawn = n > 0))}
         />
       {/key}
       {#if s.flyStar}<div class="flystar"><Icon name="star" size={90} fill /></div>{/if}
@@ -89,7 +88,7 @@
   </section>
 
   <div class="right">
-    <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(readingOf(s.c), info().speech)} />
+    <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(speechOf(s.c), info().speech)} />
     {#if s.mode !== 'test'}
       <ActionButton icon="eye" label="みる" onclick={() => canvas?.playDemo()} />
     {/if}

@@ -6,12 +6,13 @@
   import { fly } from 'svelte/transition';
   import WordCard from '$lib/components/WordCard.svelte';
   import ContinueCard from '$lib/components/ContinueCard.svelte';
+  import KanjiGrid from '$lib/components/KanjiGrid.svelte';
   import { WORDS, CATEGORIES } from '$lib/words';
   import { unlock } from '$lib/audio';
-  import Bar from '$lib/components/Bar.svelte';
   import Icon from '$lib/components/Icon.svelte';
+  import ProgressCard from '$lib/components/ProgressCard.svelte';
   import { badgesOf, TOTAL } from '$lib/badges';
-  import { earned, stats } from '$lib/progress.svelte';
+  import { stats } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
   import LangToggle from '$lib/components/LangToggle.svelte';
   import ProfileButton from '$lib/components/ProfileButton.svelte';
@@ -19,13 +20,14 @@
   const s = $derived(stats());
   const total = $derived(TOTAL(lang.v));
   const badgeCount = $derived(badgesOf(lang.v).length);
+  const kanji = $derived(lang.v === 'kanji');
 </script>
 
 <svelte:head>
   <title>{info().title}</title>
   <meta
     name="description"
-    content="iPad で遊ぶ、子ども向けのひらがな書き練習アプリ。すきな単語をえらんで、なぞって、じぶんで書いて、星とメダルをあつめよう。"
+    content="iPad で遊ぶ、子ども向けのひらがな・カタカナ・漢字・英語の書き練習アプリ。すきな単語をえらんで、なぞって、じぶんで書いて、星とメダルをあつめよう。"
   />
 </svelte:head>
 
@@ -40,15 +42,9 @@
     <ProfileButton />
     <LangToggle />
     <nav>
-      <a class="card prog" href={resolve('/trophies')}>
-        <span class="tr"><Icon name="trophy" size={22} /> {Object.keys(earned()).length} / {badgeCount}</span>
-        <span class="pl">もじ {s.chars}/{total.chars}<Bar have={s.chars} need={total.chars} /></span>
-        <span class="pl"
-          >たんご {s.words}/{total.words}<Bar have={s.words} need={total.words} color="var(--teal)" /></span
-        >
-      </a>
+      <ProgressCard {s} {total} {badgeCount} />
       <a class="card btn quiz" href={resolve('/quiz')}><Icon name="bulb" size={22} /> クイズ</a>
-      <a class="card btn" href={resolve('/chars')}>もじから えらぶ</a>
+      {#if !kanji}<a class="card btn" href={resolve('/chars')}>もじから えらぶ</a>{/if}
       <a
         class="card btn help"
         href={resolve('/about')}
@@ -61,24 +57,28 @@
   </header>
   {#key lang.v}
     <div class="words" in:fly={{ x: 80, duration: 350 }}>
-      <ContinueCard />
-      {#each CATEGORIES as cat (cat)}
-        <h2>{cat}</h2>
-        <div class="row">
-          {#each WORDS.filter((w) => w.category === cat) as w, n (w.id)}
-            <WordCard
-              word={w}
-              size={150}
-              fill
-              lazy={cat !== CATEGORIES[0] || n >= 7}
-              onclick={() => {
-                unlock();
-                goto(practiceUrl(w.id));
-              }}
-            />
-          {/each}
-        </div>
-      {/each}
+      {#if kanji}
+        <KanjiGrid />
+      {:else}
+        <ContinueCard />
+        {#each CATEGORIES as cat (cat)}
+          <h2>{cat}</h2>
+          <div class="row">
+            {#each WORDS.filter((w) => w.category === cat) as w, n (w.id)}
+              <WordCard
+                word={w}
+                size={150}
+                fill
+                lazy={cat !== CATEGORIES[0] || n >= 7}
+                onclick={() => {
+                  unlock();
+                  goto(practiceUrl(w.id));
+                }}
+              />
+            {/each}
+          </div>
+        {/each}
+      {/if}
     </div>
   {/key}
 </main>
@@ -123,29 +123,6 @@
     gap: 10px;
     white-space: nowrap;
   }
-  .prog {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 14px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-    color: var(--ink);
-  }
-  .pl {
-    display: grid;
-    gap: 3px;
-    width: 96px;
-    font-size: 11px;
-    color: var(--sub);
-  }
-  .tr {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--warn);
-  }
   .btn.quiz {
     gap: 6px;
   }
@@ -183,11 +160,5 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     padding: 6px 0 10px;
-  }
-  /* iPad Pro 12.9（1366）や名前 6 文字でも 1 行に収める。進捗バーは実績画面にもあるので省略 */
-  @media (max-width: 1500px) {
-    .pl {
-      display: none;
-    }
   }
 </style>

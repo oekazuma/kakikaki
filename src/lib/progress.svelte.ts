@@ -55,7 +55,7 @@ const load = (l: Lang) => loadOf(profiles.cur, l);
 // 記録の保存失敗（容量超過）は子どもに見せない。練習は止めずに続ける
 const save = (l: Lang, name: keyof Data) => void saveJSON(key(l, name), data[l][name]);
 
-const data = $state<Record<Lang, Data>>({ ja: load('ja'), kana: load('kana'), en: load('en') });
+const data = $state<Record<Lang, Data>>(Object.fromEntries(LANGS.map((l) => [l, load(l)])) as Record<Lang, Data>);
 const cur = () => data[lang.v];
 
 // 使う人を切り替える: その人の言語に戻し、記録を読み直す
@@ -163,7 +163,7 @@ export function resetRecords(pid: string, langs: Lang[]) {
 // 現在の人・言語の記録だけ消す
 export const reset = () => resetRecords(profiles.cur, [lang.v]);
 
-// 練習した日は 3 ことば をまたいで 1 つに（連続日数とカレンダー用）。Set は重複除去に使うだけで描画には持ち出さない
+// 練習した日は 全ことば をまたいで 1 つに（連続日数とカレンダー用）。Set は重複除去に使うだけで描画には持ち出さない
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
 export const allDays = () => [...new Set(LANGS.flatMap((l) => data[l].days))];
 export const streakNow = () => streak(allDays(), today());
@@ -216,7 +216,7 @@ export function detailOf(pid: string, l: Lang): Detail {
     weak: weakIn(d.progress)
   };
 }
-// その人が練習した日付（3 ことば の union）と連続日数
+// その人が練習した日付（全ことば の union）と連続日数
 // eslint-disable-next-line svelte/prefer-svelte-reactivity
 export const daysOf = (pid: string) => [...new Set(LANGS.flatMap((l) => loadOf(pid, l).days))];
 export const streakOf = (pid: string) => streak(daysOf(pid), today());

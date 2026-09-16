@@ -4,7 +4,7 @@
   import Icon from './Icon.svelte';
   import { imageUrl } from '$lib/image';
   import { nameOf } from '$lib/lang.svelte';
-  import { wordCrown } from '$lib/progress.svelte';
+  import { crownOf } from '$lib/practice.svelte';
   import { isCharWord, type Word } from '$lib/words';
   let {
     word,
@@ -12,18 +12,20 @@
     onreplay,
     onchallenge
   }: { word: Word; onnext: () => void; onreplay: () => void; onchallenge: () => void } = $props();
-  const crown = $derived(wordCrown(word));
+  const crown = $derived(crownOf(word));
 </script>
 
 <div class="complete card" in:fly={{ y: 40, duration: 350 }}>
-  <img
-    src={imageUrl(word)}
-    alt=""
-    width="170"
-    height="120"
-    loading="eager"
-    onerror={(e) => ((e.currentTarget as HTMLImageElement).hidden = true)}
-  />
+  {#if !isCharWord(word)}
+    <img
+      src={imageUrl(word)}
+      alt=""
+      width="170"
+      height="120"
+      loading="eager"
+      onerror={(e) => ((e.currentTarget as HTMLImageElement).hidden = true)}
+    />
+  {/if}
   <b class="cname kyokasho">{nameOf(word)}</b>
   <p>ぜんぶ できた！</p>
   {#if crown}<span class="mark gold"><Icon name="crown" size={22} fill /> おうかん</span>{:else}<span class="mark"

@@ -4,17 +4,25 @@
   import { CAT_TOTAL, TOTAL, type Stats } from '$lib/badges';
   import { CATEGORIES } from '$lib/words';
   import { quiz } from '$lib/progress.svelte';
-  import { LEVEL_NAME } from '$lib/quiz';
+  import { levelName } from '$lib/quiz';
   import { lang } from '$lib/lang.svelte';
 
   let { s }: { s: Stats } = $props();
   const total = $derived(TOTAL(lang.v));
-  const tiles = $derived([
-    { label: 'もじ', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },
-    { label: 'きんのほし', icon: 'star', have: s.gold, need: total.chars, color: 'var(--star)' },
-    { label: 'たんご', icon: 'book', have: s.words, need: total.words, color: 'var(--teal)' },
-    { label: 'おうかん', icon: 'crown', have: s.crowns, need: total.words, color: 'var(--warn)' }
-  ] as const);
+  const tiles = $derived(
+    [
+      { label: 'もじ', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },
+      { label: 'きんのほし', icon: 'star', have: s.gold, need: total.chars, color: 'var(--star)' },
+      { label: 'たんご', icon: 'book', have: s.words, need: total.words, color: 'var(--teal)' },
+      { label: 'おうかん', icon: 'crown', have: s.crowns, need: total.words, color: 'var(--warn)' }
+    ].filter((t) => t.need > 0) as {
+      label: string;
+      icon: 'pencil' | 'star' | 'book' | 'crown';
+      have: number;
+      need: number;
+      color: string;
+    }[]
+  );
   const pct = (h: number, n: number) => Math.floor((100 * h) / n);
 </script>
 
@@ -32,22 +40,25 @@
   {/each}
 </section>
 
-<section class="card cats">
-  {#each CATEGORIES as c (c)}
-    <div class="cat">
-      <span class="cn">{c}</span>
-      <Bar have={s.cats[c]} need={CAT_TOTAL[c]} color="var(--teal)" />
-      <small>{s.cats[c]} / {CAT_TOTAL[c]}</small>
-    </div>
-  {/each}
-</section>
+{#if total.words}
+  <section class="card cats">
+    {#each CATEGORIES as c (c)}
+      <div class="cat">
+        <span class="cn">{c}</span>
+        <Bar have={s.cats[c]} need={CAT_TOTAL[c]} color="var(--teal)" />
+        <small>{s.cats[c]} / {CAT_TOTAL[c]}</small>
+      </div>
+    {/each}
+  </section>
+{/if}
 
 <section class="card quiz">
   {#each [['read', 'よみクイズ'], ['write', 'かきクイズ']] as [k, name] (k)}
     <div class="qrow">
       <b>{name}</b>
       {#each [1, 2, 3] as lv (lv)}
-        <span class="qc"><small>{LEVEL_NAME[lv as 1 | 2 | 3]}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> もん</span>
+        <span class="qc"><small>{levelName(lv as 1 | 2 | 3, lang.v)}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> もん</span
+        >
       {/each}
     </div>
   {/each}
@@ -56,7 +67,7 @@
 <style>
   .tiles {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 12px;
     margin-bottom: 12px;
   }

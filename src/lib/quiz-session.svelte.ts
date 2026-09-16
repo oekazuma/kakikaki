@@ -103,6 +103,10 @@ export class WriteQuiz {
   get kind() {
     return this.qs[this.i]?.kind ?? 'picture';
   }
+  // おてほんなし で正解にする字（かんじ は同じ読みの字をまとめる）。省略時は Canvas が書く字だけを正解にする
+  get accept() {
+    return this.qs[this.i]?.accept;
+  }
   get letters() {
     return this.word ? lettersOf(this.word) : [];
   }

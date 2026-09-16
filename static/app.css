@@ -28,6 +28,11 @@
   --teal: #c95f2e;
   --dark: #b8502c;
 }
+[data-lang='kanji'] {
+  --blue: #c2495f;
+  --teal: #a63b4f;
+  --dark: #962e44;
+}
 main,
 .card,
 h1,
@@ -41,18 +46,40 @@ a,
     border-color 0.4s;
 }
 /* 教科書体（Klee One、SIL OFL）。書き順のお手本（KanjiVG）と同じ字形で り・き・さ を見せるため、ひらがな・カタカナ・英字を自前で持つ。
-   説明文までこの書体だと読みづらいので、UI は丸ゴシックのまま、書く対象の文字・単語だけ .kyokasho で使う */
+   説明文までこの書体だと読みづらいので、UI は丸ゴシックのまま、書く対象の文字・単語だけ .kyokasho で使う。
+   漢字（小学 1〜3 年の 440 字）は別ファイルにして unicode-range で分け、漢字を描く画面でだけ読み込まれるようにする。
+   既存の 2 つにも範囲を書くのは、範囲の無い face が漢字にも一致し、字が無くても同じ family の別 face には落ちないため */
 @font-face {
   font-family: 'Klee One';
   font-weight: 400;
   font-display: swap;
   src: url('fonts/KleeOne-Regular.woff2') format('woff2');
+  unicode-range:
+    U+0020-007E, U+00A0-00FF, U+2010-2027, U+3000-303F, U+3040-309F, U+30A0-30FF, U+FF01-FF5E, U+2190-2193, U+2605-2606,
+    U+25CB, U+25EF, U+00D7;
 }
 @font-face {
   font-family: 'Klee One';
   font-weight: 700;
   font-display: swap;
   src: url('fonts/KleeOne-SemiBold.woff2') format('woff2');
+  unicode-range:
+    U+0020-007E, U+00A0-00FF, U+2010-2027, U+3000-303F, U+3040-309F, U+30A0-30FF, U+FF01-FF5E, U+2190-2193, U+2605-2606,
+    U+25CB, U+25EF, U+00D7;
+}
+@font-face {
+  font-family: 'Klee One';
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/KleeOne-Regular-kanji.woff2') format('woff2');
+  unicode-range: U+4E00-9FFF;
+}
+@font-face {
+  font-family: 'Klee One';
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/KleeOne-SemiBold-kanji.woff2') format('woff2');
+  unicode-range: U+4E00-9FFF;
 }
 * {
   box-sizing: border-box;

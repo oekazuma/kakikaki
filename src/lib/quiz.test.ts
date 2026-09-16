@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, type ReadQ } from './quiz';
+import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, levelName, type ReadQ } from './quiz';
 import { WORDS, wordById } from './words';
 import { lettersOf, nameOf, LANGS, type Lang } from './lang.svelte';
 import { DIGITS } from './chars';
+import { TOTAL } from './badges';
 
 // 決定的な乱数
 const seeded =
@@ -53,7 +54,7 @@ describe('quiz', () => {
     expect(count).toEqual({ word: 2, picture: 2, listen: 2, initial: 2, blank: 2 });
   });
   it('3 ことば × 3 級 とも 10 問・3 択・重複なし・正解を含む', () => {
-    for (const l of LANGS)
+    for (const l of LANGS.filter((x) => TOTAL(x).words > 0))
       for (const level of [1, 2, 3] as const)
         for (const seed of [1, 2, 3]) {
           const count = checkRead(l, level, makeReadQuiz(l, level, 10, seeded(seed)));
@@ -100,7 +101,7 @@ describe('quiz', () => {
     for (const { word } of ws) expect(lettersOf(word, 'en').length).toBeLessThanOrEqual(4);
   });
   it('かきクイズの穴埋めは 2 文字以上の語から、範囲内の 1 文字を隠す（1 文字の語は絵に振り替わる）', () => {
-    for (const l of LANGS)
+    for (const l of LANGS.filter((x) => TOTAL(x).words > 0))
       for (const level of [1, 2, 3] as const)
         for (const seed of [1, 2]) {
           const ws = makeWriteQuiz(l, level, 10, seeded(seed));
@@ -127,5 +128,9 @@ describe('quiz', () => {
         seen.set(n, w.category);
       }
     }
+  });
+  it('級の名前は かんじ だけ学年', () => {
+    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'ja'))).toEqual(['かんたん', 'ふつう', 'むずかしい']);
+    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'kanji'))).toEqual(['1ねんせい', '2ねんせい', '3ねんせい']);
   });
 });

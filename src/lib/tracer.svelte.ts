@@ -25,7 +25,9 @@ export class Tracer {
   constructor(
     readonly char: string,
     readonly strokes: Record<string, string[]>,
-    readonly mode: Mode
+    readonly mode: Mode,
+    // おてほんなし で正解にする字。省略時は char だけ
+    private accept: string[] = [char]
   ) {
     this.samples = strokes[char].map((d) => pathToPoints(d));
   }
@@ -133,6 +135,6 @@ export class Tracer {
     this.judged = true;
     const r = recognize(this.trails, templatesFor(this.strokes));
     const mine = r.find((x) => x.char === this.char)!;
-    return { mode: 'test', score: testScore(mine.dist), ok: passes(this.char, r), top: r[0].char };
+    return { mode: 'test', score: testScore(mine.dist), ok: passes(this.accept, r), top: r[0].char };
   }
 }
