@@ -8,12 +8,11 @@ import {
   charGold,
   wordStar,
   wordCrown,
-  wordStarted,
+  openWordIds,
   recordWordStart,
   recordWordDone,
   checkBadges,
   CAP,
-  lastWord,
   type Mode
 } from './progress.svelte';
 import { lettersOf, charsOf, strokesOf, type Lang } from './lang.svelte';
@@ -69,11 +68,13 @@ export function nextMode(ch: string): Mode | null {
 
 export const wordDone = (w: Word) => wordStar(w);
 
-// ホームの「つづきから」: 最後に練習に入った単語が やりかけ（1 文字でも書いて、まだ最後まで練習していない）ならそれ。無ければ null
-export function nextOpenWord(): Word | null {
-  const w = wordById(lastWord() ?? '');
-  return w && wordStarted(w) ? w : null;
-}
+// ホームの「つづきから」: やりかけ（1 文字でも書いて、まだ最後まで練習していない）の単語を最近書いた順に 5 つまで
+export const OPEN_MAX = 5;
+export const openWords = (): Word[] =>
+  openWordIds()
+    .slice(0, OPEN_MAX)
+    .map((id) => wordById(id))
+    .filter((w) => w != null);
 
 // まだ終わっていない次の単語（同じ並び順で後ろから探し、末尾なら先頭へ）。全部終わっていれば null
 export function nextWordId(word: Word): string | null {

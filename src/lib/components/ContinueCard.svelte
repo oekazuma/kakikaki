@@ -2,24 +2,26 @@
   import { goto } from '$app/navigation';
   import WordCard from './WordCard.svelte';
   import { practiceUrl } from '$lib/nav';
-  import { nextOpenWord } from '$lib/practice.svelte';
+  import { openWords } from '$lib/practice.svelte';
   import { unlock } from '$lib/audio';
-  // ホームの先頭: やりかけの単語を 1 枚。無ければ何も出さない
-  const next = $derived(nextOpenWord());
+  // ホームの先頭: やりかけの単語を最近のものから。無ければ何も出さない
+  const words = $derived(openWords());
 </script>
 
-{#if next}
+{#if words.length}
   <h2>つづきから</h2>
   <div class="row">
-    <WordCard
-      word={next}
-      size={150}
-      fill
-      onclick={() => {
-        unlock();
-        goto(practiceUrl(next.id));
-      }}
-    />
+    {#each words as w (w.id)}
+      <WordCard
+        word={w}
+        size={150}
+        fill
+        onclick={() => {
+          unlock();
+          goto(practiceUrl(w.id));
+        }}
+      />
+    {/each}
   </div>
 {/if}
 

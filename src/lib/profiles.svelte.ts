@@ -8,7 +8,7 @@ export const NAME_MAX = 10;
 export const DEFAULT_AVATAR = 'cat';
 const KEY = 'kk:profiles';
 // 人と言語ごとの記録。名前を足すときはここだけ増やす（削除・リセット・移行がすべてこの一覧を回る）
-export const DATA_NAMES = ['progress', 'earned', 'days', 'quiz', 'last', 'words'] as const;
+export const DATA_NAMES = ['progress', 'earned', 'days', 'quiz', 'words'] as const;
 type DataName = (typeof DATA_NAMES)[number];
 export const keyOf = (pid: string, l: Lang, name: DataName) => `kk:${pid}:${l}:${name}`;
 type Saved = { list: Profile[]; cur: string };

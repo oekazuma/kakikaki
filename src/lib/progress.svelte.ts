@@ -17,8 +17,8 @@ type Data = {
   earned: Record<string, string>;
   days: string[];
   quiz: Record<string, number>;
-  last: string | null; // 最後に練習に入った単語 id（ホームの「つづきから」）
-  // 単語 id → 最後まで練習した日。null は始めた（1 文字でも書いた）だけ、'' は単語の記録を持つ前に星が付いていた単語（移行）
+  // 単語 id → 最後まで練習した日。null は始めた（1 文字でも書いた）だけ、'' は単語の記録を持つ前に星が付いていた単語（移行）。
+  // やりかけ（null）はキーの並びが最近書いた順（ホームの「つづきから」がこの順で並べる）
   words: Record<string, string | null>;
 };
 
@@ -48,7 +48,6 @@ const loadOf = (pid: string, l: Lang): Data => {
     earned: loadJSON<Data['earned']>(keyOf(pid, l, 'earned'), {}, isObject),
     days: loadJSON<Data['days']>(keyOf(pid, l, 'days'), [], isDays),
     quiz: loadJSON<Data['quiz']>(keyOf(pid, l, 'quiz'), {}, isObject),
-    last: loadJSON<Data['last']>(keyOf(pid, l, 'last'), null, (v) => typeof v === 'string'),
     words: loadWords(pid, l, progress)
   };
 };
@@ -81,14 +80,6 @@ export const get = (c: string): CharProgress => cur().progress[c] ?? { trace: 0,
 export const earned = () => cur().earned;
 export const days = () => cur().days;
 export const quiz = () => cur().quiz;
-export const lastWord = () => cur().last;
-
-// 練習に入った単語を人 × ことば ごとに覚える（1 文字練習は対象外）
-export function rememberWord(w: Word) {
-  if (isCharWord(w) || cur().last === w.id) return;
-  cur().last = w.id;
-  save(lang.v, 'last');
-}
 
 // 練習した日付に今日を足す（1 日 1 回）
 function markToday(l: Lang) {
@@ -138,11 +129,17 @@ export const charGold = (c: string) => goldIn(get(c));
 // 単語の星は「その単語を最後まで練習した」記録。文字を他の単語でそろえても勝手には付かない。王冠は星 + 全文字が金の星
 export const wordStar = (w: Word) => cur().words[w.id] != null;
 export const wordCrown = (w: Word) => wordStar(w) && lettersOf(w).every(charGold);
-// やりかけ: 始めた（1 文字でも書いた）が、まだ最後まで練習していない
-export const wordStarted = (w: Word) => w.id in cur().words && cur().words[w.id] === null;
+// やりかけ（始めたが、まだ最後まで練習していない）の単語 id を最近書いた順に
+export const openWordIds = () =>
+  Object.entries(cur().words)
+    .filter(([, v]) => v === null)
+    .map(([id]) => id)
+    .reverse();
 export function recordWordStart(w: Word) {
-  if (isCharWord(w) || w.id in cur().words) return;
-  cur().words[w.id] = null;
+  if (isCharWord(w) || wordStar(w) || Object.keys(cur().words).at(-1) === w.id) return;
+  // $state のプロキシは delete して入れ直してもキー順が変わらないので、並べ直したオブジェクトに置き換える
+  const rest = Object.fromEntries(Object.entries(cur().words).filter(([id]) => id !== w.id));
+  cur().words = { ...rest, [w.id]: null };
   save(lang.v, 'words');
 }
 export function recordWordDone(w: Word) {
@@ -155,7 +152,7 @@ export function recordWordDone(w: Word) {
 export function resetRecords(pid: string, langs: Lang[]) {
   for (const l of langs) {
     for (const name of DATA_NAMES) removeKey(keyOf(pid, l, name));
-    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {}, last: null, words: {} };
+    if (pid === profiles.cur) data[l] = { progress: {}, earned: {}, days: [], quiz: {}, words: {} };
   }
   // ことばをまたぐ かくし要素の記録は「すべて」のときだけ消す（1 ことば だけのリセットでは残す）
   if (langs.length === LANGS.length) {

@@ -18,7 +18,6 @@
   import DriveBy from '$lib/components/DriveBy.svelte';
   import { lang, info, nameOf, strokesOf } from '$lib/lang.svelte';
   import { PracticeSession, resolveWord } from '$lib/practice.svelte';
-  import { rememberWord } from '$lib/progress.svelte';
   import { speaker, sfx, readingOf } from '$lib/audio';
   import { fx } from '$lib/fx';
 
@@ -30,7 +29,6 @@
     void word.id;
     return untrack(() => new PracticeSession(word, effects));
   });
-  $effect(() => rememberWord(word));
   // 単語が切り替わったときと画面を離れるときに、待っている演出（メダルのトーストと紙吹雪）を止める
   $effect(() => {
     const cur = s;

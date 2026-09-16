@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PracticeSession, nextMode, nextWordId, nextOpenWord, resolveWord } from './practice.svelte';
-import { record, reset, get, wordCrown, rememberWord, lastWord, recordWordDone } from './progress.svelte';
+import { PracticeSession, nextMode, nextWordId, openWords, resolveWord } from './practice.svelte';
+import { record, reset, get, wordCrown, recordWordDone } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById } from './words';
 import type { Result } from './tracer.svelte';
@@ -140,23 +140,31 @@ describe('PracticeSession', () => {
     expect(nextWordId(wordById('char-あ')!)).toBe('char-い');
   });
 
-  it('nextOpenWord: やりかけの単語があるときだけ、ことば ごとに独立して出す', () => {
-    expect(nextOpenWord()).toBeNull(); // 記録が無ければ出さない
-    const giraffe = wordById('giraffe')!;
-    rememberWord(giraffe);
-    expect(nextOpenWord()).toBeNull(); // 開いただけでは出さない
-    new PracticeSession(giraffe).done(ok('trace'));
-    vi.runAllTimers();
-    expect(nextOpenWord()?.id).toBe('giraffe'); // 1 文字でも書けば やりかけ
-    rememberWord(wordById('char-あ')!); // 1 文字練習は覚えない
-    expect(lastWord()).toBe('giraffe');
+  it('openWords: やりかけの単語を最近書いた順に 5 つまで、ことば ごとに独立して出す', () => {
+    const ids = () => openWords().map((w) => w.id);
+    const write = (id: string) => {
+      new PracticeSession(wordById(id)!).done(ok('trace'));
+      vi.runAllTimers();
+    };
+    expect(ids()).toEqual([]); // 記録が無ければ出さない
+    new PracticeSession(wordById('giraffe')!); // 開いただけでは出さない
+    expect(ids()).toEqual([]);
+    write('giraffe');
+    expect(ids()).toEqual(['giraffe']); // 1 文字でも書けば やりかけ
+    write('char-あ'); // 1 文字練習は出さない
+    for (const id of ['bus', 'train', 'cat', 'dog']) write(id);
+    expect(ids()).toEqual(['dog', 'cat', 'train', 'bus', 'giraffe']); // 最近書いた順
+    write('giraffe');
+    expect(ids()).toEqual(['giraffe', 'dog', 'cat', 'train', 'bus']); // 書き足すと先頭へ
+    write('shinkansen');
+    expect(ids()).toEqual(['shinkansen', 'giraffe', 'dog', 'cat', 'train']); // 6 つ目で古いものが隠れる
     setLang('kana');
-    expect(nextOpenWord()).toBeNull(); // かたかな の記録は別
+    expect(ids()).toEqual([]); // かたかな の記録は別
     setLang('ja');
-    recordWordDone(giraffe);
-    expect(nextOpenWord()).toBeNull(); // 最後まで練習したら出さない
+    recordWordDone(wordById('shinkansen')!);
+    expect(ids()).toEqual(['giraffe', 'dog', 'cat', 'train', 'bus']); // 最後まで練習したら出さない
     reset();
-    expect(lastWord()).toBeNull(); // リセットで消える
+    expect(ids()).toEqual([]); // リセットで消える
   });
 
   it('resolveWord: その言語に無い文字の単語は既定の単語に戻す', () => {
