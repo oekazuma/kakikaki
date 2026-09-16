@@ -9,6 +9,7 @@
   import KanjiGrid from '$lib/components/KanjiGrid.svelte';
   import JumpBar from '$lib/components/JumpBar.svelte';
   import { imageUrl } from '$lib/image';
+  import { keepScroll } from '$lib/scroll';
   import { WORDS, CATEGORIES } from '$lib/words';
   import { unlock } from '$lib/audio';
   import Icon from '$lib/components/Icon.svelte';
@@ -23,6 +24,7 @@
   const total = $derived(TOTAL(lang.v));
   const badgeCount = $derived(badgesOf(lang.v).length);
   const kanji = $derived(lang.v === 'kanji');
+  keepScroll(() => `home:${lang.v}`);
   // カテゴリの飛び先バー。文字が読めない子にも分かるよう、各カテゴリ先頭の絵を目印にする
   const cats = CATEGORIES.map((c) => ({ id: c, label: c, image: imageUrl(WORDS.find((w) => w.category === c)!) }));
 </script>

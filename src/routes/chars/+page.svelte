@@ -9,6 +9,8 @@
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
   import { kanjiByReading } from '$lib/kanji';
+  import { keepScroll } from '$lib/scroll';
+  keepScroll(() => `chars:${lang.v}`);
   const title = $derived(lang.v === 'kanji' ? 'よみから さがす' : 'もじから えらぶ');
 </script>
 
