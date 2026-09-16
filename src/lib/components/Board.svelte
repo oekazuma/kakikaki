@@ -59,7 +59,6 @@
     {#if mode !== 'test'}
       {#each ds as d, i (d)}
         <path {d} class="guide" />
-        {#if i > t.si}<path {d} class="dash" />{/if}
       {/each}
     {/if}
     {#each ds as d, i (d)}
@@ -116,7 +115,6 @@
   }
   .guide,
   .ink,
-  .dash,
   .demo {
     fill: none;
     stroke-linecap: round;
@@ -125,11 +123,6 @@
   .guide {
     stroke: var(--guide);
     stroke-width: 14;
-  }
-  .dash {
-    stroke: #b9c3cc;
-    stroke-width: 1.2;
-    stroke-dasharray: 3 2.5;
   }
   /* 書き終えた画は細くして潰れを防ぐ。描いている途中の線はお手本と同じ太さ */
   .ink {
