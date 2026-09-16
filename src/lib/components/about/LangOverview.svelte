@@ -14,7 +14,7 @@
 </script>
 
 <button class={['card', 'lang', { on }]} onclick={onselect} aria-pressed={on}>
-  <span class="name"><span class="kyokasho">{info(l).glyph}</span> {info(l).short}</span>
+  <span class="name">{info(l).glyph} {info(l).short}</span>
   {#if empty}
     <span class="none">まだ記録がありません</span>
   {:else}

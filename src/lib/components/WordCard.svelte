@@ -1,7 +1,7 @@
 <script lang="ts">
   import { isCharWord, type Word } from '$lib/words';
   import { imageUrl } from '$lib/image';
-  import { starOf, crownOf } from '$lib/practice.svelte';
+  import { wordStar, wordCrown } from '$lib/progress.svelte';
   import { nameOf, subOf, lang } from '$lib/lang.svelte';
   import { READINGS } from '$lib/kanji';
   import Icon from './Icon.svelte';
@@ -18,12 +18,12 @@
   let missing = $state(false);
   // 1 文字練習にはイラストが無いので、取りに行かずに字を大きく出す
   const plain = $derived(missing || isCharWord(word));
+  const label = $derived(isCharWord(word) && lang.v === 'kanji' ? READINGS[word.name].join('・') : nameOf(word));
 </script>
 
 <button class="card" style:width={fill ? '100%' : `${size}px`} {onclick}>
-  {#if crownOf(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span>{:else if starOf(word)}<span
-      class="badge"><Icon name="star" size={18} fill /></span
-    >{/if}
+  {#if wordCrown(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span
+    >{:else if wordStar(word)}<span class="badge"><Icon name="star" size={18} fill /></span>{/if}
   {#if plain}
     <span class="initial kyokasho" style:height="{size * 0.6}px">{word.name[0]}</span>
   {:else}
@@ -38,11 +38,7 @@
       onerror={() => (missing = true)}
     />
   {/if}
-  {#if isCharWord(word) && lang.v === 'kanji'}
-    <span class="name kyokasho">{READINGS[word.name].join('・')}</span>
-  {:else}
-    <span class="name kyokasho">{nameOf(word)}</span>
-  {/if}
+  <span class="name kyokasho">{label}</span>
   {#each subOf(word) as line (line)}<span class="desc">{line}</span>{/each}
 </button>
 

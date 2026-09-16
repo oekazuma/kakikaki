@@ -5,6 +5,7 @@
   import { LANGS, info, type Lang } from '$lib/lang.svelte';
   import { byId } from '$lib/profiles.svelte';
   import { summaryOf, secretSummary } from '$lib/progress.svelte';
+  import { TOTAL } from '$lib/badges';
   // 最終確認: 誰の・どのことばの・何が消えるかを数字で見せ、チェックを入れないと削除できない。
   // mode 'records' はことば 1 つの記録、'person' は人ごと（全ことばの記録とアバター）
   const uid = $props.id();
@@ -29,11 +30,16 @@
   );
   const sums = $derived(langs.map((l) => summaryOf(pid, l)));
   const total = (k: keyof (typeof sums)[number]) => sums.reduce((a, s) => a + s[k], 0);
+  const hasWords = $derived(langs.some((l) => TOTAL(l).words > 0));
   const rows = $derived([
     ['クリアした文字', total('chars')],
     ['金の星', total('gold')],
-    ['星のついた単語', total('words')],
-    ['王冠のついた単語', total('crowns')],
+    ...(hasWords
+      ? [
+          ['星のついた単語', total('words')],
+          ['王冠のついた単語', total('crowns')]
+        ]
+      : []),
     ['メダル', total('medals')],
     ['練習した日', total('days')],
     ['クイズの正解数', total('quiz')]

@@ -62,10 +62,6 @@ export function resolveWord(id: string | null, l: Lang): Word {
   return l === 'kanji' ? charWord(charsOf(l)[0]) : wordById('patocar')!;
 }
 
-// 星・王冠。1 文字練習は単語の記録を持たないので、字のクリア・金星で決める
-export const starOf = (w: Word) => (isCharWord(w) ? charCleared(w.name) : wordStar(w));
-export const crownOf = (w: Word) => (isCharWord(w) ? charGold(w.name) : wordCrown(w));
-
 // その文字で次にやるべきモード。クリア（なぞる 2 回 + じぶんでかく）済みなら null。おてほんなし は挑戦として別枠
 export function nextMode(ch: string): Mode | null {
   const p = get(ch);
@@ -220,8 +216,8 @@ export class PracticeSession {
     this.busy = true;
     const c = this.c;
     const wasC = charCleared(c),
-      wasW = starOf(this.word),
-      wasG = crownOf(this.word);
+      wasW = wordStar(this.word),
+      wasG = wordCrown(this.word);
     record(c, r.mode);
     recordWordStart(this.word);
     // 単語の星: 最後の文字をクリアして単語を通し終えたとき（最後の文字が開いている時点で前の文字は全部クリア済み）か、
@@ -238,7 +234,7 @@ export class PracticeSession {
     }
     let wait = 1200;
     // 1 文字練習にはイラストが無いので単語の星の演出（ドライブバイ）は出さない
-    if (!wasW && !isCharWord(this.word) && starOf(this.word)) {
+    if (!wasW && !isCharWord(this.word) && wordStar(this.word)) {
       wait = 2600;
       this.later(() => {
         this.drive = true;
@@ -260,7 +256,7 @@ export class PracticeSession {
       else if (k >= 0) this.select(k, 'test');
       else if (r.mode !== 'test' && this.i < this.chars.length - 1) this.select(this.i + 1);
       // 完了モーダルは新しく星か王冠を取ったときだけ。クリア済みの単語をやり直したときは出さない
-      else if (!wasW || (!wasG && crownOf(this.word))) this.complete = true;
+      else if (!wasW || (!wasG && wordCrown(this.word))) this.complete = true;
     }, wait);
   }
 

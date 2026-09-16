@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { PracticeSession, nextMode, nextWordId, openWords, resolveWord, starOf, crownOf } from './practice.svelte';
+import { PracticeSession, nextMode, nextWordId, openWords, resolveWord } from './practice.svelte';
 import { record, reset, get, wordStar, wordCrown, recordWordDone } from './progress.svelte';
 import { setLang } from './lang.svelte';
 import { wordById, charWord } from './words';
@@ -212,7 +212,7 @@ describe('PracticeSession', () => {
   it('1 文字練習: 星・王冠は字のクリア・金星で決まり、完了モーダルは新しく取ったときだけ出る', () => {
     setLang('kanji');
     const one = charWord('一');
-    expect([starOf(one), crownOf(one)]).toEqual([false, false]);
+    expect([wordStar(one), wordCrown(one)]).toEqual([false, false]);
     const s = new PracticeSession(one);
     s.done(ok('trace'));
     vi.runAllTimers();
@@ -222,7 +222,7 @@ describe('PracticeSession', () => {
     vi.advanceTimersByTime(700);
     expect(s.drive).toBe(false); // 1 文字練習にはイラストが無いので単語の星の演出（ドライブバイ）は出さない
     vi.runAllTimers();
-    expect([s.complete, starOf(one), crownOf(one)]).toEqual([true, true, false]); // クリアで ほし
+    expect([s.complete, wordStar(one), wordCrown(one)]).toEqual([true, true, false]); // クリアで ほし
     s.replay();
     s.done(ok('trace'));
     vi.runAllTimers();
@@ -235,7 +235,7 @@ describe('PracticeSession', () => {
     expect(s.mode).toBe('test');
     s.done(ok('test'));
     vi.runAllTimers();
-    expect([s.complete, crownOf(one)]).toEqual([true, true]); // 金星で おうかん
+    expect([s.complete, wordCrown(one)]).toEqual([true, true]); // 金星で おうかん
     s.complete = false;
     s.challenge();
     expect(s.complete).toBe(false); // 金星済みなら ちょうせん は何もしない

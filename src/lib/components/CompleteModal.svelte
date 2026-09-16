@@ -4,7 +4,7 @@
   import Icon from './Icon.svelte';
   import { imageUrl } from '$lib/image';
   import { nameOf } from '$lib/lang.svelte';
-  import { crownOf } from '$lib/practice.svelte';
+  import { wordCrown } from '$lib/progress.svelte';
   import { isCharWord, type Word } from '$lib/words';
   let {
     word,
@@ -12,7 +12,7 @@
     onreplay,
     onchallenge
   }: { word: Word; onnext: () => void; onreplay: () => void; onchallenge: () => void } = $props();
-  const crown = $derived(crownOf(word));
+  const crown = $derived(wordCrown(word));
 </script>
 
 <div class="complete card" in:fly={{ y: 40, duration: 350 }}>

@@ -1,19 +1,7 @@
-import {
-  CHARS,
-  CHARS_EN,
-  CHARS_KANA,
-  SEION,
-  DAKUON,
-  HANDAKUON,
-  KOGAKI,
-  CHOON,
-  ALPHABET,
-  DIGITS,
-  toKatakana
-} from './chars';
+import { SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, DIGITS, toKatakana } from './chars';
 import { CATEGORIES, WORDS, type Word } from './words';
-import { lettersOf, type Lang } from './lang.svelte';
-import { KANJI, KANJI_ALL } from './kanji';
+import { charsOf, lettersOf, type Lang } from './lang.svelte';
+import { KANJI } from './kanji';
 import { levelName } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
@@ -48,17 +36,11 @@ const ROWS_EN: Row[] = [
   { name: 'すうじ', chars: DIGITS }
 ];
 const ROWS_KANA: Row[] = ROWS_JA.map((r) => ({ name: toKatakana(r.name), chars: r.chars.map(toKatakana) }));
-const ROWS_KANJI: Row[] = KANJI.map((k) => ({ name: k.name, chars: k.chars }));
+const ROWS_KANJI: Row[] = KANJI;
 export const ROWS: Record<Lang, Row[]> = { ja: ROWS_JA, kana: ROWS_KANA, kanji: ROWS_KANJI, en: ROWS_EN };
-const ALL_CHARS: Record<Lang, string[]> = {
-  ja: CHARS,
-  kana: CHARS_KANA,
-  kanji: KANJI_ALL,
-  en: CHARS_EN
-};
 export const CAT_TOTAL = Object.fromEntries(CATEGORIES.map((c) => [c, WORDS.filter((w) => w.category === c).length]));
 // かんじ は単語を持たない（1 文字練習だけ）。単語の合計が 0 の ことば では単語系のメダル・表示を出さない
-export const TOTAL = (l: Lang) => ({ chars: ALL_CHARS[l].length, words: l === 'kanji' ? 0 : WORDS.length });
+export const TOTAL = (l: Lang) => ({ chars: charsOf(l).length, words: l === 'kanji' ? 0 : WORDS.length });
 
 export function computeStats(
   l: Lang,
@@ -73,8 +55,8 @@ export function computeStats(
   const wordStar = (w: Word) => wordDone(w.id);
   const wordCrown = (w: Word) => wordDone(w.id) && lettersOf(w, l).every(charGold);
   return {
-    chars: ALL_CHARS[l].filter(charCleared).length,
-    gold: ALL_CHARS[l].filter(charGold).length,
+    chars: charsOf(l).filter(charCleared).length,
+    gold: charsOf(l).filter(charGold).length,
     words: WORDS.filter(wordStar).length,
     crowns: WORDS.filter(wordCrown).length,
     rows: Object.fromEntries(ROWS[l].map((r) => [r.name, r.chars.filter(charCleared).length])),
@@ -136,25 +118,72 @@ const STEPS: Record<Lang, number[]> = {
   kanji: [10, 50, 100, 200, 300],
   en: [10, 30, 50]
 };
+const GOLD_STEPS: Record<Lang, number[]> = {
+  ja: [10, 30],
+  kana: [10, 30],
+  kanji: [10, 50, 100, 200, 300],
+  en: [10, 30]
+};
 const STEP_EMOJI = ['🔟', '📘', '📗', '📙', '📕'];
 const GOLD_EMOJI = ['⭐', '🌟', '✨', '🌠', '☀️'];
 const ALL_NAME: Record<Lang, string> = { ja: 'ひらがな', kana: 'かたかな', kanji: 'かんじ', en: 'あるふぁべっと' };
+// 行メダルの段・絵文字・説明の接尾。かんじ は学年ごとで、絵文字は行の先頭文字ではなく本
+const ROW_STYLE = (l: Lang, r: Row): [BadgeGroup, string, string] =>
+  l === 'kanji' ? ['がくねん', '📖', 'の かんじ'] : ['ぎょう マスター', r.chars[0], ''];
 
 export function badgesOf(l: Lang): Badge[] {
   const T = TOTAL(l);
   const all = ALL_NAME[l];
-  const words: Badge[] =
-    T.words === 0
-      ? []
-      : [
+  const hasWords = T.words > 0;
+  return [
+    count('first-char', 'はじめて', '🌱', 'はじめの いっぽ', 'もじを 1つ クリア', (s) => [s.chars, 1]),
+    ...(hasWords
+      ? [
           count('first-word', 'はじめて', '🎈', 'はじめての たんご', 'たんごに はじめて ほしが ついた', (s) => [
             s.words,
             1
-          ]),
+          ])
+        ]
+      : []),
+    count('first-gold', 'はじめて', '✨', 'はじめての きんのほし', 'おてほんなしで はじめて ごうかく', (s) => [
+      s.gold,
+      1
+    ]),
+    ...(hasWords
+      ? [
           count('first-crown', 'はじめて', '👑', 'はじめての おうかん', 'たんごの ぜんぶの もじが きんのほし', (s) => [
             s.crowns,
             1
-          ]),
+          ])
+        ]
+      : []),
+    ...STEPS[l].map((n, k) =>
+      count(`chars-${n}`, 'もじ', STEP_EMOJI[k], `もじ ${n}`, `もじを ${n}こ クリア`, (s) => [s.chars, n])
+    ),
+    count('chars-all', 'もじ', '🏆', `${all} マスター`, `${T.chars}もじ ぜんぶ クリア`, (s) => [s.chars, T.chars]),
+    ...GOLD_STEPS[l].map((n, k) =>
+      count(`gold-${n}`, 'きんのほし', GOLD_EMOJI[k], `きんのほし ${n}`, `おてほんなしで ${n}もじ ごうかく`, (s) => [
+        s.gold,
+        n
+      ])
+    ),
+    count(
+      'gold-all',
+      'きんのほし',
+      '💫',
+      'きんのほし マスター',
+      `おてほんなしで ${T.chars}もじ ぜんぶ ごうかく`,
+      (s) => [s.gold, T.chars]
+    ),
+    ...ROWS[l].map((r) => {
+      const [group, emoji, suffix] = ROW_STYLE(l, r);
+      return count(`row-${r.name}`, group, emoji, `${r.name} マスター`, `${r.name}${suffix}を ぜんぶ クリア`, (s) => [
+        s.rows[r.name],
+        r.chars.length
+      ]);
+    }),
+    ...(hasWords
+      ? [
           count('words-10', 'たんご', '🎒', 'たんご 10', '10この たんごに ほし', (s) => [s.words, 10]),
           count('words-50', 'たんご', '🚌', 'たんご 50', '50この たんごに ほし', (s) => [s.words, 50]),
           count('words-100', 'たんご', '🚀', 'たんご 100', '100この たんごに ほし', (s) => [s.words, 100]),
@@ -170,46 +199,8 @@ export function badgesOf(l: Lang): Badge[] {
             s.crowns,
             T.words
           ])
-        ];
-  return [
-    count('first-char', 'はじめて', '🌱', 'はじめの いっぽ', 'もじを 1つ クリア', (s) => [s.chars, 1]),
-    ...words.filter((b) => b.id === 'first-word'),
-    count('first-gold', 'はじめて', '✨', 'はじめての きんのほし', 'おてほんなしで はじめて ごうかく', (s) => [
-      s.gold,
-      1
-    ]),
-    ...words.filter((b) => b.id === 'first-crown'),
-    ...STEPS[l].map((n, k) =>
-      count(`chars-${n}`, 'もじ', STEP_EMOJI[k], `もじ ${n}`, `もじを ${n}こ クリア`, (s) => [s.chars, n])
-    ),
-    count('chars-all', 'もじ', '🏆', `${all} マスター`, `${T.chars}もじ ぜんぶ クリア`, (s) => [s.chars, T.chars]),
-    ...STEPS[l]
-      .slice(0, l === 'kanji' ? 5 : 2)
-      .map((n, k) =>
-        count(`gold-${n}`, 'きんのほし', GOLD_EMOJI[k], `きんのほし ${n}`, `おてほんなしで ${n}もじ ごうかく`, (s) => [
-          s.gold,
-          n
-        ])
-      ),
-    count(
-      'gold-all',
-      'きんのほし',
-      '💫',
-      'きんのほし マスター',
-      `おてほんなしで ${T.chars}もじ ぜんぶ ごうかく`,
-      (s) => [s.gold, T.chars]
-    ),
-    ...ROWS[l].map((r) =>
-      count(
-        `row-${r.name}`,
-        l === 'kanji' ? 'がくねん' : 'ぎょう マスター',
-        l === 'kanji' ? '📖' : r.chars[0],
-        `${r.name} マスター`,
-        `${r.name}${l === 'kanji' ? 'の かんじ' : ''}を ぜんぶ クリア`,
-        (s) => [s.rows[r.name], r.chars.length]
-      )
-    ),
-    ...words.filter((b) => b.group !== 'はじめて'),
+        ]
+      : []),
     ...(['read', 'write'] as const).flatMap((k) => {
       const kn = k === 'read' ? 'よみクイズ' : 'かきクイズ';
       const em = k === 'read' ? '👀' : '✍️';

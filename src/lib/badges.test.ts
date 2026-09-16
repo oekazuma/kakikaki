@@ -1,9 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { badgesOf, ROWS, computeStats, earnedBadges, nextBadge, BADGE_GROUPS } from './badges';
-import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
-import { KANJI_ALL } from './kanji';
 import { wordById } from './words';
-import { lettersOf, LANGS, type Lang } from './lang.svelte';
+import { charsOf, lettersOf, LANGS, type Lang } from './lang.svelte';
 
 // テストでは「全文字クリア = 単語も練習済み」とみなす
 const byChars = (l: Lang, cleared: (c: string) => boolean) => (id: string) =>
@@ -14,7 +12,7 @@ describe('badges', () => {
     for (const l of LANGS) {
       const B = badgesOf(l);
       expect(new Set(B.map((b) => b.id)).size).toBe(B.length);
-      const all = l === 'ja' ? CHARS : l === 'kana' ? CHARS_KANA : l === 'en' ? CHARS_EN : KANJI_ALL;
+      const all = charsOf(l);
       expect(ROWS[l].flatMap((r) => r.chars).sort()).toEqual([...all].sort());
     }
   });

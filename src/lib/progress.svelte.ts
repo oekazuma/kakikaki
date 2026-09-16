@@ -126,9 +126,10 @@ function earn(id: string) {
 
 export const charCleared = (c: string) => clearedIn(get(c));
 export const charGold = (c: string) => goldIn(get(c));
-// 単語の星は「その単語を最後まで練習した」記録。文字を他の単語でそろえても勝手には付かない。王冠は星 + 全文字が金の星
-export const wordStar = (w: Word) => cur().words[w.id] != null;
-export const wordCrown = (w: Word) => wordStar(w) && lettersOf(w).every(charGold);
+// 単語の星は「その単語を最後まで練習した」記録。文字を他の単語でそろえても勝手には付かない。王冠は星 + 全文字が金の星。
+// 1 文字練習は単語の記録を持たないので、字のクリア・金星をそのまま使う
+export const wordStar = (w: Word) => (isCharWord(w) ? charCleared(w.name) : cur().words[w.id] != null);
+export const wordCrown = (w: Word) => (isCharWord(w) ? charGold(w.name) : wordStar(w) && lettersOf(w).every(charGold));
 // やりかけ（始めたが、まだ最後まで練習していない）の単語 id を最近書いた順に
 export const openWordIds = () =>
   Object.entries(cur().words)

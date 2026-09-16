@@ -18,7 +18,7 @@
     char: string;
     strokes: Record<string, string[]>;
     mode: Mode;
-    accept?: string[]; // おてほんなし で正解にする字（省略時は char だけ）
+    accept?: string[]; // おてほんなし で正解にする字
     onDone: (r: Result) => void;
     // 盤面にある画の数。なぞる／じぶんでかく は完成した画の数、おてほんなし は引いた線の数（0 なら できた を押せない）
     onStroke?: (n: number) => void;
@@ -56,7 +56,12 @@
     if (r === 'stroke') onStroke?.(t.si);
     if (mode !== 'test') return armIdle();
     onStroke?.(t.trails.length);
-    if (t.trails.length > 0) idle = setTimeout(judge, 4000);
+    armJudge();
+  }
+  // おてほんなし の自動判定。画数がそろう前に手が止まっても判定しない（漢字は 18 画まであり、思い出している間に不合格にしないため）
+  function armJudge() {
+    clearTimeout(idle);
+    if (t.trails.length >= strokes[char].length) idle = setTimeout(judge, 4000);
   }
   // 書き順の再生。なぞる では自動で、他のモードでは右の「みる」から
   export function playDemo() {
@@ -94,8 +99,7 @@
     else if (ev === 'stroke' || ev === 'done') completed(i, ev === 'done');
     else if (ev === 'drawn') {
       onStroke?.(t.trails.length);
-      clearTimeout(idle);
-      idle = setTimeout(judge, 4000);
+      armJudge();
     }
   }
   function failed() {

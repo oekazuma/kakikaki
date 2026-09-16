@@ -26,7 +26,7 @@ export class Tracer {
     readonly char: string,
     readonly strokes: Record<string, string[]>,
     readonly mode: Mode,
-    // おてほんなし で正解にする字。省略時は char だけ
+    // おてほんなし で正解にする字（かんじ のかきクイズは同じ読みの字をどれも通す）
     private accept: string[] = [char]
   ) {
     this.samples = strokes[char].map((d) => pathToPoints(d));
@@ -134,7 +134,7 @@ export class Tracer {
     if (this.trails.length === 0 || this.judged) return null;
     this.judged = true;
     const r = recognize(this.trails, templatesFor(this.strokes));
-    const mine = r.find((x) => x.char === this.char)!;
+    const mine = r.find((x) => this.accept.includes(x.char))!;
     return { mode: 'test', score: testScore(mine.dist), ok: passes(this.accept, r), top: r[0].char };
   }
 }

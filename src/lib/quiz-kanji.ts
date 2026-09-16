@@ -18,10 +18,7 @@ export function makeKanjiReadQuiz(level: Level, n = 10, rnd = Math.random): Read
       if (i % 2 === 0) {
         // 外れは同じ学年の別の字の代表の読み。出題した字のどの読みとも一致しないものだけ
         const others = uniq(
-          shuffle(
-            pool.filter((o) => o !== c),
-            rnd
-          )
+          shuffle(pool, rnd)
             .map(kanjiReading)
             .filter((r) => !READINGS[c].includes(r))
         ).slice(0, 2);
@@ -35,7 +32,7 @@ export function makeKanjiReadQuiz(level: Level, n = 10, rnd = Math.random): Read
       }
       // 外れは流した読みをどの読みにも持たない字（き と聞いて 木 と 気 が並ばないように）
       const others = shuffle(
-        pool.filter((o) => o !== c && !READINGS[o].includes(reading)),
+        pool.filter((o) => !READINGS[o].includes(reading)),
         rnd
       ).slice(0, 2);
       const answer = charWord(c);

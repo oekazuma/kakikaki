@@ -45,5 +45,5 @@ writeFileSync(
   icon.replace('<rect width="512" height="512" fill=', '<rect width="512" height="512" rx="112" fill=')
 );
 console.log(
-  `static/${out}.svg を書き出した${glyph === 'あ' ? '（static/icon.svg も）' : ''}。PNG 化: qlmanage -t -s 512 -o static static/icon.svg && mv static/icon.svg.png static/icon-512.png && sips -z 180 180 static/icon-512.png --out static/icon-180.png`
+  `static/${out}.svg を書き出した${glyph === 'あ' ? '（static/icon.svg も）。PNG 化: qlmanage -t -s 512 -o static static/icon.svg && mv static/icon.svg.png static/icon-512.png && sips -z 180 180 static/icon-512.png --out static/icon-180.png' : ''}`
 );
