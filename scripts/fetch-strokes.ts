@@ -1,13 +1,15 @@
 // 実行: node scripts/fetch-strokes.ts
 import { writeFileSync } from 'node:fs';
 import { CHARS, CHARS_KANA } from '../src/lib/chars.ts';
+import { KANJI_ALL } from '../src/lib/kanji.ts';
 
 // 取得元のコミット。上げるときは pnpm strokes を回して差分を確認する（上流の修正で座標が変わると判定の手触りも変わる）
 const KANJIVG = '422b5538595676da918c288a4230cb5e22a1ee7e';
 
 for (const [chars, file, name] of [
   [CHARS, 'src/lib/strokes.ts', 'STROKES'],
-  [CHARS_KANA, 'src/lib/strokes-kana.ts', 'STROKES_KANA']
+  [CHARS_KANA, 'src/lib/strokes-kana.ts', 'STROKES_KANA'],
+  [KANJI_ALL, 'src/lib/strokes-kanji.ts', 'STROKES_KANJI']
 ] as const) {
   const out: Record<string, string[]> = {};
   for (const c of chars) {

@@ -2,7 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
 import { STROKES_KANA } from './strokes-kana';
+import { STROKES_KANJI } from './strokes-kanji';
 import { CHARS, CHARS_EN, CHARS_KANA } from './chars';
+import { KANJI_ALL } from './kanji';
 import { pathToPoints, translate } from './geometry';
 import { recognize, passes, makeTemplates, templatesFor } from './recognize';
 
@@ -10,6 +12,7 @@ const drawn = (S: Record<string, string[]>, c: string) => S[c].map((d) => pathTo
 const T_JA = templatesFor(STROKES);
 const T_EN = makeTemplates(STROKES_EN);
 const T_KANA = makeTemplates(STROKES_KANA);
+const T_KANJI = makeTemplates(STROKES_KANJI);
 
 describe('recognize', () => {
   it('お手本そのものは 81 文字すべて 1 位が自分', () => {
@@ -47,6 +50,10 @@ describe('recognize', () => {
   it('ひらがなのテンプレートは 81 個で、文字セットごとに 1 回だけ作られる', () => {
     expect(templatesFor(STROKES).length).toBe(81);
     expect(templatesFor(STROKES)).toBe(templatesFor(STROKES));
+  });
+  it('漢字: お手本そのものは 440 字のお手本の中で合格する（10 字おきに確認）', () => {
+    for (const c of KANJI_ALL.filter((_, i) => i % 10 === 0))
+      expect(passes(c, recognize(drawn(STROKES_KANJI, c), T_KANJI)), c).toBe(true);
   });
 });
 
