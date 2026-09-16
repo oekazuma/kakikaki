@@ -8,8 +8,8 @@
   import { flipFor } from '$lib/facing';
   import { profiles } from '$lib/profiles.svelte';
   import { recordEgg, recordPinball } from '$lib/secret';
-  import type { Word } from '$lib/words';
-  // かくし演出: イラストがカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。
+  import { isCharWord, type Word } from '$lib/words';
+  // かくし演出: イラスト（1 文字練習は字。字は左右反転しない）がカード（from の中心）から跳び出して走り、タップすると弾かれて飛び回る。
   // 左右反転は transform の最後に入れる（scale プロパティだと translate ごと反転して画面外へ出る）
   // 出ている間は透明な覆いで他の操作を止める（もどる だけは覆いより上に置いてある）
   let { word, from, onend }: { word: Word; from: { x: number; y: number }; onend: () => void } = $props();
@@ -60,19 +60,28 @@
     <small>{b.hits >= GOAL ? 'すごい！' : 'かい'}</small>
   </div>
 {/if}
-<img
-  class="bouncer"
-  src={imageUrl(word)}
-  alt=""
-  width={SIZE}
-  height={SIZE}
-  draggable="false"
-  style:transform="translate({b.x}px, {b.y}px) rotate({b.rot}deg) scale({flipFor(word.id, b.right ? 'right' : 'left')
-    ? -1
-    : 1}, 1)"
-  onpointerdown={kick}
-  onerror={onend}
-/>
+{#if isCharWord(word)}
+  <span
+    class="bouncer glyph kyokasho"
+    style:transform="translate({b.x}px, {b.y}px) rotate({b.rot}deg)"
+    onpointerdown={kick}
+    role="presentation">{word.name}</span
+  >
+{:else}
+  <img
+    class="bouncer"
+    src={imageUrl(word)}
+    alt=""
+    width={SIZE}
+    height={SIZE}
+    draggable="false"
+    style:transform="translate({b.x}px, {b.y}px) rotate({b.rot}deg) scale({flipFor(word.id, b.right ? 'right' : 'left')
+      ? -1
+      : 1}, 1)"
+    onpointerdown={kick}
+    onerror={onend}
+  />
+{/if}
 
 <style>
   .shield {
@@ -127,5 +136,13 @@
     -webkit-user-select: none;
     user-select: none;
     will-change: transform;
+  }
+  .glyph {
+    display: grid;
+    place-content: center;
+    font-size: 120px;
+    font-weight: bold;
+    line-height: 1;
+    color: var(--blue);
   }
 </style>

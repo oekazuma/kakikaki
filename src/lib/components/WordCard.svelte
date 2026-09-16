@@ -5,7 +5,7 @@
   import { nameOf, subOf, lang } from '$lib/lang.svelte';
   import { READINGS, readingLabel } from '$lib/kanji';
   import Icon from './Icon.svelte';
-  // ghost: イラストを灰色のシルエットにする（かくし演出でイラストが跳び出している間）。
+  // ghost: イラスト（1 文字練習は字）を灰色のシルエットにする（かくし演出で跳び出している間）。
   // fill: 親のグリッドのマス幅に合わせる（ホームの一覧。画面幅で右に余白が残らないように）
   let {
     word,
@@ -27,7 +27,7 @@
   {#if wordCrown(word)}<span class="badge gold"><Icon name="crown" size={18} fill /></span
     >{:else if wordStar(word)}<span class="badge"><Icon name="star" size={18} fill /></span>{/if}
   {#if plain}
-    <span class="initial kyokasho" style:height="{size * 0.6}px">{word.name[0]}</span>
+    <span class={['initial', 'kyokasho', { ghost }]} style:height="{size * 0.6}px">{word.name[0]}</span>
   {:else}
     <img
       class={{ ghost }}
@@ -47,6 +47,9 @@
 <style>
   img.ghost {
     filter: brightness(0) opacity(0.18);
+  }
+  .initial.ghost {
+    color: rgba(0, 0, 0, 0.18);
   }
   .card {
     position: relative;

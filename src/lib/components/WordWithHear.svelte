@@ -10,7 +10,7 @@
   import { TapCounter } from '$lib/taps';
   import { isCharWord, type Word } from '$lib/words';
   // 練習画面の左上: 単語カードに、単語全体を読み上げるスピーカーを重ねる（右の きく は 1 文字だけ）。
-  // かくし演出: カードを 10 回続けてタップ（2 秒あくと数え直し）するとイラストが画面を走る
+  // かくし演出: カードを 10 回続けてタップ（2 秒あくと数え直し）するとイラスト（1 文字練習は字）が画面を走る
   let { word, size = 240, onegg }: { word: Word; size?: number; onegg?: () => void } = $props();
   let speaking = $state(false);
   const hear = speaker((on) => (speaking = on));
@@ -24,7 +24,7 @@
     if (egg) return;
     sfx.pon();
     if (hit) {
-      const r = box?.querySelector('img')?.getBoundingClientRect();
+      const r = box?.querySelector('img, .initial')?.getBoundingClientRect();
       if (!r) return;
       from = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
       egg = true;
