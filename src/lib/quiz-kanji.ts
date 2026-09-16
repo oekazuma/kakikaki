@@ -3,10 +3,9 @@ import { charWord } from './words';
 import { shuffle } from './shuffle';
 import type { Level, ReadQ, WriteQ } from './quiz';
 
-// かんじ のクイズ。級は学年 2 つずつ（1 = 1・2 年、2 = 3・4 年、3 = 5・6 年）で、出題はその学年の字だけ。
+// かんじ のクイズ。級は学年（Level 1〜6 = 1〜6 年）で、出題はその学年の字だけ。
 // quiz.ts とは型だけを共有する（値を import すると循環になる）
-export const gradesOf = (level: Level) => KANJI.slice((level - 1) * 2, level * 2);
-const gradeChars = (level: Level) => gradesOf(level).flatMap((g) => g.chars);
+const gradeChars = (level: Level) => KANJI[level - 1].chars;
 const uniq = <T>(a: T[]) => [...new Set(a)];
 
 // よみクイズ: 字を見て読みを選ぶ（kanji-read）と、読みを聞いて字を選ぶ（kanji-listen）を半分ずつ混ぜる

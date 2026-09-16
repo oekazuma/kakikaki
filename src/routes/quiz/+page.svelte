@@ -6,9 +6,10 @@
   import { lang, info } from '$lib/lang.svelte';
   import { quiz } from '$lib/progress.svelte';
   import { levelName, QUESTIONS, type Kind, type Level } from '$lib/quiz';
-  import { gradesOf } from '$lib/quiz-kanji';
+  import { KANJI } from '$lib/kanji';
 
   const kanji = $derived(lang.v === 'kanji');
+  const COLORS = ['#4caf50', '#3f87d6', '#ef6c30', '#8e5bd8', '#1f9e9e', '#d9455f'];
   const KINDS = $derived<{ id: Kind; icon: 'eye' | 'pencil'; name: string; desc: string }[]>([
     {
       id: 'read',
@@ -25,7 +26,7 @@
   ]);
   const LEVELS = $derived<{ lv: Level; hint: string }[]>(
     kanji
-      ? ([1, 2, 3] as const).map((lv) => ({ lv, hint: `${gradesOf(lv).reduce((n, g) => n + g.chars.length, 0)} じ` }))
+      ? KANJI.map((k) => ({ lv: k.grade, hint: `${k.chars.length} じ` }))
       : [
           { lv: 1, hint: 'みじかい ことば' },
           { lv: 2, hint: 'ふつうの ことば' },
@@ -54,10 +55,10 @@
             <p>{k.desc}（{QUESTIONS[k.id]} もん）</p>
           </div>
         </div>
-        <div class="levels">
+        <div class="levels" style:--n={LEVELS.length}>
           {#each LEVELS as { lv, hint } (lv)}
-            <a class={['lv', `l${lv}`]} href="{resolve(`/quiz/${k.id}`)}?level={lv}">
-              <span class="stars">{'★'.repeat(lv)}</span>
+            <a class="lv" style:--c={COLORS[lv - 1]} href="{resolve(`/quiz/${k.id}`)}?level={lv}">
+              <span class={['stars', { many: LEVELS.length > 3 }]}>{'★'.repeat(lv)}</span>
               <span class="name">{levelName(lv, lang.v)}<small>{hint}</small></span>
               <span class="n">せいかい<b>{quiz()[`${k.id}${lv}`] ?? 0}</b></span>
             </a>
@@ -134,7 +135,7 @@
   }
   .levels {
     display: grid;
-    grid-template-rows: repeat(3, 1fr);
+    grid-template-rows: repeat(var(--n), 1fr);
     gap: 12px;
     min-height: 0;
   }
@@ -147,24 +148,22 @@
     border-radius: 22px;
     text-decoration: none;
     color: #fff;
+    background: var(--c);
     transition: transform 0.15s;
   }
   .lv:active {
     transform: scale(0.97);
   }
-  .l1 {
-    background: #4caf50;
-  }
-  .l2 {
-    background: #3f87d6;
-  }
-  .l3 {
-    background: #ef6c30;
-  }
   .stars {
     font-size: 26px;
     color: var(--star);
     letter-spacing: 2px;
+  }
+  /* 6 級のときは星が多いので小さく折り返す */
+  .stars.many {
+    font-size: 15px;
+    letter-spacing: 0;
+    line-height: 1.1;
   }
   .name {
     font-size: 30px;

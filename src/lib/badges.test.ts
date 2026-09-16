@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { badgesOf, ROWS, computeStats, earnedBadges, nextBadge, BADGE_GROUPS } from './badges';
 import { wordById } from './words';
+import { levelsOf } from './quiz';
 import { charsOf, lettersOf, LANGS, type Lang } from './lang.svelte';
 
 // テストでは「全文字クリア = 単語も練習済み」とみなす
@@ -63,7 +64,12 @@ describe('badges', () => {
   });
   it('全部クリアで全メダル', () => {
     for (const l of LANGS) {
-      const quiz = { read1: 10, read2: 10, read3: 10, write1: 10, write2: 10, write3: 10 };
+      const quiz = Object.fromEntries(
+        levelsOf(l).flatMap((lv) => [
+          [`read${lv}`, 10],
+          [`write${lv}`, 10]
+        ])
+      );
       const ids = earnedBadges(
         l,
         computeStats(
@@ -78,7 +84,7 @@ describe('badges', () => {
         )
       ).map((b) => b.id);
       expect(ids.length).toBe(badgesOf(l).length);
-      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : l === 'kanji' ? 47 : 66);
+      expect(badgesOf(l).length).toBe(l === 'en' ? 62 : l === 'kanji' ? 53 : 66);
     }
   });
 

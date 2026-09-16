@@ -1,11 +1,12 @@
-import { makeReadQuiz, makeWriteQuiz, type Kind, type Level, type ReadQ, type WriteQ } from './quiz';
+import { makeReadQuiz, makeWriteQuiz, levelsOf, type Kind, type Level, type ReadQ, type WriteQ } from './quiz';
 import { lettersOf, lang } from './lang.svelte';
 import { recordQuiz, recordMiss, checkBadges, type Mode } from './progress.svelte';
 import type { Result } from './tracer.svelte';
 import type { Effects } from './practice.svelte';
 import { clamp } from './geometry';
 
-export const levelFromParam = (v: string | null): Level => clamp(Math.round(Number(v) || 1), 1, 3) as Level;
+export const levelFromParam = (v: string | null): Level =>
+  clamp(Math.round(Number(v) || 1), 1, levelsOf(lang.v).length) as Level;
 
 // 終了時の記録と演出は よみ・かき で共通
 function finish(kind: Kind, level: Level, correct: number, total: number, fx: Effects) {

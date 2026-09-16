@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { makeKanjiReadQuiz, makeKanjiWriteQuiz, gradesOf } from './quiz-kanji';
+import { makeKanjiReadQuiz, makeKanjiWriteQuiz } from './quiz-kanji';
 import { makeReadQuiz, makeWriteQuiz } from './quiz';
-import { READINGS, kanjiReading } from './kanji';
+import { KANJI, READINGS, kanjiReading } from './kanji';
 
 const seeded =
   (s = 1) =>
@@ -9,15 +9,15 @@ const seeded =
     (s = (s * 9301 + 49297) % 233280) / 233280;
 
 describe('quiz-kanji', () => {
-  it('よみクイズは 10 問、2 形式が 5 問ずつ、出題は級の学年（2 つずつ）の字だけ、重複なし', () => {
-    for (const level of [1, 2, 3] as const)
+  it('よみクイズは 10 問、2 形式が 5 問ずつ、出題は学年の字だけ、重複なし', () => {
+    for (const level of [1, 2, 3, 4, 5, 6] as const)
       for (const seed of [1, 2, 3]) {
         const qs = makeKanjiReadQuiz(level, 10, seeded(seed));
         expect(qs.length).toBe(10);
         expect(new Set(qs.map((q) => q.answer.id)).size).toBe(10);
         expect(qs.filter((q) => q.kind === 'kanji-read').length).toBe(5);
         expect(qs.filter((q) => q.kind === 'kanji-listen').length).toBe(5);
-        for (const q of qs) expect(gradesOf(level).flatMap((g) => g.chars)).toContain(q.answer.name);
+        for (const q of qs) expect(KANJI[level - 1].chars).toContain(q.answer.name);
       }
   });
   it('字を見て読みを選ぶ: 正解は代表の読み、外れは出題した字のどの読みとも一致しない', () => {
@@ -51,7 +51,7 @@ describe('quiz-kanji', () => {
       expect(w.accept).toContain(w.word.name);
       for (const c of w.accept!) expect(READINGS[c]).toContain(kanjiReading(w.word.name));
     }
-    const kou = makeKanjiWriteQuiz(1, 240, seeded(7)).find((w) => w.word.name === '工')!;
+    const kou = makeKanjiWriteQuiz(2, 160, seeded(7)).find((w) => w.word.name === '工')!;
     expect(kou.accept).toEqual(expect.arrayContaining(['工', '公']));
   });
   it('makeReadQuiz / makeWriteQuiz は かんじ をこちらに委譲する', () => {

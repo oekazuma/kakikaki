@@ -2,7 +2,7 @@
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
   import Stars from './Stars.svelte';
-  import { levelName, type Kind, type Level } from '$lib/quiz';
+  import { levelName, levelsOf, type Kind, type Level } from '$lib/quiz';
   import { lang } from '$lib/lang.svelte';
   // 次の級があればそちらを主ボタンにする（クリア後は もういちど より次へ進みたくなるため）
   let {
@@ -12,7 +12,7 @@
     level,
     onRetry
   }: { correct: number; total: number; kind: Kind; level: Level; onRetry: () => void } = $props();
-  const next = $derived(level < 3 ? ((level + 1) as Level) : null);
+  const next = $derived(level < levelsOf(lang.v).length ? ((level + 1) as Level) : null);
   const stars = $derived(correct === total ? 3 : correct >= total * 0.7 ? 2 : 1);
   const msg = $derived(
     correct === total

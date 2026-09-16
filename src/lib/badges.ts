@@ -2,7 +2,7 @@ import { SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, DIGITS, toKatakana }
 import { CATEGORIES, WORDS, type Word } from './words';
 import { charsOf, lettersOf, type Lang } from './lang.svelte';
 import { KANJI } from './kanji';
-import { levelName } from './quiz';
+import { levelName, levelsOf } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
 export type Stats = {
@@ -207,7 +207,7 @@ export function badgesOf(l: Lang): Badge[] {
       const kn = k === 'read' ? 'よみクイズ' : 'かきクイズ';
       const em = k === 'read' ? '👀' : '✍️';
       return [
-        ...([1, 2, 3] as const).map((lv) =>
+        ...levelsOf(l).map((lv) =>
           count(
             `${k}-${lv}`,
             'クイズ',
@@ -223,7 +223,7 @@ export function badgesOf(l: Lang): Badge[] {
           k === 'read' ? '🧠' : '🖋️',
           `${kn} マスター`,
           `${kn}の ぜんぶの きゅうで 10もん せいかい`,
-          (s) => [[1, 2, 3].filter((lv) => (s.quiz[`${k}${lv}`] ?? 0) >= 10).length, 3]
+          (s) => [levelsOf(l).filter((lv) => (s.quiz[`${k}${lv}`] ?? 0) >= 10).length, levelsOf(l).length]
         )
       ];
     }),

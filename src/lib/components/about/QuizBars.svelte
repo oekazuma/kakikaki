@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { levelName } from '$lib/quiz';
+  import { levelName, levelsOf } from '$lib/quiz';
   import type { Lang } from '$lib/lang.svelte';
   // クイズの正解数（累計）を横棒で。長さはいちばん多い項目を 100% にする
   let { quiz, l }: { quiz: Record<string, number>; l: Lang } = $props();
@@ -7,10 +7,9 @@
     ['read', 'よみ'],
     ['write', 'かき']
   ] as const;
-  const LEVELS = [1, 2, 3] as const;
   const rows = $derived(
     KINDS.flatMap(([k, name]) =>
-      LEVELS.map((lv) => ({
+      levelsOf(l).map((lv) => ({
         key: `${k}${lv}`,
         kind: k,
         label: `${name} ${levelName(lv, l)}`,
