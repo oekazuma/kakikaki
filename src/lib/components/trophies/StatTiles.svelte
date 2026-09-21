@@ -48,7 +48,7 @@
   </section>
 {/if}
 
-<section class="card quiz">
+<section class="card quiz" class:one={levelsOf(lang.v).length > 3}>
   {#each [['read', 'よみクイズ'], ['write', 'かきクイズ']] as [k, name] (k)}
     <div class="qrow">
       <b>{name}</b>
@@ -138,6 +138,10 @@
     gap: 8px 30px;
     margin-bottom: 16px;
   }
+  /* かんじ は級が 6 つあり、よみ と かき を横に並べると語が 1 字ずつ折り返す */
+  .quiz.one {
+    grid-template-columns: 1fr;
+  }
   .qrow {
     display: flex;
     align-items: center;
@@ -145,6 +149,7 @@
     font-size: 14px;
   }
   .qrow > b {
+    flex: none;
     width: 90px;
   }
   .qc {
@@ -152,6 +157,7 @@
     align-items: baseline;
     gap: 4px;
     font-size: 12px;
+    white-space: nowrap;
     color: var(--sub);
   }
   .qc b {

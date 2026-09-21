@@ -50,7 +50,8 @@
   {#if w.word}
     <div class="left">
       <div class="card pic">
-        {#if w.kind === 'kanji'}<b class="yomi kyokasho">{readingLabel(yomi)}</b>{/if}
+        {#if w.kind === 'kanji'}<b class="yomi kyokasho" style:--n={readingLabel(yomi).length}>{readingLabel(yomi)}</b
+          >{/if}
         {#if w.kind === 'kanji' || w.kind === 'listen'}
           <button class={['hear', { big: w.kind === 'listen', speaking }]} onclick={() => hear(say, info().speech)}
             ><Icon name="speaker" size={w.kind === 'listen' ? 40 : 22} /> きく</button
@@ -130,8 +131,10 @@
   .pic img {
     height: 150px;
   }
+  /* 1 字 1em の字形なので、字数で割ってカードの内幅 212px（少し余白を残して 208px）に 1 行で収める。途中で折り返すと そな / （える） と読みが割れる */
   .yomi {
-    font-size: 56px;
+    font-size: min(56px, calc(208px / var(--n)));
+    white-space: nowrap;
     color: var(--blue);
   }
   .hear {

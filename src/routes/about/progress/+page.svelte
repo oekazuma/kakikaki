@@ -84,9 +84,10 @@
     margin: 0 8px 0 0;
     font-size: 22px;
   }
+  /* 右端はカレンダー。7 列の丸（32px + 間 4px）とカードの余白が収まる幅 */
   .top {
     display: grid;
-    grid-template-columns: repeat(4, 1fr) 260px;
+    grid-template-columns: repeat(4, 1fr) 290px;
     gap: 12px;
     align-items: stretch;
   }

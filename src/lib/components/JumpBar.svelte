@@ -36,8 +36,14 @@
   .jump {
     position: fixed;
     right: calc(env(safe-area-inset-right, 0px) + 10px);
-    top: 50%;
-    translate: 0 -50%;
+    /* 見出しの段より下の帯の中で上下中央に置く。画面の中央に置くと、高さの低い iPad mini ではバーが見出しの段まで伸びて右上の ? ボタンに重なる */
+    top: calc(var(--sat) + 88px);
+    bottom: calc(var(--sab) + 12px);
+    height: fit-content;
+    margin-block: auto;
+    /* 帯より高いと上下の margin が負になって見出しの段へはみ出すので、帯に収めて中をスクロールさせる */
+    max-height: calc(100dvh - var(--sat) - var(--sab) - 100px);
+    overflow-y: auto;
     z-index: 1;
     display: grid;
     gap: 6px;
