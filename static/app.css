@@ -13,8 +13,8 @@
   --danger: #e53935;
   --danger-ink: #c62828;
   --pill: #eef1f4;
-  /* 安全領域。上は iPad のホーム画面アプリでステータスバーの帯が内容に少し被るので、実際の値より 1.35 倍空ける（ブラウザでは 0 のまま） */
-  --sat: calc(env(safe-area-inset-top, 0px) * 1.35);
+  /* 安全領域。ステータスバーは default 指定で内容に被らないので、そのままの値で空ける（ブラウザでは 0） */
+  --sat: env(safe-area-inset-top, 0px);
   --sab: env(safe-area-inset-bottom, 0px);
 }
 /* かたかな は緑系、えいご はオレンジ系。切替時は色がにじむように変わる */
