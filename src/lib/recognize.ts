@@ -1,7 +1,8 @@
 import { centroid, clamp, dist, pathToPoints, resampleN, translate, type Pt } from './geometry';
 
 // 調整ノブ。iPad で実際に子どもが書いた結果を見て変える。
-export const RECOG = { N: 32, PENALTY_STROKE: 40, MARGIN: 10, D_MAX: 30 };
+// TAP: これより短い線はタップとみなす（i の点は 5 単位あるので、判定し直すときだけ除く）
+export const RECOG = { N: 32, PENALTY_STROKE: 40, MARGIN: 10, D_MAX: 30, TAP: 2 };
 
 type Template = { char: string; strokes: Pt[][] };
 

@@ -1,13 +1,17 @@
-import { pathToPoints, dist, type Pt } from './geometry';
+import { pathToPoints, dist, length, type Pt } from './geometry';
 import type { Sample } from './ribbon';
 import { canStart, advance, traceDone, coverage, JUDGE, TOL, type Tolerance } from './judge';
 import { strokeScore } from './score';
-import { recognize, passes, testScore, templatesFor } from './recognize';
+import { recognize, passes, testScore, templatesFor, RECOG } from './recognize';
 import type { Mode } from './progress.svelte';
 
 export type Result = { mode: Mode; score: number; ok: boolean; top: string };
 // up() の結果: 画が完成 / 文字が完成 / 逸脱でやり直し / まだ途中（じぶんでかく）/ 1 画ぶん描いた（おてほんなし）
 type UpEvent = 'stroke' | 'done' | 'fail' | 'pending' | 'drawn' | 'idle';
+
+// おてほんなし で落ちたときの一言。top が空なのは書いた字そのものが 1 位なのに落ちたとき（画数の罰点で距離が伸びた）
+export const missMsg = (r: Result) =>
+  r.top ? `おしい！ 「${r.top}」に みえるよ。もういちど！` : 'おしい！ せんの かずを たしかめて もういちど！';
 
 // 1 文字ぶんの書き取りの状態機械。座標は 109 マスの viewBox 単位。描画・演出・タイマーは Canvas.svelte が持つ
 export class Tracer {
@@ -148,8 +152,17 @@ export class Tracer {
   judge(): Result | null {
     if (this.trails.length === 0 || this.judged) return null;
     this.judged = true;
-    const r = recognize(this.trails, templatesFor(this.strokes));
+    const t = templatesFor(this.strokes);
+    let r = recognize(this.trails, t);
+    let ok = passes(this.accept, r);
+    // うっかり触った点が 1 画に数えられて画数の罰点で落ちるので、落ちたときだけタップを除いて判定し直す
+    const lines = this.trails.filter((s) => length(s) >= RECOG.TAP);
+    if (!ok && lines.length > 0 && lines.length < this.trails.length) {
+      const r2 = recognize(lines, t);
+      if (passes(this.accept, r2)) [r, ok] = [r2, true];
+    }
     const mine = r.find((x) => this.accept.includes(x.char))!;
-    return { mode: 'test', score: testScore(mine.dist), ok: passes(this.accept, r), top: r[0].char };
+    const top = !ok && this.accept.includes(r[0].char) ? '' : r[0].char;
+    return { mode: 'test', score: testScore(mine.dist), ok, top };
   }
 }

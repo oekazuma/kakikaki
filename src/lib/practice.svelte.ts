@@ -18,7 +18,7 @@ import {
 import { lettersOf, charsOf, canWrite, type Lang } from './lang.svelte';
 import type { Badge } from './badges';
 import { stars, praise } from './score';
-import type { Result } from './tracer.svelte';
+import { missMsg, type Result } from './tracer.svelte';
 
 // 演出は差し替え可能にしておく（テストでは何もしない）
 export type Effects = {
@@ -207,7 +207,7 @@ export class PracticeSession {
     if (this.busy) return;
     if (r.mode === 'test' && !r.ok) {
       recordMiss(this.c);
-      this.msg = `おしい！ 「${r.top}」に みえるよ。もういちど！`;
+      this.msg = missMsg(r);
       this.fx.buu?.();
       this.drawn = false;
       return;

@@ -1,7 +1,7 @@
 import { makeReadQuiz, makeWriteQuiz, levelsOf, type Kind, type Level, type ReadQ, type WriteQ } from './quiz';
 import { lettersOf, lang } from './lang.svelte';
 import { recordQuiz, recordMiss, checkBadges, type Mode } from './progress.svelte';
-import type { Result } from './tracer.svelte';
+import { missMsg, type Result } from './tracer.svelte';
 import type { Effects } from './practice.svelte';
 import { clamp } from './geometry';
 
@@ -146,7 +146,7 @@ export class WriteQuiz {
         this.mode = 'trace';
         this.msg = 'おてほんを なぞって みよう';
         this.gen++;
-      } else this.msg = `おしい！ 「${r.top}」に みえるよ。もういちど！`;
+      } else this.msg = missMsg(r);
       return;
     }
     this.fx.pon?.();

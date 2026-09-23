@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { Tracer } from './tracer.svelte';
+import { Tracer, missMsg } from './tracer.svelte';
 import { STROKES } from './strokes';
+import { STROKES_EN } from './strokes-en';
 import { pathToPoints, translate, type Pt } from './geometry';
 
 const strokePts = (c: string, i: number) => pathToPoints(STROKES[c][i], 2);
@@ -178,5 +179,30 @@ describe('Tracer おてほんなし', () => {
     expect(t.judge()).toBeNull();
     drag(t, strokePts('あ', 1));
     expect(t.judge()).not.toBeNull();
+  });
+  it('うっかり触った点（タップ）が混じっても合格する', () => {
+    const t = new Tracer('ぶ', STROKES, 'test');
+    drag(t, [{ x: 20, y: 90 }]);
+    for (let i = 0; i < 6; i++) drag(t, strokePts('ぶ', i));
+    expect(t.judge()!.ok).toBe(true);
+  });
+  it('i の点をタップで打っても合格する（タップは捨てずに、落ちたときだけ除いて判定し直す）', () => {
+    const t = new Tracer('i', STROKES_EN, 'test');
+    const [stem, dot] = STROKES_EN.i.map((d) => pathToPoints(d, 2));
+    drag(t, stem);
+    drag(t, [dot[0]]);
+    expect(t.judge()!.ok).toBe(true);
+  });
+  it('書いた字が 1 位でも不合格なら「〜に みえるよ」とは言わない（ぶ に短い線を 1 本足すと画数の罰点で落ちる）', () => {
+    const t = new Tracer('ぶ', STROKES, 'test');
+    drag(t, [
+      { x: 20, y: 90 },
+      { x: 24, y: 92 }
+    ]);
+    for (let i = 0; i < 6; i++) drag(t, strokePts('ぶ', i));
+    const r = t.judge()!;
+    expect(r.ok).toBe(false);
+    expect(missMsg(r)).not.toContain('ぶ');
+    expect(missMsg({ mode: 'test', score: 0, ok: false, top: 'ほ' })).toContain('「ほ」に みえるよ');
   });
 });
