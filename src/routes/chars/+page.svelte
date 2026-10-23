@@ -95,6 +95,11 @@
     direction: rtl;
     display: grid;
     gap: 18px;
+    container-type: inline-size;
+  }
+  /* 10 行 × 96px は幅 1076px ほど要る。それより狭い画面（折りたたみスマートフォンの内側など）では わ 行が左に切れるので縮める */
+  .ja > .table {
+    --cell: min(96px, (100cqi - 72px) / 10);
   }
   .table {
     display: grid;

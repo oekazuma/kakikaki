@@ -25,6 +25,8 @@
   const MIN_H = 520;
   $effect(() => watchViewport());
   const tooSmall = $derived(vp.w > 0 && (vp.w < MIN_W || vp.h < MIN_H));
+  // 縦向きでも回して足りる画面だけ回転を促す。スマートフォン（折りたたみの外側の画面など）は横にしても足りない
+  const rotate = $derived(vp.portrait && vp.h >= MIN_W && vp.w >= MIN_H);
 </script>
 
 <svelte:document onvisibilitychange={onVisible} />
@@ -34,7 +36,7 @@
 <Splash />
 {#if tooSmall}
   <div class="guard card">
-    {#if vp.portrait}
+    {#if rotate}
       <!-- タブレットが縦から横へ回るアニメーション -->
       <svg class="tablet" viewBox="0 0 140 160" width="150" height="171" aria-hidden="true">
         <g class="spin">
@@ -71,7 +73,7 @@
           />
         </g>
       </svg>
-      <p>タブレットを よこむきに してね</p>
+      <p>がめんを よこむきに してね</p>
     {:else}
       <div class="icon"><Icon name="help" size={80} /></div>
       <p>がめんを もっと おおきく してね</p>

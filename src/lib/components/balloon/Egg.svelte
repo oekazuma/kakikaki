@@ -31,8 +31,8 @@
 <style>
   .egg {
     position: fixed;
-    right: 18px;
-    bottom: 14px;
+    right: calc(env(safe-area-inset-right, 0px) + 18px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
     opacity: 0.45;
     transform: scale(var(--s));
     transform-origin: bottom center;
