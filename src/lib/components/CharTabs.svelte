@@ -49,6 +49,15 @@
     --tabh: 58px;
     --tabf: 24px;
   }
+  /* 背の低い画面（折りたたみスマートフォンの内側など）では 4 文字を 1 段に収め、左の列の下にある星の表が切れないようにする */
+  @media (max-height: 680px) {
+    .tabs:not(.compact) {
+      gap: 8px;
+      --tab: 53px;
+      --tabh: 60px;
+      --tabf: 26px;
+    }
+  }
   .tab {
     width: var(--tab);
     height: var(--tabh);

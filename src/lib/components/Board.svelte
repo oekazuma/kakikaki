@@ -105,6 +105,7 @@
   .wrap {
     height: 100%;
     aspect-ratio: 1;
+    max-width: 100%; /* 列が高さより狭いと右の列に重なる。SVG は既定の meet なので字の枠は正方形のまま */
     margin: 0 auto;
   }
   .shake {

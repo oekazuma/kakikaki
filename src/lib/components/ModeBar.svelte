@@ -17,9 +17,11 @@
   .modes {
     display: flex;
     padding: 4px;
+    container-type: inline-size;
   }
   button {
     flex: 1;
+    white-space: nowrap;
     padding: 10px;
     border-radius: 16px;
     font-weight: bold;
@@ -32,5 +34,11 @@
   .on {
     background: var(--teal);
     color: #fff;
+  }
+  /* 安全領域で幅が削られる折りたたみスマートフォンの内側などでは、アイコンまで入れると おてほんなし が収まらない */
+  @container (width < 480px) {
+    button :global(svg) {
+      display: none;
+    }
   }
 </style>

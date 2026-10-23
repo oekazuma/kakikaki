@@ -134,4 +134,17 @@
     color: var(--sub);
     font-size: 12px;
   }
+  /* 4 枚を横 1 列に並べると幅 1000px 未満ではリングが入らないので、2×2 にしてカレンダーを右に縦長で置く */
+  @media (max-width: 1000px) {
+    .top {
+      grid-template-columns: 1fr 1fr 290px;
+    }
+    .top :global(.cal) {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+    }
+    .detail {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>

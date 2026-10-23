@@ -115,7 +115,7 @@
 <style>
   main {
     display: grid;
-    grid-template-columns: 240px 1fr 120px;
+    grid-template-columns: 240px minmax(0, 1fr) 120px;
     grid-template-rows: auto 1fr;
     gap: 14px 22px;
     height: calc(100vh - var(--sat) - var(--sab));
@@ -140,9 +140,15 @@
     overflow-y: auto;
     padding: 2px;
   }
+  @media (max-height: 680px) {
+    .left {
+      gap: 12px;
+    }
+  }
   .center {
     display: grid;
     grid-template-rows: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
     min-height: 0;
   }

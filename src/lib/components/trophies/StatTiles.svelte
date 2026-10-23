@@ -62,7 +62,7 @@
 <style>
   .tiles {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 12px;
     margin-bottom: 12px;
   }
@@ -141,6 +141,11 @@
   /* かんじ は級が 6 つあり、よみ と かき を横に並べると語が 1 字ずつ折り返す */
   .quiz.one {
     grid-template-columns: 1fr;
+  }
+  @media (max-width: 1000px) {
+    .quiz {
+      grid-template-columns: 1fr;
+    }
   }
   .qrow {
     display: flex;

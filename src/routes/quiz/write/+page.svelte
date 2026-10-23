@@ -111,7 +111,7 @@
 <style>
   main {
     display: grid;
-    grid-template-columns: 240px 1fr 110px;
+    grid-template-columns: 240px minmax(0, 1fr) 110px;
     grid-template-rows: auto 1fr;
     gap: 12px 18px;
     height: calc(100vh - var(--sat) - var(--sab));
@@ -174,6 +174,7 @@
   .center {
     display: grid;
     grid-template-rows: 1fr auto;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
     min-height: 0;
   }
