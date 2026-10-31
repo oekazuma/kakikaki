@@ -85,8 +85,11 @@
     background: var(--c);
     color: #fff;
   }
+  /* 幅の狭い画面では きんのほし が途中で折れるので、名前は 1 行のまま数を次の行へ送る */
   .tl {
     display: flex;
+    flex-wrap: wrap;
+    white-space: nowrap;
     justify-content: space-between;
     align-items: baseline;
     font-weight: bold;

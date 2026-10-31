@@ -20,8 +20,9 @@
     loadStrokes(lang.v);
   });
 
-  // 練習画面（左 240 + 書き取り面 + 右 120）が操作できる最小サイズ。iPad 横向きはすべて満たす
-  const MIN_W = 900;
+  // 練習画面（左 240 + 書き取り面 + 右 120）が操作できる最小サイズ。iPad 横向きはすべて満たす。
+  // 折りたたみスマートフォンの内側のホーム画面アプリは、横向きでも縦に並んだステータスバーぶん幅が削られて 867px になる
+  const MIN_W = 860;
   const MIN_H = 520;
   $effect(() => watchViewport());
   const tooSmall = $derived(vp.w > 0 && (vp.w < MIN_W || vp.h < MIN_H));
