@@ -15,6 +15,10 @@ import { KANJI, READINGS, readingLabel, readingSpeech } from './kanji';
 import { WORDS, charWord } from './words';
 import { LANGS, charsOf, lettersOf, nameOf, subOf } from './lang.svelte';
 import { speechOf } from './audio';
+import { ROWS, badgesOf, computeStats, earnedBadges, nextBadge } from './badges';
+import { streak } from './streak';
+import { kanjiByReading } from './kanji';
+import { SEION, GROUPS, ALPHABET, DIGITS, toKatakana } from './chars';
 import type { Tolerance } from './judge';
 
 const WRITE = process.env.KK_IOS_EXPORT === '1';
@@ -297,6 +301,88 @@ emit(
     readings: Object.values(READINGS)
       .flat()
       .map((r) => ({ r, label: readingLabel(r), speech: readingSpeech(r) }))
+  });
+}
+
+// メダル・集計・連続日数・行の分け方・五十音の表。ここも KanjiVG を含まない
+{
+  const r = rng(7);
+  const kata = (g: string[][]) => g.map((col) => col.map(toKatakana));
+  const gojuon = (l: (typeof LANGS)[number]) =>
+    l === 'ja' || l === 'kana'
+      ? [{ name: '', cols: SEION }, ...GROUPS].map((g) => ({
+          name: g.name,
+          grid: l === 'kana' ? kata(g.cols) : g.cols,
+          vertical: true
+        }))
+      : l === 'en'
+        ? [
+            { name: 'おおもじ', grid: ALPHABET.slice(0, 2), vertical: false },
+            { name: 'こもじ', grid: ALPHABET.slice(2), vertical: false },
+            { name: 'すうじ', grid: [DIGITS], vertical: false }
+          ]
+        : [];
+  const statsCases = (l: (typeof LANGS)[number]) => {
+    const visible = badgesOf(l).filter((b) => !b.secret);
+    return [0, 1, 0.3, 0.6, 0.9, 0.05].map((rate) => {
+      const all = rate === 1;
+      const cleared = new Set(charsOf(l).filter(() => all || r() < rate));
+      const gold = new Set([...cleared].filter(() => all || r() < rate));
+      const done = new Set(WORDS.filter(() => all || r() < rate).map((w) => w.id));
+      const quiz = Object.fromEntries(
+        ['read', 'write'].flatMap((k) => [1, 2, 3, 4, 5, 6].map((lv) => [`${k}${lv}`, Math.floor(r() * 14 * rate)]))
+      );
+      const s = computeStats(
+        l,
+        (c) => cleared.has(c),
+        (c) => gold.has(c),
+        (id) => done.has(id),
+        Math.floor(r() * 40 * rate),
+        quiz,
+        Math.floor(r() * 9 * rate)
+      );
+      const earned = Object.fromEntries(visible.filter(() => r() < rate).map((b) => [b.id, '2026-11-09']));
+      return {
+        cleared: [...cleared],
+        gold: [...gold],
+        done: [...done],
+        days: s.days,
+        quiz,
+        streak: s.streak,
+        stats: { ...s, balloons: undefined, balloon: undefined, eggs: undefined, pinball: undefined },
+        need: Object.fromEntries(visible.map((b) => [b.id, b.need(s)])),
+        earned,
+        earnedBadges: earnedBadges(l, s)
+          .filter((b) => !b.secret)
+          .map((b) => b.id),
+        next: nextBadge(visible, s, earned)?.id ?? null
+      };
+    });
+  };
+  const days = ['2026-11-07', '2026-11-08', '2026-11-09', '2026-10-31', '2026-11-01', '2026-11-08'];
+  emit('parity/medals.json', {
+    rows: Object.fromEntries(LANGS.map((l) => [l, ROWS[l].map(({ name, chars }) => ({ name, chars }))])),
+    kanjiByReading: kanjiByReading(),
+    gojuon: Object.fromEntries(LANGS.map((l) => [l, gojuon(l)])),
+    badges: Object.fromEntries(
+      LANGS.map((l) => [
+        l,
+        badgesOf(l)
+          .filter((b) => !b.secret)
+          .map(({ id, group, emoji, name, desc, shared }) => ({ id, group, emoji, name, desc, shared: !!shared }))
+      ])
+    ),
+    stats: Object.fromEntries(LANGS.map((l) => [l, statsCases(l)])),
+    streak: [
+      [[], '2026-11-09'],
+      [['2026-11-09'], '2026-11-09'],
+      [['2026-11-08'], '2026-11-09'],
+      [['2026-11-07'], '2026-11-09'],
+      [days, '2026-11-09'],
+      [days, '2026-11-10'],
+      [['2026-10-31', '2026-11-01'], '2026-11-01'],
+      [['2026-02-28', '2026-03-01', '2026-03-02'], '2026-03-02']
+    ].map(([d, t]) => ({ days: d, today: t, out: streak(d as string[], t as string) }))
   });
 }
 
