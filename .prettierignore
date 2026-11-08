@@ -7,3 +7,4 @@ yarn.lock
 src/lib/strokes.ts
 src/lib/strokes-*.ts
 static/img/
+ios-data/

@@ -20,9 +20,12 @@ pnpm check                    # svelte-check
 pnpm build && pnpm preview    # 静的ビルドと確認（Service Worker は build でのみ有効）
 pnpm strokes                  # KanjiVG から src/lib/strokes.ts（ひらがな）・strokes-kana.ts（カタカナ）・strokes-kanji.ts（漢字）を再生成
 pnpm strokes:en               # アルファベット 52 文字と数字 10 文字の書き順を線分・円弧の DSL から生成（src/lib/strokes-en.ts）
+pnpm ios:export               # iOS 版が取り込む ios-data/（書き順 JSON と一致テスト用の入出力）を書き直す。普段の test:run はコミット済みの中身と同じかを検査する
 pnpm images                   # words.ts の emoji から Twemoji SVG を static/img/ に取得（既存は上書きしない）
 pnpm icon                     # アイコン/ロゴマーク SVG を生成。引数で文字と色と出力名を変えれば姉妹アプリ用になる（PWA アイコンは ひらがな のときだけ書く。PNG 化手順は出力に表示）
 ```
+
+`ios-data/` は iOS 版（別の非公開リポジトリ）が決まったコミットから写し取るデータで、`src/lib/ios-export.test.ts` が作る。書き順・判定・認識・`Tracer` を変えたら `pnpm ios:export` で書き直してコミットする（しないと test:run が落ちる）。ライセンスは `ios-data/LICENSE-STROKES.md`。
 
 svelte-vitals は `svelte-vitals.config.ts` の方針（個人用・noindex なので `seo: { indexable: false }` で共有向け SEO 規則をまとめて外す。`seo/single-h1` と `seo/robots-txt` は残る。ディレクトリは kebab-case、全ページに `<main>`、`failOn: 'warning'`）で動く。コンポーネントは 200 行未満に保つ（`architecture/component-size`、抑制ファイルは使っていない）。画面の状態遷移はクラス（`tracer.svelte.ts` / `practice.svelte.ts` / `quiz-session.svelte.ts` / `gate.svelte.ts`）に寄せて vitest で検証し、`.svelte` は描画とイベント配線だけにする。Vite プラグインは `ssr = false` のプリレンダー済みルート（殻 HTML）を自動で飛ばし、それらは CLI のソース解析で検査される（svelte-vitals 0.54.6 以降）。PR では `.github/workflows/svelte-vitals.yml` の action が差分だけを報告する。
 

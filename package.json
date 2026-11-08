@@ -15,6 +15,7 @@
     "test:run": "vitest run",
     "strokes": "node scripts/fetch-strokes.ts",
     "strokes:en": "node scripts/make-strokes-en.ts",
+    "ios:export": "KK_IOS_EXPORT=1 vitest run src/lib/ios-export.test.ts",
     "images": "node scripts/fetch-images.ts",
     "icon": "node scripts/make-icon.ts",
     "vitals": "svelte-vitals .",
