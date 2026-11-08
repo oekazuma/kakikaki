@@ -11,7 +11,10 @@ import { advance, coverage, traceDone } from './judge';
 import { stars, strokeScore } from './score';
 import { makeTemplates, passes, recognize } from './recognize';
 import { Tracer } from './tracer.svelte';
-import { KANJI } from './kanji';
+import { KANJI, READINGS, readingLabel, readingSpeech } from './kanji';
+import { WORDS, charWord } from './words';
+import { LANGS, charsOf, lettersOf, nameOf, subOf } from './lang.svelte';
+import { speechOf } from './audio';
 import type { Tolerance } from './judge';
 
 const WRITE = process.env.KK_IOS_EXPORT === '1';
@@ -273,12 +276,37 @@ const pts2 = (lang: L, c: string) => SETS[lang][c].map((d) => pathToPoints(d, 2)
   );
 }
 
+// 単語・文字・漢字の読み。ここは KanjiVG を含まない（MIT）
+emit(
+  'catalog/words.json',
+  WORDS.map(({ id, name, en, category }) => ({ id, name, en, category }))
+);
+emit('catalog/chars.json', Object.fromEntries(LANGS.map((l) => [l, charsOf(l)])));
+emit(
+  'catalog/kanji.json',
+  KANJI.map((k) => ({ grade: k.grade, chars: k.chars.map((c) => ({ c, r: READINGS[c] })) }))
+);
+{
+  const words = [...WORDS, ...[...'あアAa一'].map(charWord)];
+  emit('parity/text.json', {
+    words: words.map((w) => ({
+      id: w.id,
+      ...Object.fromEntries(LANGS.map((l) => [l, { name: nameOf(w, l), sub: subOf(w, l), letters: lettersOf(w, l) }]))
+    })),
+    speech: Object.fromEntries(LANGS.map((l) => [l, Object.fromEntries(charsOf(l).map((c) => [c, speechOf(c, l)]))])),
+    readings: Object.values(READINGS)
+      .flat()
+      .map((r) => ({ r, label: readingLabel(r), speech: readingSpeech(r) }))
+  });
+}
+
 describe('ios-data', () => {
   it('文字数', () => {
     expect(toList(STROKES)).toHaveLength(81);
     expect(toList(STROKES_KANA)).toHaveLength(81);
     expect(toList(STROKES_EN)).toHaveLength(62);
     expect(toList(STROKES_KANJI)).toHaveLength(1026);
+    expect(WORDS).toHaveLength(224);
   });
 
   it('いまのコードから作ったものと同じ（違えば pnpm ios:export）', () => {

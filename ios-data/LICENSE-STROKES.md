@@ -10,3 +10,5 @@
 `strokes/en.json`（アルファベットと数字）は、このリポジトリの `scripts/make-strokes-en.ts` で作ったもので、リポジトリと同じ MIT ライセンスです。
 
 `parity/` は Web 版の判定・認識の入出力を記録した検査用のデータです。KanjiVG 由来の点列を含むので、KanjiVG のデータと同じ CC BY-SA 3.0 で配ります。
+
+`catalog/`（単語・文字・漢字の読み）と `parity/text.json`（表示名と読み上げの文字列）は KanjiVG のデータを含まず、このリポジトリと同じ MIT ライセンスです。
