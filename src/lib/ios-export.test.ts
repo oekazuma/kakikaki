@@ -9,6 +9,10 @@ import { STROKES_KANJI } from './strokes-kanji';
 import { centroid, pathToPoints, resampleN, translate, type Pt } from './geometry';
 import { advance, coverage, traceDone } from './judge';
 import { stars, strokeScore } from './score';
+import { makeTemplates, passes, recognize } from './recognize';
+import { Tracer } from './tracer.svelte';
+import { KANJI } from './kanji';
+import type { Tolerance } from './judge';
 
 const WRITE = process.env.KK_IOS_EXPORT === '1';
 const files = new Map<string, string>();
@@ -105,6 +109,154 @@ const jitter = (pts: Pt[], amp: number, r: () => number) =>
     strokeScore: sc,
     stars: [0.64, 0.65, 0.84, 0.85, 1].map((score) => ({ score, out: stars(score) }))
   });
+}
+
+const SETS = { ja: STROKES, kana: STROKES_KANA, en: STROKES_EN, kanji: STROKES_KANJI };
+type L = keyof typeof SETS;
+const pts2 = (lang: L, c: string) => SETS[lang][c].map((d) => pathToPoints(d, 2));
+
+{
+  const r = rng(2);
+  const pick = (cs: string[], n: number) => Array.from({ length: n }, (_, i) => cs[Math.floor((i * cs.length) / n)]);
+  const kanji = KANJI.flatMap((g) => {
+    const cs = [...g.chars];
+    return [cs[0], cs[Math.floor(cs.length / 4)], cs[Math.floor(cs.length / 2)], cs.at(-1)!];
+  });
+  type Case = { lang: L; strokes: Pt[][]; targets: string[] };
+  const cases: Case[] = [];
+  for (const [lang, cs] of [
+    ['ja', pick(Object.keys(STROKES), 10)],
+    ['kana', pick(Object.keys(STROKES_KANA), 10)],
+    ['en', pick(Object.keys(STROKES_EN), 10)],
+    ['kanji', kanji]
+  ] as [L, string[]][])
+    for (const c of cs) {
+      const s = pts2(lang, c);
+      cases.push({ lang, strokes: s, targets: [c] });
+      cases.push({ lang, strokes: s.map((st) => jitter(translate(st, 6, -4), 2, r)), targets: [c] });
+    }
+  cases.push({ lang: 'ja', strokes: pts2('ja', 'あ').slice(0, 2), targets: ['あ'] });
+  cases.push({ lang: 'en', strokes: [...pts2('en', 'i'), [{ x: 50, y: 50 }]], targets: ['i'] });
+  cases.push({ lang: 'ja', strokes: [], targets: ['あ'] });
+  cases.push({ lang: 'en', strokes: pts2('en', 'I'), targets: ['l'] });
+  cases.push({ lang: 'en', strokes: pts2('en', 'O'), targets: ['0'] });
+  cases.push({ lang: 'kanji', strokes: pts2('kanji', '公'), targets: ['工', '公'] });
+  const tpl = Object.fromEntries(Object.entries(SETS).map(([k, v]) => [k, makeTemplates(v)]));
+  emit(
+    'parity/recognize.json',
+    cases.map(({ lang, strokes, targets }) => {
+      const res = recognize(strokes, tpl[lang]);
+      return {
+        lang,
+        strokes: strokes.map(P),
+        top: res.slice(0, 5).map(({ char, dist }) => ({ c: char, dist })), // Infinity は JSON で null になる
+        targets,
+        passes: passes(targets, res)
+      };
+    })
+  );
+}
+
+{
+  type Ev =
+    | { t: 'down' | 'move'; x: number; y: number; p?: number; id: number }
+    | { t: 'up'; id: number }
+    | { t: 'undo' | 'judge' | 'result' };
+  const drag = (pts: Pt[], id = 0, p?: (i: number) => number): Ev[] => [
+    { t: 'down', x: pts[0].x, y: pts[0].y, ...(p ? { p: p(0) } : {}), id },
+    ...pts.map((q, i): Ev => ({ t: 'move', x: q.x, y: q.y, ...(p ? { p: p(i) } : {}), id })),
+    { t: 'up', id }
+  ];
+  const r = rng(3);
+  const a = pts2('ja', 'あ');
+  const half = (s: Pt[]) => [s.slice(0, Math.ceil(s.length / 2)), s.slice(Math.ceil(s.length / 2) - 1)];
+  const kaki = pts2('kanji', '書');
+  const K: Tolerance = { r: 15, end: 0.2 };
+  const cases: {
+    lang: L;
+    char: string;
+    mode: 'trace' | 'free' | 'test';
+    accept?: string[];
+    tol?: Tolerance;
+    events: Ev[];
+  }[] = [
+    { lang: 'ja', char: 'あ', mode: 'trace', events: [...a.flatMap((s) => drag(s)), { t: 'result' }] },
+    {
+      lang: 'ja',
+      char: 'あ',
+      mode: 'trace',
+      events: [
+        ...drag(a[0].slice(0, 5)).slice(0, -1),
+        { t: 'move', x: a[0][4].x, y: a[0][4].y + 20, id: 0 },
+        { t: 'up', id: 0 }
+      ]
+    },
+    { lang: 'ja', char: 'あ', mode: 'trace', events: [{ t: 'down', x: 100, y: 100, id: 0 }] },
+    {
+      lang: 'kanji',
+      char: '書',
+      mode: 'trace',
+      tol: K,
+      events: [...kaki.flatMap((s) => drag(s.slice(0, Math.ceil(s.length * 0.85)))), { t: 'result' }]
+    },
+    { lang: 'ja', char: 'あ', mode: 'trace', events: drag(a[0], 0, (i) => 0.3 + (0.5 * i) / a[0].length) },
+    {
+      lang: 'ja',
+      char: 'あ',
+      mode: 'trace',
+      events: [{ t: 'down', x: a[0][0].x, y: a[0][0].y, id: 0 }, ...drag(a[1], 1), ...drag(a[0]).slice(1)]
+    },
+    {
+      lang: 'ja',
+      char: 'あ',
+      mode: 'free',
+      events: [
+        ...drag(jitter(a[0], 2, r)),
+        ...half(jitter(a[1], 2, r)).flatMap((s) => drag(s)),
+        ...drag(jitter(a[2], 2, r)),
+        { t: 'result' }
+      ]
+    },
+    {
+      lang: 'ja',
+      char: 'あ',
+      mode: 'free',
+      events: [...drag(a[0]), ...drag(half(a[1])[0]), { t: 'undo' }, { t: 'undo' }, { t: 'undo' }]
+    },
+    { lang: 'ja', char: 'あ', mode: 'test', events: [...a.flatMap((s) => drag(s)), { t: 'judge' }, { t: 'judge' }] },
+    {
+      lang: 'ja',
+      char: 'あ',
+      mode: 'test',
+      events: [...a.flatMap((s) => drag(s)), { t: 'down', x: 10, y: 10, id: 0 }, { t: 'up', id: 0 }, { t: 'judge' }]
+    },
+    { lang: 'ja', char: 'ぬ', mode: 'test', events: [...pts2('ja', 'め').flatMap((s) => drag(s)), { t: 'judge' }] },
+    {
+      lang: 'kanji',
+      char: '工',
+      mode: 'test',
+      accept: ['工', '公'],
+      events: [...pts2('kanji', '公').flatMap((s) => drag(s)), { t: 'judge' }]
+    }
+  ];
+  emit(
+    'parity/tracer.json',
+    cases.map(({ lang, char, mode, accept = [char], tol = { r: 12, end: 0 }, events }) => {
+      const t = new Tracer(char, SETS[lang], mode, accept, tol);
+      const out: unknown[] = [];
+      const state: unknown[] = [];
+      for (const e of events) {
+        if (e.t === 'down') out.push(t.down({ x: e.x, y: e.y, p: e.p }, e.id));
+        else if (e.t === 'move') out.push(t.move({ x: e.x, y: e.y, p: e.p }, e.id));
+        else if (e.t === 'up') out.push(t.up(e.id));
+        else if (e.t === 'undo') out.push(t.undo());
+        else if (e.t === 'judge') out.push(t.judge());
+        else out.push(t.result());
+        state.push({ si: t.si, cursor: t.cursor, tracing: t.tracing, trails: t.trails.length, pr: t.pr.length });
+      }
+      return { lang, char, mode, accept, tol, events, out, state };
+    })
+  );
 }
 
 describe('ios-data', () => {
