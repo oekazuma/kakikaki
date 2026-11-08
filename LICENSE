@@ -25,7 +25,8 @@ SOFTWARE.
 This license covers the source code of かきかき. The following bundled data
 and assets are under their own licenses:
 
-- src/lib/strokes.ts, src/lib/strokes-kana.ts — stroke data derived from
+- src/lib/strokes.ts, src/lib/strokes-kana.ts, src/lib/strokes-kanji.ts, and
+  ios-data/ (except ios-data/strokes/en.json) — stroke data derived from
   KanjiVG (https://kanjivg.tagaini.net), CC BY-SA 3.0. Modified versions of
   these files must stay under CC BY-SA 3.0.
 - static/img/*.svg — illustrations from Twemoji (https://github.com/jdecked/twemoji),

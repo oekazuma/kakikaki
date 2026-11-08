@@ -230,6 +230,20 @@ const pts2 = (lang: L, c: string) => SETS[lang][c].map((d) => pathToPoints(d, 2)
       mode: 'test',
       events: [...a.flatMap((s) => drag(s)), { t: 'down', x: 10, y: 10, id: 0 }, { t: 'up', id: 0 }, { t: 'judge' }]
     },
+    // 指が速いとき（1 回で約 18 単位）。先読み幅が動いた距離で広がらないと cursor が遅れる
+    {
+      lang: 'ja',
+      char: 'あ',
+      mode: 'trace',
+      events: drag(a[0].filter((_, i) => i % 9 === 0 || i === a[0].length - 1))
+    },
+    // 1 画目を 2 本に分けて書くと、書いた字が 1 位のまま画数違いで落ちる（top は空）
+    {
+      lang: 'ja',
+      char: 'ぼ',
+      mode: 'test',
+      events: [...[...half(pts2('ja', 'ぼ')[0]), ...pts2('ja', 'ぼ').slice(1)].flatMap((s) => drag(s)), { t: 'judge' }]
+    },
     { lang: 'ja', char: 'ぬ', mode: 'test', events: [...pts2('ja', 'め').flatMap((s) => drag(s)), { t: 'judge' }] },
     {
       lang: 'kanji',
