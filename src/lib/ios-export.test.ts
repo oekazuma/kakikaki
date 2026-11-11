@@ -410,6 +410,8 @@ emit(
     '1 {日|にち} 1 {回|かい}',
     'A を かく',
     'ピンボール かいすう',
+    '{メダル|めだる} と {記録|きろく}',
+    '{アルファベット|あるふぁべっと} マスター',
     '{戻|もど}る',
     ...LANGS.flatMap((l) => badgesOf(l).flatMap((b) => [b.name, b.desc]))
   ];
@@ -436,7 +438,8 @@ emit(
         hidden,
         out: display('お{手本|てほん}なしで {書|か}いて {見|み}る', 6, hidden)
       })),
-      { text: '{見|み}る', grade: null, hidden: [], out: display('{見|み}る', null) }
+      { text: '{見|み}る', grade: null, hidden: [], out: display('{見|み}る', null) },
+      { text: '{メダル|めだる}', grade: 4, hidden: ['ダ'], out: display('{メダル|めだる}', 4, ['ダ']) }
     ],
     labels: {
       badgeGroups: GROUP_LABEL,

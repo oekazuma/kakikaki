@@ -142,7 +142,12 @@ const GOLD_STEPS: Record<Lang, number[]> = {
 };
 const STEP_EMOJI = ['🔟', '📘', '📗', '📙', '📕', '📚'];
 const GOLD_EMOJI = ['⭐', '🌟', '✨', '🌠', '☀️', '🌈'];
-const ALL_NAME: Record<Lang, string> = { ja: 'ひらがな', kana: 'かたかな', kanji: 'かんじ', en: 'あるふぁべっと' };
+const ALL_NAME: Record<Lang, string> = {
+  ja: 'ひらがな',
+  kana: 'かたかな',
+  kanji: 'かんじ',
+  en: '{アルファベット|あるふぁべっと}'
+};
 // 行メダルの段・絵文字・説明の接尾。かんじ は学年ごとで、絵文字は行の先頭文字ではなく本
 const ROW_STYLE = (l: Lang, r: Row): [BadgeGroup, string, string] =>
   l === 'kanji' ? ['がくねん', '📖', 'の {漢字|かんじ}'] : ['ぎょう マスター', r.chars[0], ''];

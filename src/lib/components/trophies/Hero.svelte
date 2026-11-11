@@ -39,11 +39,11 @@
       />
     </svg>
     <div class="num"><b>{got}</b><small>/ {badges.length}</small></div>
-    <span class="lbl">{t(`めだる ${pct}%`)}</span>
+    <span class="lbl">{t(`{メダル|めだる} ${pct}%`)}</span>
   </div>
   {#if next}
     <div class="next">
-      <small>{t('{次|つぎ}の めだる')}</small>
+      <small>{t('{次|つぎ}の {メダル|めだる}')}</small>
       <div class="nb">
         <span class="em">{next.emoji}</span>
         <div>
@@ -55,7 +55,7 @@
       </div>
     </div>
   {:else}
-    <div class="next all"><b>{t('{全部|ぜんぶ}の めだるを {集|あつ}めた！')}</b></div>
+    <div class="next all"><b>{t('{全部|ぜんぶ}の {メダル|めだる}を {集|あつ}めた！')}</b></div>
   {/if}
 </section>
 

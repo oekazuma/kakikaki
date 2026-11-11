@@ -7,7 +7,7 @@
 
 <div class="toast card" transition:fly={{ y: -80, duration: 400 }}>
   <span class="tem">{badge.emoji}</span>
-  <div><small>{t('めだる ゲット！')}</small><b>{t(badge.name)}</b></div>
+  <div><small>{t('{メダル|めだる} ゲット！')}</small><b>{t(badge.name)}</b></div>
 </div>
 
 <style>

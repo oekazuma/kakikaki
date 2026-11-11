@@ -31,7 +31,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1><Icon name="trophy" /> {t('めだる と {記録|きろく}')}</h1>
+    <h1><Icon name="trophy" /> {t('{メダル|めだる} と {記録|きろく}')}</h1>
   </header>
   <Hero {s} {badges} {got} />
   <StatTiles {s} />

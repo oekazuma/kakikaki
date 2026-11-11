@@ -30,13 +30,16 @@ export function schoolGrade(birth: string, today: string): number {
 export const kanjiUpTo = (grade: number | null) => (grade == null ? 0 : Math.min(6, Math.max(0, grade - 1)));
 
 const allowed = Array.from({ length: 7 }, (_, n) => new Set(KANJI.filter((k) => k.grade <= n).flatMap((k) => k.chars)));
+// カタカナは 1 年生で習う字として扱う（書き方 {メダル|めだる} は 2 年生からカタカナになる）
+const KATAKANA = /[゠-ヿ]/;
 const WORD = /[ぁ-ゟ゠-ヿ々一-鿿]/;
 
 // 答えを隠している画面では、隠している字を含む語を読みにする（「お手本なし」で 手 を書かせない）
 export function display(text: string, grade: number | null, hidden: readonly string[] = []): string {
-  const ok = allowed[kanjiUpTo(grade)];
+  const upTo = kanjiUpTo(grade);
+  const ok = (c: string) => (KATAKANA.test(c) ? upTo >= 1 : allowed[upTo].has(c)) && !hidden.includes(c);
   const s = text.replace(/\{([^{}|]+)\|([^{}|]+)\}/g, (_, kanji: string, yomi: string) =>
-    [...kanji].every((c) => ok.has(c) && !hidden.includes(c)) ? kanji : yomi
+    [...kanji].every(ok) ? kanji : yomi
   );
   if ((grade ?? 0) < 3) return s;
   return s.replace(/ /g, (sp, i: number) => (WORD.test(s[i - 1] ?? '') && WORD.test(s[i + 1] ?? '') ? '' : sp));
