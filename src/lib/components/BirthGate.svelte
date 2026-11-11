@@ -5,7 +5,8 @@
   import { updateProfile } from '$lib/profiles.svelte';
   import { today } from '$lib/today';
   import { missingBirth } from '$lib/yomi.svelte';
-  // 保護者向けの画面なので漢字で書き、t() は通さない。開いたときに入っていない人だけを聞く
+  // 保護者向けの画面なので漢字で書き、t() は通さない。開いたときに入っていない人だけを聞き、
+  // 空けたままの人は「あとで」として空の生年月日を保存する（聞き直さない）
   const people = $state(
     untrack(() =>
       missingBirth().map((p) => ({
@@ -18,7 +19,8 @@
     )
   );
   const range = birthRange(today());
-  const ready = $derived(people.every((p) => p.name.trim() && isBirth(p.birth, today())));
+  const ready = $derived(people.every((p) => p.birth === '' || isBirth(p.birth, today())));
+  const later = $derived(people.every((p) => p.birth === ''));
   let error = $state(false);
 
   function start() {
@@ -30,6 +32,10 @@
   <section class="card">
     <h2>使う人の名前と生年月日を入れてください</h2>
     <p>学年に合わせて、習った漢字で説明文を表示するために使います。</p>
+    <p>
+      あとで入れる人は空けたままにできます。「だれが
+      つかう？」の鉛筆ボタンから、いつでも入れられます。入っていない人には、漢字を使わずにかなで表示します。
+    </p>
     <p>このブラウザの中に保存し、外に送ることはありません。</p>
     {#each people as p (p.id)}
       <div class="row">
@@ -39,7 +45,7 @@
       </div>
     {/each}
     {#if error}<p class="err">保存できませんでした。ブラウザの空き容量を確かめてください。</p>{/if}
-    <button class="go" onclick={start} disabled={!ready}>はじめる</button>
+    <button class="go" onclick={start} disabled={!ready}>{later ? 'あとで入れる' : 'はじめる'}</button>
   </section>
 </div>
 

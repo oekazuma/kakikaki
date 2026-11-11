@@ -37,7 +37,7 @@
   <label class="name">
     {t('{誕生日|たんじょうび}')}
     <input type="date" bind:value={birth} min={range.min} max={range.max} />
-    <small class="len">学年に合わせた漢字の表示に使います（このブラウザの中だけに保存）</small>
+    <small class="len">学年に合わせた漢字の表示に使います（このブラウザの中だけに保存。空けたままでも使えます）</small>
   </label>
   <AvatarPicker bind:value={avatar} />
   {#if error}<p class="err">{t(error)}</p>{/if}
@@ -48,7 +48,7 @@
       >
     {/if}
     <button class="cancel" onclick={onclose}>やめる</button>
-    <button class="save" onclick={save} disabled={!name.trim() || !isBirth(birth, today())}
+    <button class="save" onclick={save} disabled={!name.trim() || (birth !== '' && !isBirth(birth, today()))}
       ><Icon name="check" size={22} /> {t('{保存|ほぞん}')}</button
     >
   </div>

@@ -32,4 +32,13 @@ describe('yomi', () => {
     expect(m.missingBirth().map((p) => p.id)).toEqual([m.profiles.list[0].id, a.id, b.id]);
     expect(m.missingBirth().some((p) => p.id === c.id)).toBe(false);
   });
+
+  it('「あとで」にした人（空の生年月日）は聞き直さず、学年なしで表示する', async () => {
+    const m = await fresh();
+    const later = m.addProfile('later', 'cat', 'ja', '')!;
+    expect(m.missingBirth().some((p) => p.id === later.id)).toBe(false);
+    m.setCurrent(later.id);
+    expect(m.gradeNow()).toBe(null);
+    expect(m.t('{見|み}る ことば')).toBe('みる ことば');
+  });
 });

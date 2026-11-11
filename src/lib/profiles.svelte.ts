@@ -2,7 +2,7 @@ import { LANGS, type Lang } from './lang.svelte';
 import { getRaw, isObject, loadJSON, removeKey, saveJSON, setRaw } from './storage';
 
 // 使う人（きょうだい・大人）ごとの記録の入れ物。記録のキーは kk:<id>:<lang>:<name>。
-// birth は生年月日（YYYY-MM-DD）。形が違う値も読み込み、grade.ts の isBirth で入っていないものとして聞き直す
+// birth は生年月日（YYYY-MM-DD）。空は「あとで」と答えた人。形が違う値も読み込み、grade.ts の isBirth で入っていないものとして聞き直す
 export type Profile = { id: string; name: string; avatar: string; lang: Lang; birth?: string };
 export const MAX_PROFILES = 10;
 export const NAME_MAX = 10;
