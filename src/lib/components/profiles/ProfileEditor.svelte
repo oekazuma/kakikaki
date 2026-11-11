@@ -37,7 +37,9 @@
   <label class="name">
     {t('{誕生日|たんじょうび}')}
     <input type="date" bind:value={birth} min={range.min} max={range.max} />
-    <small class="len">学年に合わせた漢字の表示に使います（このブラウザの中だけに保存。空けたままでも使えます）</small>
+    <small class="len"
+      >画面の説明やボタンを、学年までに習った漢字で表示します。練習する文字は変わりません（このブラウザの中だけに保存。空けたままでも使えます）</small
+    >
   </label>
   <AvatarPicker bind:value={avatar} />
   {#if error}<p class="err">{t(error)}</p>{/if}
