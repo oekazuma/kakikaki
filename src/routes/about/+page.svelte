@@ -41,6 +41,10 @@
           <li>右の「バックアップ」で「記録を書き出す」（または「共有する」）を押し、ファイルを保存します。</li>
           <li>アプリのホーム右上の ? から「アプリについて」を開き、「記録を読み込む」で保存したファイルを選びます。</li>
         </ol>
+        <p class="close">
+          この Web 版は 2026 年 11 月 30
+          日で公開を終えます。ホーム画面に追加してあれば、そのあともこの端末で使い続けられます。ただし更新は届かなくなり、ホーム画面から消すと入れ直せません。念のため、右の「バックアップ」で記録を書き出しておいてください。
+        </p>
         <a class="go" href="https://apps.apple.com/jp/app/id6832798120"
           >App Store で見る <Icon name="back" size={18} /></a
         >
@@ -122,6 +126,13 @@
   ol {
     margin: 0;
     padding-left: 22px;
+  }
+  .close {
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--bg);
+    font-weight: bold;
   }
   .link {
     display: grid;

@@ -6,7 +6,7 @@
 
 <!-- 子どもが App Store へ出ていかないよう、ホームからは保護者向けの「アプリについて」へだけつなぐ -->
 <a class="card notice" href={resolve('/about')}>
-  {t('おうちの {方|かた}へ：iPad アプリが できました')}
+  {t('おうちの {方|かた}へ：iPad アプリが できました（この Web {版|ばん}は 11/30 まで）')}
   <Icon name="back" size={18} />
 </a>
 

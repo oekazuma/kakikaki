@@ -8,7 +8,9 @@
   import { updated } from '$app/state';
   import { vp, watchViewport } from '$lib/viewport.svelte';
   import { missingBirth, t } from '$lib/yomi.svelte';
+  import { keepStorage } from '$lib/pwa';
   let { children } = $props();
+  $effect(() => keepStorage());
   // ホーム画面のアプリはページ遷移が少なくポーリングも止まりがちなので、前面に戻ったときに新版を確認する（1 分に 1 回まで）
   let lastCheck = 0;
   function onVisible() {
