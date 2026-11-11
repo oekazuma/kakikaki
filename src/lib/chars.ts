@@ -26,9 +26,17 @@ export const CHOON: string[][] = [['ー']];
 export const GROUPS: { name: string; cols: string[][] }[] = [
   { name: 'だくおん', cols: DAKUON },
   { name: 'はんだくおん', cols: HANDAKUON },
-  { name: '{小|ちい}さい{文字|もじ}', cols: KOGAKI },
-  { name: 'のばす{音|おと}', cols: CHOON }
+  { name: 'ちいさいもじ', cols: KOGAKI },
+  { name: 'のばすおと', cols: CHOON }
 ];
+// まとまりの表示名。name は iOS 版との一致データで識別子として比べるので、書き方はここにだけ付ける
+export const GROUP_NAME: Record<string, string> = {
+  ちいさいもじ: '{小|ちい}さい{文字|もじ}',
+  のばすおと: 'のばす{音|おと}',
+  おおもじ: '{大|おお}{文字|もじ}',
+  こもじ: '{小|こ}{文字|もじ}',
+  すうじ: '{数字|すうじ}'
+};
 const GOJUON = [...SEION, ...DAKUON, ...HANDAKUON, ...KOGAKI, ...CHOON];
 export const CHARS = GOJUON.flat().filter(Boolean);
 

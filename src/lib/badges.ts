@@ -1,4 +1,4 @@
-import { SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, DIGITS, toKatakana } from './chars';
+import { SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, DIGITS, GROUP_NAME, toKatakana } from './chars';
 import { CAT_LABEL, CATEGORIES, WORDS, type Word } from './words';
 import { charsOf, lettersOf, type Lang } from './lang.svelte';
 import { KANJI, gradeLabel } from './kanji';
@@ -147,8 +147,7 @@ const ALL_NAME: Record<Lang, string> = { ja: 'ひらがな', kana: 'かたかな
 const ROW_STYLE = (l: Lang, r: Row): [BadgeGroup, string, string] =>
   l === 'kanji' ? ['がくねん', '📖', 'の {漢字|かんじ}'] : ['ぎょう マスター', r.chars[0], ''];
 // 行の表示名。r.name はメダルの id にも使うので書き方を付けない
-const ROW_LABEL: Record<string, string> = { すうじ: '{数字|すうじ}', ちいさいもじ: '{小|ちい}さい{文字|もじ}' };
-const rowLabel = (r: Row) => ROW_LABEL[r.name] ?? gradeLabel(r.name);
+export const rowLabel = (r: Row) => GROUP_NAME[r.name] ?? gradeLabel(r.name);
 
 export function badgesOf(l: Lang): Badge[] {
   const T = TOTAL(l);

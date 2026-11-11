@@ -15,11 +15,11 @@ import { KANJI, READINGS, readingLabel, readingSpeech } from './kanji';
 import { CAT_LABEL, WORDS, charWord } from './words';
 import { LANGS, charsOf, lettersOf, nameOf, subOf } from './lang.svelte';
 import { speechOf } from './audio';
-import { GROUP_LABEL, ROWS, badgesOf, computeStats, earnedBadges, nextBadge } from './badges';
+import { GROUP_LABEL, ROWS, badgesOf, rowLabel, computeStats, earnedBadges, nextBadge } from './badges';
 import { display, isBirth, schoolGrade } from './grade';
 import { streak } from './streak';
 import { kanjiByReading } from './kanji';
-import { SEION, GROUPS, ALPHABET, DIGITS, toKatakana } from './chars';
+import { SEION, GROUPS, GROUP_NAME, ALPHABET, DIGITS, toKatakana } from './chars';
 import type { Tolerance } from './judge';
 
 const WRITE = process.env.KK_IOS_EXPORT === '1';
@@ -438,7 +438,12 @@ emit(
       })),
       { text: '{見|み}る', grade: null, hidden: [], out: display('{見|み}る', null) }
     ],
-    labels: { groups: GROUP_LABEL, cats: CAT_LABEL }
+    labels: {
+      badgeGroups: GROUP_LABEL,
+      cats: CAT_LABEL,
+      charGroups: GROUP_NAME,
+      rows: Object.fromEntries(LANGS.map((l) => [l, ROWS[l].map(rowLabel)]))
+    }
   });
 }
 

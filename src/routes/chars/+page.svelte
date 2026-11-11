@@ -5,7 +5,7 @@
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import KanjiGrid from '$lib/components/KanjiGrid.svelte';
-  import { SEION, GROUPS, ALPHABET, DIGITS, toKatakana } from '$lib/chars';
+  import { SEION, GROUPS, GROUP_NAME, ALPHABET, DIGITS, toKatakana } from '$lib/chars';
   import { charWordId } from '$lib/words';
   import { charCleared, charGold } from '$lib/progress.svelte';
   import { lang, info } from '$lib/lang.svelte';
@@ -55,7 +55,7 @@
       <div class="groups">
         {#each GROUPS as g (g.name)}
           <section class="card group">
-            <h2>{t(g.name)}</h2>
+            <h2>{t(GROUP_NAME[g.name] ?? g.name)}</h2>
             {@render table(g.cols.map((col) => col.map(k)))}
           </section>
         {/each}
@@ -63,9 +63,9 @@
     </div>
   {:else}
     <div class="en">
-      {#each [['{大|おお}{文字|もじ}', ALPHABET.slice(0, 2)], ['{小|こ}{文字|もじ}', ALPHABET.slice(2)], ['{数字|すうじ}', [DIGITS]]] as const as [name, rows] (name)}
+      {#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)], ['すうじ', [DIGITS]]] as const as [name, rows] (name)}
         <section class="card group">
-          <h2 class="ltr">{t(name)}</h2>
+          <h2 class="ltr">{t(GROUP_NAME[name])}</h2>
           {#each rows as row (row.join(''))}
             <div class="row">
               {#each row as c (c)}{@render cell(c)}{/each}
