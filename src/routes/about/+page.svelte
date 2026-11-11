@@ -31,6 +31,20 @@
 
   <div class="cols">
     <div class="left">
+      <section class="card">
+        <h2>iPad アプリを公開しました</h2>
+        <p>
+          App Store で「かきかき -
+          なぞって覚える書き方練習」を公開しました。ひらがなは無料ですべて練習できます。記録はバックアップのファイルで引き継げます。
+        </p>
+        <ol>
+          <li>右の「バックアップ」で「記録を書き出す」（または「共有する」）を押し、ファイルを保存します。</li>
+          <li>アプリのホーム右上の ? から「アプリについて」を開き、「記録を読み込む」で保存したファイルを選びます。</li>
+        </ol>
+        <a class="go" href="https://apps.apple.com/jp/app/id6832798120"
+          >App Store で見る <Icon name="back" size={18} /></a
+        >
+      </section>
       <a class="card link" href={resolve('/about/progress')}>
         <h2>みんなの進み具合</h2>
         <p>人ごと・ことばごとの達成率、練習した日、クイズの正解数、苦手な文字が見られます。</p>
@@ -104,7 +118,8 @@
     margin: 0 0 8px;
     color: var(--blue);
   }
-  ul {
+  ul,
+  ol {
     margin: 0;
     padding-left: 22px;
   }

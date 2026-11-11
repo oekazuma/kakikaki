@@ -20,6 +20,7 @@
   import { lang, info } from '$lib/lang.svelte';
   import LangToggle from '$lib/components/LangToggle.svelte';
   import ProfileButton from '$lib/components/ProfileButton.svelte';
+  import AppStoreNotice from '$lib/components/AppStoreNotice.svelte';
   import { updated } from '$app/state';
   const s = $derived(stats());
   const total = $derived(TOTAL(lang.v));
@@ -68,6 +69,7 @@
       </a>
     </nav>
   </header>
+  <AppStoreNotice />
   {#key lang.v}
     <div class="words" in:fly={{ x: 80, duration: 350 }}>
       {#if kanji}
