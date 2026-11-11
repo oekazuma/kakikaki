@@ -18,11 +18,11 @@
     class="card pop"
     role="dialog"
     aria-modal="true"
-    aria-label="iPad アプリができました"
+    aria-label="iPhone・iPad アプリができました"
     transition:scale={{ duration: 200, start: 0.9 }}
   >
     <span class="for">おうちの方へ</span>
-    <h2>iPad アプリができました</h2>
+    <h2>iPhone・iPad アプリができました</h2>
     <p>
       App Store で「かきかき -
       なぞって覚える書き方練習」を公開しました。ひらがなは無料ですべて練習できます。記録はバックアップのファイルでアプリに引き継げます。

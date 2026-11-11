@@ -6,7 +6,7 @@
 
 <a class="notice" href="https://apps.apple.com/jp/app/id6832798120" target="_blank" rel="noreferrer">
   <span>
-    <b>{t('iPad アプリが できました！')}</b>
+    <b>{t('iPhone・iPad アプリが できました！')}</b>
     <small>{t('おうちの {方|かた}へ：App Store で {見|み}られます（この Web {版|ばん}は 11/30 まで）')}</small>
   </span>
   <Icon name="back" size={22} />
