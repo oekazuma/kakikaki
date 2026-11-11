@@ -1,8 +1,9 @@
 import { LANGS, type Lang } from './lang.svelte';
 import { getRaw, isObject, loadJSON, removeKey, saveJSON, setRaw } from './storage';
 
-// 使う人（きょうだい・大人）ごとの記録の入れ物。記録のキーは kk:<id>:<lang>:<name>
-export type Profile = { id: string; name: string; avatar: string; lang: Lang };
+// 使う人（きょうだい・大人）ごとの記録の入れ物。記録のキーは kk:<id>:<lang>:<name>。
+// birth は生年月日（YYYY-MM-DD）。形が違う値も読み込み、grade.ts の isBirth で入っていないものとして聞き直す
+export type Profile = { id: string; name: string; avatar: string; lang: Lang; birth?: string };
 export const MAX_PROFILES = 10;
 export const NAME_MAX = 10;
 export const DEFAULT_AVATAR = 'cat';
@@ -58,11 +59,11 @@ export const byId = (id: string) => profiles.list.find((p) => p.id === id);
 // アバター画像（data URL）が大きいと Safari の 5MB 上限に当たるので、保存失敗は呼び出し側に知らせる
 const save = () => saveJSON(KEY, { list: profiles.list, cur: profiles.cur });
 
-export function addProfile(name: string, avatar = DEFAULT_AVATAR, lang: Lang = 'ja'): Profile | null {
+export function addProfile(name: string, avatar = DEFAULT_AVATAR, lang: Lang = 'ja', birth?: string): Profile | null {
   if (profiles.list.length >= MAX_PROFILES) return null;
   let n = 1;
   while (byId(`p${n}`)) n++;
-  const p = { id: `p${n}`, name: name.trim().slice(0, NAME_MAX) || 'なまえ', avatar, lang };
+  const p: Profile = { id: `p${n}`, name: name.trim().slice(0, NAME_MAX) || 'なまえ', avatar, lang, birth };
   profiles.list.push(p);
   if (!save()) {
     profiles.list.pop();

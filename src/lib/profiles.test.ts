@@ -124,3 +124,25 @@ describe('profiles', () => {
     }
   });
 });
+
+describe('生年月日', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('作るときに入れた生年月日が残り、編集で直せる', async () => {
+    const m = await fresh();
+    const b = m.addProfile('はな', 'cat', 'ja', '2019-05-01')!;
+    expect(b.birth).toBe('2019-05-01');
+    expect(m.updateProfile(b.id, { birth: '2018-05-01' })).toBe(true);
+    const again = await fresh();
+    expect(again.byId(b.id)?.birth).toBe('2018-05-01');
+  });
+
+  it('形の違う生年月日を持つ人も読み込める', async () => {
+    localStorage.setItem(
+      'kk:profiles',
+      JSON.stringify({ list: [{ id: 'p1', name: 'a', avatar: 'cat', lang: 'ja', birth: 20190501 }], cur: 'p1' })
+    );
+    const m = await fresh();
+    expect(m.profiles.list.map((p) => p.id)).toEqual(['p1']);
+  });
+});

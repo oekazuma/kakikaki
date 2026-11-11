@@ -1,11 +1,13 @@
 <script lang="ts">
   import { fx } from '$lib/fx';
   import Icon from '$lib/components/Icon.svelte';
+  import BirthGate from '$lib/components/BirthGate.svelte';
   import Splash from '$lib/components/Splash.svelte';
   import { lang, loadStrokes } from '$lib/lang.svelte';
   import { rememberLang } from '$lib/progress.svelte';
   import { updated } from '$app/state';
   import { vp, watchViewport } from '$lib/viewport.svelte';
+  import { missingBirth } from '$lib/yomi.svelte';
   let { children } = $props();
   // ホーム画面のアプリはページ遷移が少なくポーリングも止まりがちなので、前面に戻ったときに新版を確認する（1 分に 1 回まで）
   let lastCheck = 0;
@@ -34,6 +36,7 @@
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
 {@render children()}
+{#if missingBirth().length}<BirthGate />{/if}
 <Splash />
 {#if tooSmall}
   <div class="guard card">

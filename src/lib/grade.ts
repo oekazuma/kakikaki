@@ -8,8 +8,15 @@ export function isBirth(s: unknown, today: string): s is string {
   const [y, m, d] = s.split('-').map(Number);
   const t = new Date(Date.UTC(y, m - 1, d));
   if (t.getUTCMonth() !== m - 1 || t.getUTCDate() !== d) return false;
-  return s <= today && s >= `${Number(today.slice(0, 4)) - 100}${today.slice(4)}`;
+  const r = birthRange(today);
+  return s <= r.max && s >= r.min;
 }
+
+// 入力の欄の min / max（isBirth と同じ範囲）
+export const birthRange = (today: string) => ({
+  min: `${Number(today.slice(0, 4)) - 100}${today.slice(4)}`,
+  max: today
+});
 
 // 4 月 2 日〜翌 4 月 1 日生まれが同じ学年（4 月 1 日生まれは前の学年）。学年は 4 月 1 日に上がる。
 // 0 以下は小学校に入る前、7 からは中学生以上

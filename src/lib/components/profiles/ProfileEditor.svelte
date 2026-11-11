@@ -4,7 +4,9 @@
   import AvatarPicker from './AvatarPicker.svelte';
   import Icon from '../Icon.svelte';
   import DangerZone from './DangerZone.svelte';
+  import { birthRange, isBirth } from '$lib/grade';
   import { lang } from '$lib/lang.svelte';
+  import { today } from '$lib/today';
   import { addProfile, byId, profiles, updateProfile, DEFAULT_AVATAR, NAME_MAX } from '$lib/profiles.svelte';
   // id が null なら新しい人を追加
   let { id, onclose }: { id: string | null; onclose: () => void } = $props();
@@ -12,11 +14,13 @@
   const p = untrack(() => (id ? byId(id) : undefined));
   let name = $state(p?.name ?? '');
   let avatar = $state(p?.avatar ?? DEFAULT_AVATAR);
+  let birth = $state(p?.birth ?? '');
+  const range = birthRange(today());
   let error = $state('');
   let deleting = $state(false);
 
   function save() {
-    const ok = id ? updateProfile(id, { name, avatar }) : !!addProfile(name, avatar, lang.v);
+    const ok = id ? updateProfile(id, { name, avatar, birth }) : !!addProfile(name, avatar, lang.v, birth);
     if (ok) onclose();
     else error = 'ほぞん できませんでした。しゃしんを かえて みてね';
   }
@@ -29,6 +33,11 @@
     <input type="text" bind:value={name} maxlength={NAME_MAX} placeholder="なまえ" />
     <small class={['len', { max: name.length >= NAME_MAX }]}>{name.length} / {NAME_MAX} もじ</small>
   </label>
+  <label class="name">
+    たんじょうび
+    <input type="date" bind:value={birth} min={range.min} max={range.max} />
+    <small class="len">学年に合わせた漢字の表示に使います（このブラウザの中だけに保存）</small>
+  </label>
   <AvatarPicker bind:value={avatar} />
   {#if error}<p class="err">{error}</p>{/if}
   <div class="actions">
@@ -36,7 +45,9 @@
       <button class="del" onclick={() => (deleting = true)}><Icon name="trash" size={20} /> けす・リセット</button>
     {/if}
     <button class="cancel" onclick={onclose}>やめる</button>
-    <button class="save" onclick={save} disabled={!name.trim()}><Icon name="check" size={22} /> ほぞん</button>
+    <button class="save" onclick={save} disabled={!name.trim() || !isBirth(birth, today())}
+      ><Icon name="check" size={22} /> ほぞん</button
+    >
   </div>
   {#if deleting && id}
     <DangerZone {id} canDelete={profiles.list.length > 1} ondone={onclose} />
@@ -64,6 +75,7 @@
     gap: 12px;
     font-weight: bold;
     font-size: 18px;
+    white-space: nowrap;
   }
   .len {
     font-size: 13px;
