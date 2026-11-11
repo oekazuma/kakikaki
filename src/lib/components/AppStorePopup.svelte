@@ -34,6 +34,13 @@
     <div class="btns">
       <button class="later" onclick={close}>とじる</button>
       <a class="more" href={resolve('/about')} onclick={close}>くわしく見る</a>
+      <a
+        class="store"
+        href="https://apps.apple.com/jp/app/id6832798120"
+        target="_blank"
+        rel="noreferrer"
+        onclick={close}>App Store で見る</a
+      >
     </div>
   </section>
 {/if}
@@ -93,6 +100,10 @@
     color: var(--ink);
   }
   .more {
+    background: var(--pill);
+    color: var(--blue);
+  }
+  .store {
     background: var(--blue);
     color: #fff;
   }

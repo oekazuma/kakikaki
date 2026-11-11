@@ -45,7 +45,7 @@
           この Web 版は 2026 年 11 月 30
           日で公開を終えます。ホーム画面に追加してあれば、そのあともこの端末で使い続けられます。ただし更新は届かなくなり、ホーム画面から消すと入れ直せません。念のため、右の「バックアップ」で記録を書き出しておいてください。
         </p>
-        <a class="store" href="https://apps.apple.com/jp/app/id6832798120"
+        <a class="store" href="https://apps.apple.com/jp/app/id6832798120" target="_blank" rel="noreferrer"
           >App Store で見る <Icon name="back" size={18} /></a
         >
       </section>

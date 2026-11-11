@@ -1,15 +1,13 @@
 <script lang="ts">
-  import { resolve } from '$app/paths';
   import { t } from '$lib/yomi.svelte';
   import Icon from './Icon.svelte';
   import AppStorePopup from './AppStorePopup.svelte';
 </script>
 
-<!-- 子どもが App Store へ出ていかないよう、ホームからは保護者向けの「アプリについて」へだけつなぐ -->
-<a class="notice" href={resolve('/about')}>
+<a class="notice" href="https://apps.apple.com/jp/app/id6832798120" target="_blank" rel="noreferrer">
   <span>
     <b>{t('iPad アプリが できました！')}</b>
-    <small>{t('おうちの {方|かた}へ：この Web {版|ばん}は 11/30 で おわります')}</small>
+    <small>{t('おうちの {方|かた}へ：App Store で {見|み}られます（この Web {版|ばん}は 11/30 まで）')}</small>
   </span>
   <Icon name="back" size={22} />
 </a>
