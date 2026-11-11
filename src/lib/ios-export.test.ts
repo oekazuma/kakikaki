@@ -12,10 +12,11 @@ import { stars, strokeScore } from './score';
 import { makeTemplates, passes, recognize } from './recognize';
 import { Tracer } from './tracer.svelte';
 import { KANJI, READINGS, readingLabel, readingSpeech } from './kanji';
-import { WORDS, charWord } from './words';
+import { CAT_LABEL, WORDS, charWord } from './words';
 import { LANGS, charsOf, lettersOf, nameOf, subOf } from './lang.svelte';
 import { speechOf } from './audio';
-import { ROWS, badgesOf, computeStats, earnedBadges, nextBadge } from './badges';
+import { GROUP_LABEL, ROWS, badgesOf, computeStats, earnedBadges, nextBadge } from './badges';
+import { display, isBirth, schoolGrade } from './grade';
 import { streak } from './streak';
 import { kanjiByReading } from './kanji';
 import { SEION, GROUPS, ALPHABET, DIGITS, toKatakana } from './chars';
@@ -393,6 +394,51 @@ emit(
       [['2026-10-31', '2026-11-01'], '2026-11-01'],
       [['2026-02-28', '2026-03-01', '2026-03-02'], '2026-03-02']
     ].map(([d, t]) => ({ days: d, today: t, out: streak(d as string[], t as string) }))
+  });
+}
+
+{
+  const T = '2026-11-11';
+  const births = ['2019-04-02', '2019-04-01', '2020-02-29', '2020-04-01', '2014-01-15', '1990-06-01', '2024-01-01'];
+  const todays = ['2026-03-31', '2026-04-01', '2026-11-11', '2025-04-01'];
+  const texts = [
+    '{練習|れんしゅう}',
+    '{見|み}る',
+    'お{手本|てほん}なし',
+    'おてほんなしで {書|か}いてみよう！ もう{一度|いちど}',
+    'せんの かずは 4 ほんだよ',
+    '1 {日|にち} 1 {回|かい}',
+    'A を かく',
+    'ピンボール かいすう',
+    '{戻|もど}る',
+    ...LANGS.flatMap((l) => badgesOf(l).flatMap((b) => [b.name, b.desc]))
+  ];
+  emit('parity/grade.json', {
+    grade: births.flatMap((birth) => todays.map((today) => ({ birth, today, out: schoolGrade(birth, today) }))),
+    isBirth: [
+      '2019-05-01',
+      T,
+      '2026-11-12',
+      '1926-11-11',
+      '1926-11-10',
+      '2019-02-30',
+      '2019-5-1',
+      '2019-05-01x',
+      ''
+    ].map((s) => ({ s, today: T, out: isBirth(s, T) })),
+    display: [
+      ...texts.flatMap((text) =>
+        [0, 2, 3, 6, 7].map((grade) => ({ text, grade, hidden: [], out: display(text, grade) }))
+      ),
+      ...[['手'], ['目'], ['書', '見']].map((hidden) => ({
+        text: 'お{手本|てほん}なしで {書|か}いて {見|み}る',
+        grade: 6,
+        hidden,
+        out: display('お{手本|てほん}なしで {書|か}いて {見|み}る', 6, hidden)
+      })),
+      { text: '{見|み}る', grade: null, hidden: [], out: display('{見|み}る', null) }
+    ],
+    labels: { groups: GROUP_LABEL, cats: CAT_LABEL }
   });
 }
 
