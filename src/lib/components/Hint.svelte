@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import type { PracticeSession } from '$lib/practice.svelte';
   // 書き取り面の下のひとこと。なぞる では いまの画の番号を書き取り面と同じ丸で示す
   let { s, total }: { s: PracticeSession; total: number } = $props();
@@ -6,13 +7,13 @@
 
 <p class="hint">
   {#if s.msg}
-    {s.msg}
+    {t(s.msg)}
   {:else if s.mode === 'trace'}
-    <span class="num">{Math.min(s.stroke + 1, total)}</span>{s.cur.hint}
+    <span class="num">{Math.min(s.stroke + 1, total)}</span>{t(s.cur.hint)}
   {:else if s.mode === 'test' && s.drawn}
-    かけたら みぎの「できた」を おしてね
+    {t('{書|か}けたら {右|みぎ}の「できた」を おしてね')}
   {:else}
-    {s.cur.hint}
+    {t(s.cur.hint)}
   {/if}
 </p>
 

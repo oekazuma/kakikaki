@@ -1062,6 +1062,8 @@ export const READINGS: Record<string, string[]> = Object.fromEntries(
 );
 export const KANJI_ALL: string[] = KANJI.flatMap((k) => k.chars);
 export const kanjiReading = (c: string) => READINGS[c][0];
+// 学年の名前（1ねんせい）を表示用の書き方つきにする。name は見出しの id とメダルの id にも使うので書き方を付けない
+export const gradeLabel = (name: string) => name.replace('ねんせい', '{年生|ねんせい}');
 // やす.む → やす（む）／やすむ
 export const readingLabel = (r: string) => r.replace(/\.(.+)$/, '（$1）');
 export const readingSpeech = (r: string) => r.replace('.', '');

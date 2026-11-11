@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { practiceUrl } from '$lib/nav';
@@ -10,7 +11,7 @@
   import JumpBar from '$lib/components/JumpBar.svelte';
   import { imageUrl } from '$lib/image';
   import { keepScroll } from '$lib/scroll';
-  import { WORDS, CATEGORIES } from '$lib/words';
+  import { WORDS, CATEGORIES, CAT_LABEL } from '$lib/words';
   import { unlock } from '$lib/audio';
   import Icon from '$lib/components/Icon.svelte';
   import ProgressCard from '$lib/components/ProgressCard.svelte';
@@ -26,7 +27,11 @@
   const kanji = $derived(lang.v === 'kanji');
   keepScroll(() => `home:${lang.v}`);
   // カテゴリの飛び先バー。文字が読めない子にも分かるよう、各カテゴリ先頭の絵を目印にする
-  const cats = CATEGORIES.map((c) => ({ id: c, label: c, image: imageUrl(WORDS.find((w) => w.category === c)!) }));
+  const cats = CATEGORIES.map((c) => ({
+    id: c,
+    label: CAT_LABEL[c],
+    image: imageUrl(WORDS.find((w) => w.category === c)!)
+  }));
 </script>
 
 <svelte:head>
@@ -50,11 +55,13 @@
     <nav>
       <ProgressCard {s} {total} {badgeCount} />
       <a class="card btn quiz" href={resolve('/quiz')}><Icon name="bulb" size={22} /> クイズ</a>
-      <a class="card btn" href={resolve('/chars')}>{kanji ? 'よみから さがす' : 'もじから えらぶ'}</a>
+      <a class="card btn" href={resolve('/chars')}
+        >{t(kanji ? '{読|よ}みから {探|さが}す' : '{文字|もじ}から {選|えら}ぶ')}</a
+      >
       <a
         class="card btn help"
         href={resolve('/about')}
-        aria-label={updated.current ? 'アプリについて（あたらしい バージョンが あります）' : 'アプリについて'}
+        aria-label={updated.current ? t('アプリについて（{新|あたら}しい バージョンが あります）') : 'アプリについて'}
       >
         <Icon name="help" size={22} />
         {#if updated.current}<span class="dot"></span>{/if}
@@ -67,10 +74,10 @@
         <ContinueCard />
         <KanjiGrid jump />
       {:else}
-        <JumpBar items={cats} label="カテゴリへ とぶ" />
+        <JumpBar items={cats} label={'カテゴリへ {飛|と}ぶ'} />
         <ContinueCard />
         {#each CATEGORIES as cat (cat)}
-          <h2 id={cat}>{cat}</h2>
+          <h2 id={cat}>{t(CAT_LABEL[cat])}</h2>
           <div class="row">
             {#each WORDS.filter((w) => w.category === cat) as w, n (w.id)}
               <WordCard

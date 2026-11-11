@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Bar from '../Bar.svelte';
-  import { BADGE_GROUPS, type Badge, type Stats } from '$lib/badges';
+  import { BADGE_GROUPS, GROUP_LABEL, type Badge, type Stats } from '$lib/badges';
   import { today } from '$lib/today';
   // メダルをテーマごとの段に並べる。獲得済みは色つき、未獲得は灰色で進み具合のバー、きょう取ったものは NEW
   let { s, badges, got }: { s: Stats; badges: Badge[]; got: Record<string, string> } = $props();
@@ -14,7 +15,7 @@
   {@const done = g.items.filter((b) => got[b.id]).length}
   <section class="group">
     <h2>
-      {g.name}
+      {t(GROUP_LABEL[g.name])}
       <span class={['cnt', { full: done === g.items.length }]}>{done} / {g.items.length}</span>
     </h2>
     <div class="badges">
@@ -27,17 +28,17 @@
           {#if b.secret && !ok}
             <span class="em">❓</span>
             <b>？？？</b>
-            <small>どこかに かくれているよ</small>
+            <small>{t('どこかに かくれているよ')}</small>
           {:else}
             <span class="em">{b.emoji}</span>
-            <b>{b.name}</b>
-            <small>{b.desc}</small>
+            <b>{t(b.name)}</b>
+            <small>{t(b.desc)}</small>
           {/if}
           {#if ok}
-            <span class="date">{date.replaceAll('-', '/')} ゲット！</span>
+            <span class="date">{date.replaceAll('-', '/')} {t('ゲット！')}</span>
           {:else if !b.secret}
             <Bar {have} {need} color="var(--teal)" />
-            <span class="rest">あと {Math.max(0, need - have)}</span>
+            <span class="rest">{t(`あと ${Math.max(0, need - have)}`)}</span>
           {/if}
         </div>
       {/each}

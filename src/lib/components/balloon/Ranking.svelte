@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { fly } from 'svelte/transition';
   import Avatar from '../Avatar.svelte';
   import Icon from '../Icon.svelte';
@@ -16,22 +17,22 @@
 </script>
 
 <section class="card over" in:fly={{ y: 40, duration: 300 }}>
-  <h2>おわり！</h2>
-  <p class="score"><b>{score}</b> てん <small>さいだい {combo} コンボ</small></p>
-  {#if isBest}<p class="best"><Icon name="star" size={20} fill /> じこベスト こうしん！</p>{/if}
+  <h2>{t('{終|お}わり！')}</h2>
+  <p class="score"><b>{score}</b> {t('{点|てん}')} <small>{t(`{最大|さいだい} ${combo} コンボ`)}</small></p>
+  {#if isBest}<p class="best"><Icon name="star" size={20} fill /> {t('{自己|じこ}ベスト {更新|こうしん}！')}</p>{/if}
   <ol class="rank">
     {#each rows as r, i (r.id)}
       <li class={{ me: r.id === profiles.cur, top: i === 0 }}>
         <span class="no">{i + 1}</span>
         <Avatar avatar={r.avatar} size={36} />
         <b>{r.name}</b>
-        <span class="pt">{r.score} てん</span>
+        <span class="pt">{r.score} {t('{点|てん}')}</span>
       </li>
     {/each}
   </ol>
   <div class="actions">
     <button class="back" onclick={onback}>もどる</button>
-    <button class="retry" onclick={onretry}><Icon name="redo" size={22} /> もういちど</button>
+    <button class="retry" onclick={onretry}><Icon name="redo" size={22} /> {t('もう{一度|いちど}')}</button>
   </div>
 </section>
 

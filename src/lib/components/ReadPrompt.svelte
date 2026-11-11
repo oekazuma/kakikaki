@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from './Icon.svelte';
   import { imageUrl } from '$lib/image';
   import { info, nameOf, lettersOf } from '$lib/lang.svelte';
@@ -14,26 +15,26 @@
 <div class={['prompt', 'card', q.kind]} data-kind={q.kind}>
   {#if q.kind === 'word'}
     <b class="target kyokasho">{nameOf(q.answer)}</b>
-    <span>は どれ？</span>
+    <span>{t('は どれ？')}</span>
   {:else if q.kind === 'listen'}
     <button class={['hear', 'big', { speaking }]} onclick={() => hear(nameOf(q.answer), info().speech)}
-      ><Icon name="speaker" size={40} /> きく</button
+      ><Icon name="speaker" size={40} /> {t('{聞|き}く')}</button
     >
-    <span>きこえた ものは どれ？</span>
+    <span>{t('{聞|き}こえた {物|もの}は どれ？')}</span>
   {:else if q.kind === 'initial'}
     <b class="target kyokasho">{lettersOf(q.answer)[0]}</b>
-    <span>で はじまる ものは どれ？</span>
+    <span>{t('で {始|はじ}まる {物|もの}は どれ？')}</span>
   {:else if q.kind === 'kanji-read'}
     <b class="target kyokasho">{nameOf(q.answer)}</b>
-    <span>の よみかたは？</span>
+    <span>{t('の {読|よ}み{方|かた}は？')}</span>
   {:else if q.kind === 'kanji-listen'}
     <button
       class={['hear', 'big', { speaking }]}
       onclick={() => hear(readingSpeech(kanjiReading(q.answer.name)), info().speech)}
-      ><Icon name="speaker" size={40} /> きく</button
+      ><Icon name="speaker" size={40} /> {t('{聞|き}く')}</button
     >
     <b class="target kyokasho">{readingLabel(kanjiReading(q.answer.name))}</b>
-    <span>と よむ かんじは どれ？</span>
+    <span>{t('と {読|よ}む {漢字|かんじ}は どれ？')}</span>
   {:else if q.kind === 'blank'}
     <img src={imageUrl(q.answer)} alt="" width="200" height="140" loading="eager" />
     <div class="fill">
@@ -42,11 +43,11 @@
           <span class={{ blank: i === q.blank }}>{i === q.blank ? '？' : ch}</span>
         {/each}
       </span>
-      <span>？ に はいる もじは？</span>
+      <span>{t('？ に {入|はい}る {文字|もじ}は？')}</span>
     </div>
   {:else}
     <img src={imageUrl(q.answer)} alt="" width="280" height="200" loading="eager" />
-    <span>これは なに？</span>
+    <span>{t('これは {何|なに}？')}</span>
   {/if}
 </div>
 

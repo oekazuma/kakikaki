@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import JumpBar from './JumpBar.svelte';
   import KanjiCell from './KanjiCell.svelte';
-  import { KANJI } from '$lib/kanji';
+  import { KANJI, gradeLabel } from '$lib/kanji';
   import { charCleared } from '$lib/progress.svelte';
   // 既定は学年ごと（ホーム）。/chars は読みの行ごとの並びを渡す
   // jump: 段の頭文字（学年の数字・読みの行の頭文字）の飛び先バーを出す（1026 字は縦に長い）
@@ -9,10 +10,12 @@
 </script>
 
 {#if jump}
-  <JumpBar items={groups.map((g) => ({ id: g.name, label: g.name[0] }))} label="だんへ とぶ" />
+  <JumpBar items={groups.map((g) => ({ id: g.name, label: g.name[0] }))} label={'{段|だん}へ {飛|と}ぶ'} />
 {/if}
 {#each groups as g (g.name)}
-  <h2 id={g.name}>{g.name} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span></h2>
+  <h2 id={g.name}>
+    {t(gradeLabel(g.name))} <span class="cnt">{g.chars.filter(charCleared).length} / {g.chars.length}</span>
+  </h2>
   <div class={['grid', { narrow: jump }]}>
     {#each g.chars as c (c)}<KanjiCell {c} />{/each}
   </div>

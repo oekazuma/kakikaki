@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from './Icon.svelte';
   // 練習・かきクイズの右側に並ぶ大きなボタン。できた（check）は大きく目立たせ、active は読み上げ中の点灯。
   // disabled はそのモードで使えないボタン。モードが変わってもボタンの位置がずれないよう、消さずに薄く残す
@@ -21,7 +22,7 @@
 </script>
 
 <button class={['rb', { done, ready, active }]} {onclick} {disabled}>
-  <span class="card ic"><Icon name={icon} size={done ? 36 : 32} /></span>{label}
+  <span class="card ic"><Icon name={icon} size={done ? 36 : 32} /></span>{t(label)}
 </button>
 
 <style>

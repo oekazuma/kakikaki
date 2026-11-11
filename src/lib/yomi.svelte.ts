@@ -5,6 +5,14 @@ import { today } from './today';
 // 答えを隠している画面（おてほんなし、かきクイズ、読みを聞いて字を選ぶ よみクイズ）が入れ、離れるときに空にする
 export const hide = $state<{ v: string[] }>({ v: [] });
 
+// 画面にいる間だけ字を隠す。離れたら空に戻す
+export function hiding(chars: () => string[]) {
+  $effect(() => {
+    hide.v = chars();
+    return () => (hide.v = []);
+  });
+}
+
 export function gradeNow(): number | null {
   const b = current().birth;
   const d = today();

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
   import Stars from './Stars.svelte';
@@ -16,23 +17,23 @@
   const stars = $derived(correct === total ? 3 : correct >= total * 0.7 ? 2 : 1);
   const msg = $derived(
     correct === total
-      ? 'ぜんもん せいかい！ すごい！'
+      ? '{全問|ぜんもん} {正解|せいかい}！ すごい！'
       : correct >= total * 0.7
-        ? 'じょうず！'
+        ? '{上手|じょうず}！'
         : 'また ちょうせん してね！'
   );
 </script>
 
 <div class="result card" in:fly={{ y: 40, duration: 350 }}>
-  <div class="score">{total} もん中 <b>{correct}</b> もん せいかい</div>
+  <div class="score">{total} {t('{問中|もんちゅう}')} <b>{correct}</b> {t('{問|もん} {正解|せいかい}')}</div>
   <Stars n={3} k={stars} size={56} />
   <p>{msg}</p>
   <div class="btns">
     {#if next}
-      <a class="main" href="{resolve(`/quiz/${kind}`)}?level={next}">つぎは {levelName(next, lang.v)}</a>
+      <a class="main" href="{resolve(`/quiz/${kind}`)}?level={next}">{t(`{次|つぎ}は ${levelName(next, lang.v)}`)}</a>
     {/if}
-    <button class={next ? 'sub' : 'main'} onclick={onRetry}>もういちど</button>
-    <a class="sub" href={resolve('/quiz')}>クイズを えらぶ</a>
+    <button class={next ? 'sub' : 'main'} onclick={onRetry}>{t('もう{一度|いちど}')}</button>
+    <a class="sub" href={resolve('/quiz')}>{t('クイズを {選|えら}ぶ')}</a>
   </div>
 </div>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Avatar from '../Avatar.svelte';
   import Bar from '../Bar.svelte';
   import { nextBadge, type Badge, type Stats } from '$lib/badges';
@@ -19,7 +20,7 @@
     <Avatar avatar={current().avatar} size={72} />
     <div>
       <b>{current().name}</b>
-      <small>{info().short} の きろく</small>
+      <small>{t(`${info().short} の {記録|きろく}`)}</small>
     </div>
   </div>
   <div class="ring">
@@ -38,23 +39,23 @@
       />
     </svg>
     <div class="num"><b>{got}</b><small>/ {badges.length}</small></div>
-    <span class="lbl">めだる {pct}%</span>
+    <span class="lbl">{t(`めだる ${pct}%`)}</span>
   </div>
   {#if next}
     <div class="next">
-      <small>つぎの めだる</small>
+      <small>{t('{次|つぎ}の めだる')}</small>
       <div class="nb">
         <span class="em">{next.emoji}</span>
         <div>
-          <b>{next.name}</b>
-          <span class="desc">{next.desc}</span>
+          <b>{t(next.name)}</b>
+          <span class="desc">{t(next.desc)}</span>
           <Bar have={need[0]} need={need[1]} color="var(--teal)" />
-          <span class="rest">あと {Math.max(0, need[1] - need[0])}</span>
+          <span class="rest">{t(`あと ${Math.max(0, need[1] - need[0])}`)}</span>
         </div>
       </div>
     </div>
   {:else}
-    <div class="next all"><b>ぜんぶの めだるを あつめた！</b></div>
+    <div class="next all"><b>{t('{全部|ぜんぶ}の めだるを {集|あつ}めた！')}</b></div>
   {/if}
 </section>
 

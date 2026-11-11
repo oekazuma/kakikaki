@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
   import Icon from './Icon.svelte';
@@ -27,19 +28,21 @@
     />
   {/if}
   <b class="cname kyokasho">{nameOf(word)}</b>
-  <p>ぜんぶ できた！</p>
+  <p>{t('{全部|ぜんぶ} できた！')}</p>
   {#if crown}<span class="mark gold"><Icon name="crown" size={22} fill /> おうかん</span>{:else}<span class="mark"
-      ><Icon name="star" size={22} fill /> ほし ゲット</span
+      ><Icon name="star" size={22} fill /> {t('{星|ほし} ゲット')}</span
     >{/if}
   {#if !crown}
     <button class="challenge" onclick={onchallenge}
-      ><Icon name="star" size={22} fill /> おてほんなしに ちょうせん</button
+      ><Icon name="star" size={22} fill /> {t('お{手本|てほん}なしに ちょうせん')}</button
     >
   {/if}
   <div class="btns">
-    <button class="next" onclick={onnext}>{isCharWord(word) ? 'つぎの もじ' : 'つぎの たんご'}</button>
+    <button class="next" onclick={onnext}
+      >{t(isCharWord(word) ? '{次|つぎ}の {文字|もじ}' : '{次|つぎ}の {単語|たんご}')}</button
+    >
     <a class="home" href={resolve('/')}>ホームへ</a>
-    <button class="again" onclick={onreplay}>もういちど</button>
+    <button class="again" onclick={onreplay}>{t('もう{一度|いちど}')}</button>
   </div>
 </div>
 

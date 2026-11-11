@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { untrack } from 'svelte';
   import { imageUrl } from '$lib/image';
   import { Bouncer, SIZE, GOAL } from '$lib/bouncer.svelte';
@@ -57,7 +58,7 @@
 {#if b.phase === 'pinball'}
   <div class={['count', { goal: b.hits >= GOAL }]}>
     {#key b.hits}<b>{b.hits}</b>{/key}
-    <small>{b.hits >= GOAL ? 'すごい！' : 'かい'}</small>
+    <small>{t(b.hits >= GOAL ? 'すごい！' : '{回|かい}')}</small>
   </div>
 {/if}
 {#if isCharWord(word)}

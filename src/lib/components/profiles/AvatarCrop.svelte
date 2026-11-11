@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
+  const HOW =
+    '{指|ゆび}で {動|うご}かして、{丸|まる}の {中|なか}に {顔|かお}を {入|い}れてね（2 {本|ほん}の {指|ゆび}で {大|おお}きく できるよ）';
   import { untrack } from 'svelte';
   import Icon from '../Icon.svelte';
   import { cropAvatar } from '$lib/avatar';
@@ -80,7 +83,7 @@
   <div
     class="win"
     role="img"
-    aria-label="しゃしんの きりぬき"
+    aria-label={t('{写真|しゃしん}の {切|き}りぬき')}
     style:width="{V}px"
     style:height="{V}px"
     onpointerdown={down}
@@ -101,9 +104,10 @@
     <span class="ring"></span>
   </div>
   <div class="side">
-    <p>ゆびで うごかして、まるの なかに かおを いれてね（2 ほんの ゆびで おおきく できるよ）</p>
+    <p>{t(HOW)}</p>
     <label
-      >おおきさ <input
+      >{t('{大|おお}きさ')}
+      <input
         type="range"
         min="1"
         max={ZOOM_MAX}
@@ -114,7 +118,7 @@
     >
     <div class="actions">
       <button class="cancel" onclick={oncancel}>やめる</button>
-      <button class="ok" onclick={pick}><Icon name="check" size={22} /> きめる</button>
+      <button class="ok" onclick={pick}><Icon name="check" size={22} /> {t('{決|き}める')}</button>
     </div>
   </div>
 </div>

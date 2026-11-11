@@ -7,7 +7,7 @@
   import { rememberLang } from '$lib/progress.svelte';
   import { updated } from '$app/state';
   import { vp, watchViewport } from '$lib/viewport.svelte';
-  import { missingBirth } from '$lib/yomi.svelte';
+  import { missingBirth, t } from '$lib/yomi.svelte';
   let { children } = $props();
   // ホーム画面のアプリはページ遷移が少なくポーリングも止まりがちなので、前面に戻ったときに新版を確認する（1 分に 1 回まで）
   let lastCheck = 0;
@@ -77,10 +77,10 @@
           />
         </g>
       </svg>
-      <p>がめんを よこむきに してね</p>
+      <p>{t('{画面|がめん}を {横|よこ}{向|む}きに してね')}</p>
     {:else}
       <div class="icon"><Icon name="help" size={80} /></div>
-      <p>がめんを もっと おおきく してね</p>
+      <p>{t('{画面|がめん}を もっと {大|おお}きく してね')}</p>
     {/if}
     <small>
       推奨: 横向きのタブレット、または {MIN_W}×{MIN_H}px 以上のブラウザ画面<br />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   // 長い一覧の右端に固定する飛び先バー。見出しの id へのアンカーだけで動く。
   // 上に固定すると iPad のステータスバーのぼかしに重なって読めなくなるので右端に縦に並べる
   let { items, label }: { items: { id: string; label: string; image?: string }[]; label: string } = $props();
@@ -24,10 +25,12 @@
   });
 </script>
 
-<nav class="card jump" aria-label={label}>
+<nav class="card jump" aria-label={t(label)}>
   {#each items as it (it.id)}
-    <a href="#{it.id}" aria-label={it.label} class={{ active: it.id === active }}>
-      {#if it.image}<img src={it.image} alt={it.label} width="32" height="32" loading="lazy" />{:else}{it.label}{/if}
+    <a href="#{it.id}" aria-label={t(it.label)} class={{ active: it.id === active }}>
+      {#if it.image}<img src={it.image} alt={t(it.label)} width="32" height="32" loading="lazy" />{:else}{t(
+          it.label
+        )}{/if}
     </a>
   {/each}
 </nav>

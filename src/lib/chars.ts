@@ -26,8 +26,8 @@ export const CHOON: string[][] = [['ー']];
 export const GROUPS: { name: string; cols: string[][] }[] = [
   { name: 'だくおん', cols: DAKUON },
   { name: 'はんだくおん', cols: HANDAKUON },
-  { name: 'ちいさいもじ', cols: KOGAKI },
-  { name: 'のばすおと', cols: CHOON }
+  { name: '{小|ちい}さい{文字|もじ}', cols: KOGAKI },
+  { name: 'のばす{音|おと}', cols: CHOON }
 ];
 const GOJUON = [...SEION, ...DAKUON, ...HANDAKUON, ...KOGAKI, ...CHOON];
 export const CHARS = GOJUON.flat().filter(Boolean);

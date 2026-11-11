@@ -34,22 +34,22 @@ export const MODES: { id: Mode; icon: 'trace' | 'pencil' | 'star'; label: string
     id: 'trace',
     icon: 'trace',
     label: 'なぞる',
-    hint: 'の まるから せんに そって ゆっくり',
+    hint: 'の {丸|まる}から {線|せん}に そって ゆっくり',
     title: 'なぞって みよう！'
   },
   {
     id: 'free',
     icon: 'pencil',
-    label: 'じぶんで かく',
-    hint: 'おてほんを ぬろう。なんかいに わけても いいよ',
-    title: 'じぶんで かいてみよう！'
+    label: '{自分|じぶん}で {書|か}く',
+    hint: 'お{手本|てほん}を ぬろう。{何回|なんかい}に {分|わ}けても いいよ',
+    title: '{自分|じぶん}で {書|か}いてみよう！'
   },
   {
     id: 'test',
     icon: 'star',
-    label: 'おてほんなし',
-    hint: 'おもいだして かいてみよう',
-    title: 'おてほんなしで かいてみよう！'
+    label: 'お{手本|てほん}なし',
+    hint: '{思|おも}い{出|だ}して {書|か}いてみよう',
+    title: 'お{手本|てほん}なしで {書|か}いてみよう！'
   }
 ];
 

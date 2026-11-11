@@ -118,6 +118,18 @@ export class WriteQuiz {
   get c() {
     return this.letters[this.targets[this.k]];
   }
+  // 盤面の下のひとこと（書き方つき）
+  get hint() {
+    if (this.msg) return this.msg;
+    if (this.mode !== 'test') return '{丸|まる}から {線|せん}に そって なぞろう';
+    if (this.kind === 'blank') return '？ の {文字|もじ}を {書|か}こう';
+    if (this.kind === 'kanji') return '{読|よ}みを {見|み}て {漢字|かんじ}を {書|か}こう';
+    return `${this.k + 1} {文字|もじ}めを {書|か}いてみよう`;
+  }
+  // お手本なしで書いている間は、正解にする字（同じ読みの字を含む）を画面の文に出さない
+  get hidden() {
+    return this.mode === 'test' && !this.done ? (this.accept ?? [this.c]) : [];
+  }
   start() {
     clearTimeout(this.timer);
     this.qs = makeWriteQuiz(lang.v, this.level, undefined, this.rnd);
@@ -144,7 +156,7 @@ export class WriteQuiz {
       if (this.miss >= 2) {
         this.helped = true;
         this.mode = 'trace';
-        this.msg = 'おてほんを なぞって みよう';
+        this.msg = 'お{手本|てほん}を なぞって みよう';
         this.gen++;
       } else this.msg = missMsg(r);
       return;
@@ -154,7 +166,7 @@ export class WriteQuiz {
     if (!this.helped) this.correct++;
     this.fx.kira?.();
     this.fx.confetti?.(80);
-    this.msg = this.helped ? 'かけたね！' : 'せいかい！';
+    this.msg = this.helped ? '{書|か}けたね！' : '{正解|せいかい}！';
     this.timer = setTimeout(() => {
       if (this.i < this.qs.length - 1) {
         this.i++;

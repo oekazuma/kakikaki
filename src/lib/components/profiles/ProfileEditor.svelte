@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { untrack } from 'svelte';
   import { fade, scale } from 'svelte/transition';
   import AvatarPicker from './AvatarPicker.svelte';
@@ -22,31 +23,33 @@
   function save() {
     const ok = id ? updateProfile(id, { name, avatar, birth }) : !!addProfile(name, avatar, lang.v, birth);
     if (ok) onclose();
-    else error = 'ほぞん できませんでした。しゃしんを かえて みてね';
+    else error = '{保存|ほぞん} できませんでした。{写真|しゃしん}を {変|か}えて みてね';
   }
 </script>
 
 <div class="dim" transition:fade={{ duration: 150 }} role="presentation" onclick={onclose}></div>
 <section class="card sheet" transition:scale={{ duration: 200, start: 0.9 }}>
   <label class="name">
-    なまえ
-    <input type="text" bind:value={name} maxlength={NAME_MAX} placeholder="なまえ" />
-    <small class={['len', { max: name.length >= NAME_MAX }]}>{name.length} / {NAME_MAX} もじ</small>
+    {t('{名前|なまえ}')}
+    <input type="text" bind:value={name} maxlength={NAME_MAX} placeholder={t('{名前|なまえ}')} />
+    <small class={['len', { max: name.length >= NAME_MAX }]}>{name.length} / {NAME_MAX} {t('{文字|もじ}')}</small>
   </label>
   <label class="name">
-    たんじょうび
+    {t('{誕生日|たんじょうび}')}
     <input type="date" bind:value={birth} min={range.min} max={range.max} />
     <small class="len">学年に合わせた漢字の表示に使います（このブラウザの中だけに保存）</small>
   </label>
   <AvatarPicker bind:value={avatar} />
-  {#if error}<p class="err">{error}</p>{/if}
+  {#if error}<p class="err">{t(error)}</p>{/if}
   <div class="actions">
     {#if id && !deleting}
-      <button class="del" onclick={() => (deleting = true)}><Icon name="trash" size={20} /> けす・リセット</button>
+      <button class="del" onclick={() => (deleting = true)}
+        ><Icon name="trash" size={20} /> {t('{消|け}す・リセット')}</button
+      >
     {/if}
     <button class="cancel" onclick={onclose}>やめる</button>
     <button class="save" onclick={save} disabled={!name.trim() || !isBirth(birth, today())}
-      ><Icon name="check" size={22} /> ほぞん</button
+      ><Icon name="check" size={22} /> {t('{保存|ほぞん}')}</button
     >
   </div>
   {#if deleting && id}

@@ -15,4 +15,8 @@ export function strokeScore(trail: Pt[], samples: Pt[]): number {
 export const stars = (score: number): 1 | 2 | 3 => (score >= 0.85 ? 3 : score >= 0.65 ? 2 : 1);
 
 export const praise = (n: 1 | 2 | 3) =>
-  n === 3 ? 'すごい！ とても じょうず！' : n === 2 ? 'じょうず！' : 'かけたね！ もっと きれいに かけるかな？';
+  n === 3
+    ? 'すごい！ とても {上手|じょうず}！'
+    : n === 2
+      ? '{上手|じょうず}！'
+      : '{書|か}けたね！ もっと きれいに {書|か}けるかな？';

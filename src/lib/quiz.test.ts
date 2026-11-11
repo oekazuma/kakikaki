@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { display } from './grade';
 import { levelOf, wordsOf, makeReadQuiz, makeWriteQuiz, pickChoices, levelName, levelsOf, type ReadQ } from './quiz';
 import { WORDS, wordById } from './words';
 import { lettersOf, nameOf, LANGS, type Lang } from './lang.svelte';
@@ -130,10 +131,14 @@ describe('quiz', () => {
     }
   });
   it('級の名前は かんじ だけ学年', () => {
-    expect([1, 2, 3].map((lv) => levelName(lv as 1 | 2 | 3, 'ja'))).toEqual(['かんたん', 'ふつう', 'むずかしい']);
+    expect([1, 2, 3].map((lv) => display(levelName(lv as 1 | 2 | 3, 'ja'), 1))).toEqual([
+      'かんたん',
+      'ふつう',
+      'むずかしい'
+    ]);
     expect(levelsOf('kanji')).toEqual([1, 2, 3, 4, 5, 6]);
     expect(levelsOf('ja')).toEqual([1, 2, 3]);
-    expect(levelsOf('kanji').map((lv) => levelName(lv, 'kanji'))).toEqual([
+    expect(levelsOf('kanji').map((lv) => display(levelName(lv, 'kanji'), 1))).toEqual([
       '1ねんせい',
       '2ねんせい',
       '3ねんせい',

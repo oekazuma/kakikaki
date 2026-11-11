@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { display } from './grade';
 import { ReadQuiz, WriteQuiz, levelFromParam } from './quiz-session.svelte';
 import { reset, quiz } from './progress.svelte';
 import { setLang } from './lang.svelte';
@@ -66,7 +67,7 @@ describe('quiz session', () => {
     // 1 語目: 全文字を一発で
     const n1 = w.letters.length;
     for (let k = 0; k < n1; k++) w.onDone(ok('test'));
-    expect([w.msg, w.correct]).toEqual(['せいかい！', 1]);
+    expect([display(w.msg, 1), w.correct]).toEqual(['せいかい！', 1]);
     vi.advanceTimersByTime(1400);
     expect([w.i, w.k, w.mode]).toEqual([1, 0, 'test']);
     // 2 語目: 1 文字目を 2 回外す → なぞる。なぞって進めても正解にならない
@@ -75,10 +76,10 @@ describe('quiz session', () => {
     expect(w.msg).toContain('おしい');
     expect(w.drawn).toBe(false);
     w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
-    expect([w.mode, w.helped, w.msg]).toEqual(['trace', true, 'おてほんを なぞって みよう']);
+    expect([w.mode, w.helped, display(w.msg, 1)]).toEqual(['trace', true, 'おてほんを なぞって みよう']);
     w.onDone(ok('trace'));
     for (let k = 1; k < w.letters.length; k++) w.onDone(ok('test'));
-    expect([w.msg, w.correct]).toEqual(['かけたね！', 1]);
+    expect([display(w.msg, 1), w.correct]).toEqual(['かけたね！', 1]);
     vi.advanceTimersByTime(1400);
     expect([w.i, w.helped]).toEqual([2, false]);
     // 残りを全部正解して終了
@@ -108,8 +109,21 @@ describe('quiz session', () => {
     expect(w.mode).toBe('trace');
     const before = w.correct;
     w.onDone({ mode: 'trace', score: 1, ok: true, top: w.c });
-    expect(w.msg).toBe('かけたね！');
+    expect(display(w.msg, 1)).toBe('かけたね！');
     expect(w.correct).toBe(before);
+  });
+
+  it('かきクイズ（かんじ）: おてほんなし の間は正解にする字を隠し、なぞる に切り替わると隠さない', () => {
+    setLang('kanji');
+    const w = new WriteQuiz(2, {}, seeded(5));
+    expect(w.kind).toBe('kanji');
+    expect(w.hidden).toEqual(w.accept);
+    expect(w.hidden).toContain(w.c);
+    expect(display('{見|み}る', 6, w.hidden)).toBe(w.hidden.includes('見') ? 'みる' : '見る');
+    w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
+    w.onDone({ mode: 'test', score: 0, ok: false, top: 'x' });
+    expect(w.mode).toBe('trace');
+    expect(w.hidden).toEqual([]);
   });
 
   it('かきクイズの穴埋め: 一発で書けたら正解に数え、次の問題へ進む', () => {
@@ -122,7 +136,7 @@ describe('quiz session', () => {
     }
     const before = w.correct;
     w.onDone({ mode: 'test', score: 1, ok: true, top: w.c });
-    expect(w.msg).toBe('せいかい！');
+    expect(display(w.msg, 1)).toBe('せいかい！');
     expect(w.correct).toBe(before + 1);
     vi.advanceTimersByTime(1400);
     if (blankIdx + 1 < w.qs.length) expect(w.i).toBe(blankIdx + 1);

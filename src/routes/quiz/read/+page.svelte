@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hiding } from '$lib/yomi.svelte';
   import { page } from '$app/state';
   import { untrack } from 'svelte';
   import { fly, scale } from 'svelte/transition';
@@ -8,6 +9,7 @@
   import { lang, info } from '$lib/lang.svelte';
   import { ReadQuiz, levelFromParam } from '$lib/quiz-session.svelte';
   import { levelName } from '$lib/quiz';
+  import { KANJI_ALL, READINGS, kanjiReading } from '$lib/kanji';
   import { sfx, unlock } from '$lib/audio';
   import { fx } from '$lib/fx';
 
@@ -24,6 +26,11 @@
     const q = r;
     return () => q.dispose();
   });
+  // 読みを聞いて字を選ぶ問題では、その読みの字を画面の文に出さない
+  hiding(() => {
+    const yomi = r.q?.kind === 'kanji-listen' && !r.done ? kanjiReading(r.q.answer.name) : '';
+    return yomi ? KANJI_ALL.filter((c) => READINGS[c].includes(yomi)) : [];
+  });
 
   function pick(key: string, e: MouseEvent) {
     unlock();
@@ -37,7 +44,7 @@
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
-  <QuizHeader title="よみクイズ" {level} i={r.i} total={r.qs.length} done={r.done} />
+  <QuizHeader title={'{読|よ}みクイズ'} {level} i={r.i} total={r.qs.length} done={r.done} />
   {#if r.q}
     {#key r.i}
       <div class="qwrap" in:fly={{ x: 60, duration: 300 }}><ReadQuestion {r} onpick={pick} /></div>

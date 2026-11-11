@@ -255,6 +255,20 @@ export const WORDS: Word[] = [
 ];
 
 export const CATEGORIES = [...new Set(WORDS.map((w) => w.category))];
+// カテゴリの表示名。category は見出しの id とメダルの id にも使うので、書き方はここにだけ付ける
+export const CAT_LABEL: Record<string, string> = {
+  あそび: '{遊|あそ}び',
+  からだ: '{体|からだ}',
+  きもち: '{気持|きも}ち',
+  くだもの: '{果物|くだもの}',
+  しぜん: '{自然|しぜん}',
+  たべもの: '{食|た}べ{物|もの}',
+  どうぶつ: '{動物|どうぶつ}',
+  のりもの: '{乗|の}り{物|もの}',
+  ひと: '{人|ひと}',
+  みのまわり: '{身|み}の{回|まわ}り',
+  やさい: '{野菜|やさい}'
+};
 
 // 1 文字だけの練習は `char-<文字>` という id の擬似単語として扱う
 const CHAR_PREFIX = 'char-';

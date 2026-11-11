@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { untrack } from 'svelte';
   import BackButton from '$lib/components/BackButton.svelte';
   import Icon from '$lib/components/Icon.svelte';
@@ -82,12 +83,12 @@
 <main>
   <header>
     <BackButton />
-    <h1>ふうせん ぽん</h1>
+    <h1>{t('ふうせん ぽん')}</h1>
     <div class="hud">
-      <span class="score">{g.score} <small>てん</small></span>
+      <span class="score">{g.score} <small>{t('{点|てん}')}</small></span>
       {#if g.combo >= 2}<span class="combo">{g.combo} コンボ！</span>{/if}
       {#if g.level > 0}{#key g.level}<span class="level">レベル {g.level}</span>{/key}{/if}
-      <span class="lives" role="img" aria-label="のこり {MISS_MAX - g.misses}">
+      <span class="lives" role="img" aria-label={t(`{残|のこ}り ${MISS_MAX - g.misses}`)}>
         {#each Array.from({ length: MISS_MAX }, (_, i) => i) as i (i)}
           <span class={{ lost: i < g.misses }}><Icon name="heart" size={26} fill /></span>
         {/each}

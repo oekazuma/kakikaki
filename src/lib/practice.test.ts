@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { display } from './grade';
 import { PracticeSession, nextMode, nextWordId, openWords, resolveWord } from './practice.svelte';
 import { record, reset, get, wordStar, wordCrown, recordWordDone } from './progress.svelte';
 import { setLang } from './lang.svelte';
@@ -80,7 +81,7 @@ describe('PracticeSession', () => {
     expect([s.complete, s.i, s.mode]).toEqual([false, 0, 'test']);
     s.drawn = true;
     s.done({ mode: 'test', score: 0.5, ok: false, top: 'は' });
-    expect(s.msg).toContain('「は」に みえるよ');
+    expect(display(s.msg, 1)).toContain('「は」に みえるよ');
     expect([get('ば').test, get('ば').miss]).toEqual([0, 1]);
     expect(s.drawn).toBe(false);
     s.done(ok('test', 0.8));

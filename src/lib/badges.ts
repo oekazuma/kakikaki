@@ -1,7 +1,7 @@
 import { SEION, DAKUON, HANDAKUON, KOGAKI, CHOON, ALPHABET, DIGITS, toKatakana } from './chars';
-import { CATEGORIES, WORDS, type Word } from './words';
+import { CAT_LABEL, CATEGORIES, WORDS, type Word } from './words';
 import { charsOf, lettersOf, type Lang } from './lang.svelte';
-import { KANJI } from './kanji';
+import { KANJI, gradeLabel } from './kanji';
 import { levelName, levelsOf } from './quiz';
 
 // 進捗の集計。判定関数は progress ストアに依存させず、集計値だけを受け取る
@@ -97,6 +97,20 @@ export const BADGE_GROUPS = [
   'かくし'
 ] as const;
 export type BadgeGroup = (typeof BADGE_GROUPS)[number];
+// 段の表示名。group は段の並びと判定にも使うので、書き方はここにだけ付ける
+export const GROUP_LABEL: Record<BadgeGroup, string> = {
+  はじめて: '{初|はじ}めて',
+  もじ: '{文字|もじ}',
+  きんのほし: '{金|きん}の{星|ほし}',
+  'ぎょう マスター': '{行|ぎょう} マスター',
+  がくねん: '{学年|がくねん}',
+  たんご: '{単語|たんご}',
+  はかせ: '{博士|はかせ}',
+  おうかん: 'おうかん',
+  クイズ: 'クイズ',
+  'つづけた ひ': '{続|つづ}けた {日|ひ}',
+  かくし: 'かくし'
+};
 
 export type Badge = {
   id: string;
@@ -131,80 +145,133 @@ const GOLD_EMOJI = ['⭐', '🌟', '✨', '🌠', '☀️', '🌈'];
 const ALL_NAME: Record<Lang, string> = { ja: 'ひらがな', kana: 'かたかな', kanji: 'かんじ', en: 'あるふぁべっと' };
 // 行メダルの段・絵文字・説明の接尾。かんじ は学年ごとで、絵文字は行の先頭文字ではなく本
 const ROW_STYLE = (l: Lang, r: Row): [BadgeGroup, string, string] =>
-  l === 'kanji' ? ['がくねん', '📖', 'の かんじ'] : ['ぎょう マスター', r.chars[0], ''];
+  l === 'kanji' ? ['がくねん', '📖', 'の {漢字|かんじ}'] : ['ぎょう マスター', r.chars[0], ''];
+// 行の表示名。r.name はメダルの id にも使うので書き方を付けない
+const ROW_LABEL: Record<string, string> = { すうじ: '{数字|すうじ}', ちいさいもじ: '{小|ちい}さい{文字|もじ}' };
+const rowLabel = (r: Row) => ROW_LABEL[r.name] ?? gradeLabel(r.name);
 
 export function badgesOf(l: Lang): Badge[] {
   const T = TOTAL(l);
   const all = ALL_NAME[l];
   const hasWords = T.words > 0;
   return [
-    count('first-char', 'はじめて', '🌱', 'はじめの いっぽ', 'もじを 1つ クリア', (s) => [s.chars, 1]),
-    ...(hasWords
-      ? [
-          count('first-word', 'はじめて', '🎈', 'はじめての たんご', 'たんごに はじめて ほしが ついた', (s) => [
-            s.words,
-            1
-          ])
-        ]
-      : []),
-    count('first-gold', 'はじめて', '✨', 'はじめての きんのほし', 'おてほんなしで はじめて ごうかく', (s) => [
-      s.gold,
+    count('first-char', 'はじめて', '🌱', '{初|はじ}めの {一歩|いっぽ}', '{文字|もじ}を 1つ クリア', (s) => [
+      s.chars,
       1
     ]),
     ...(hasWords
       ? [
-          count('first-crown', 'はじめて', '👑', 'はじめての おうかん', 'たんごの ぜんぶの もじが きんのほし', (s) => [
-            s.crowns,
-            1
-          ])
+          count(
+            'first-word',
+            'はじめて',
+            '🎈',
+            '{初|はじ}めての {単語|たんご}',
+            '{単語|たんご}に {初|はじ}めて {星|ほし}が ついた',
+            (s) => [s.words, 1]
+          )
+        ]
+      : []),
+    count(
+      'first-gold',
+      'はじめて',
+      '✨',
+      '{初|はじ}めての {金|きん}の{星|ほし}',
+      'お{手本|てほん}なしで {初|はじ}めて {合格|ごうかく}',
+      (s) => [s.gold, 1]
+    ),
+    ...(hasWords
+      ? [
+          count(
+            'first-crown',
+            'はじめて',
+            '👑',
+            '{初|はじ}めての おうかん',
+            '{単語|たんご}の {全部|ぜんぶ}の {文字|もじ}が {金|きん}の{星|ほし}',
+            (s) => [s.crowns, 1]
+          )
         ]
       : []),
     ...STEPS[l].map((n, k) =>
-      count(`chars-${n}`, 'もじ', STEP_EMOJI[k], `もじ ${n}`, `もじを ${n}こ クリア`, (s) => [s.chars, n])
+      count(`chars-${n}`, 'もじ', STEP_EMOJI[k], `{文字|もじ} ${n}`, `{文字|もじ}を ${n}こ クリア`, (s) => [s.chars, n])
     ),
-    count('chars-all', 'もじ', '🏆', `${all} マスター`, `${T.chars}もじ ぜんぶ クリア`, (s) => [s.chars, T.chars]),
+    count('chars-all', 'もじ', '🏆', `${all} マスター`, `${T.chars}{文字|もじ} {全部|ぜんぶ} クリア`, (s) => [
+      s.chars,
+      T.chars
+    ]),
     ...GOLD_STEPS[l].map((n, k) =>
-      count(`gold-${n}`, 'きんのほし', GOLD_EMOJI[k], `きんのほし ${n}`, `おてほんなしで ${n}もじ ごうかく`, (s) => [
-        s.gold,
-        n
-      ])
+      count(
+        `gold-${n}`,
+        'きんのほし',
+        GOLD_EMOJI[k],
+        `{金|きん}の{星|ほし} ${n}`,
+        `お{手本|てほん}なしで ${n}{文字|もじ} {合格|ごうかく}`,
+        (s) => [s.gold, n]
+      )
     ),
     count(
       'gold-all',
       'きんのほし',
       '💫',
-      'きんのほし マスター',
-      `おてほんなしで ${T.chars}もじ ぜんぶ ごうかく`,
+      '{金|きん}の{星|ほし} マスター',
+      `お{手本|てほん}なしで ${T.chars}{文字|もじ} {全部|ぜんぶ} {合格|ごうかく}`,
       (s) => [s.gold, T.chars]
     ),
     ...ROWS[l].map((r) => {
       const [group, emoji, suffix] = ROW_STYLE(l, r);
-      return count(`row-${r.name}`, group, emoji, `${r.name} マスター`, `${r.name}${suffix}を ぜんぶ クリア`, (s) => [
-        s.rows[r.name],
-        r.chars.length
-      ]);
+      return count(
+        `row-${r.name}`,
+        group,
+        emoji,
+        `${rowLabel(r)} マスター`,
+        `${rowLabel(r)}${suffix}を {全部|ぜんぶ} クリア`,
+        (s) => [s.rows[r.name], r.chars.length]
+      );
     }),
     ...(hasWords
       ? [
-          count('words-10', 'たんご', '🎒', 'たんご 10', '10この たんごに ほし', (s) => [s.words, 10]),
-          count('words-50', 'たんご', '🚌', 'たんご 50', '50この たんごに ほし', (s) => [s.words, 50]),
-          count('words-100', 'たんご', '🚀', 'たんご 100', '100この たんごに ほし', (s) => [s.words, 100]),
-          count('words-all', 'たんご', '🎖️', 'たんご マスター', 'ぜんぶの たんごに ほし', (s) => [s.words, T.words]),
-          ...CATEGORIES.map((c) =>
-            count(`cat-${c}`, 'はかせ', CAT_EMOJI[c] ?? '🏅', `${c} はかせ`, `${c}の たんごに ぜんぶ ほし`, (s) => [
-              s.cats[c],
-              CAT_TOTAL[c]
-            ])
+          count('words-10', 'たんご', '🎒', '{単語|たんご} 10', '10この {単語|たんご}に {星|ほし}', (s) => [
+            s.words,
+            10
+          ]),
+          count('words-50', 'たんご', '🚌', '{単語|たんご} 50', '50この {単語|たんご}に {星|ほし}', (s) => [
+            s.words,
+            50
+          ]),
+          count('words-100', 'たんご', '🚀', '{単語|たんご} 100', '100この {単語|たんご}に {星|ほし}', (s) => [
+            s.words,
+            100
+          ]),
+          count(
+            'words-all',
+            'たんご',
+            '🎖️',
+            '{単語|たんご} マスター',
+            '{全部|ぜんぶ}の {単語|たんご}に {星|ほし}',
+            (s) => [s.words, T.words]
           ),
-          count('crowns-10', 'おうかん', '👸', 'おうかん 10', '10この たんごに おうかん', (s) => [s.crowns, 10]),
-          count('crowns-all', 'おうかん', '🏰', 'おうかん マスター', 'ぜんぶの たんごに おうかん', (s) => [
-            s.crowns,
-            T.words
-          ])
+          ...CATEGORIES.map((c) =>
+            count(
+              `cat-${c}`,
+              'はかせ',
+              CAT_EMOJI[c] ?? '🏅',
+              `${CAT_LABEL[c]} {博士|はかせ}`,
+              `${CAT_LABEL[c]}の {単語|たんご}に {全部|ぜんぶ} {星|ほし}`,
+              (s) => [s.cats[c], CAT_TOTAL[c]]
+            )
+          ),
+          count('crowns-10', 'おうかん', '👸', 'おうかん 10', '10この {単語|たんご}に おうかん', (s) => [s.crowns, 10]),
+          count(
+            'crowns-all',
+            'おうかん',
+            '🏰',
+            'おうかん マスター',
+            '{全部|ぜんぶ}の {単語|たんご}に おうかん',
+            (s) => [s.crowns, T.words]
+          )
         ]
       : []),
     ...(['read', 'write'] as const).flatMap((k) => {
-      const kn = k === 'read' ? 'よみクイズ' : 'かきクイズ';
+      const kn = k === 'read' ? '{読|よ}みクイズ' : '{書|か}きクイズ';
       const em = k === 'read' ? '👀' : '✍️';
       return [
         ...levelsOf(l).map((lv) =>
@@ -213,7 +280,7 @@ export function badgesOf(l: Lang): Badge[] {
             'クイズ',
             em,
             `${kn} ${levelName(lv, l)}`,
-            `${kn}の ${levelName(lv, l)}で 10もん せいかい`,
+            `${kn}の ${levelName(lv, l)}で 10{問|もん} {正解|せいかい}`,
             (s) => [Math.min(10, s.quiz[`${k}${lv}`] ?? 0), 10]
           )
         ),
@@ -222,25 +289,48 @@ export function badgesOf(l: Lang): Badge[] {
           'クイズ',
           k === 'read' ? '🧠' : '🖋️',
           `${kn} マスター`,
-          `${kn}の ぜんぶの きゅうで 10もん せいかい`,
+          `${kn}の {全部|ぜんぶ}の {級|きゅう}で 10{問|もん} {正解|せいかい}`,
           (s) => [levelsOf(l).filter((lv) => (s.quiz[`${k}${lv}`] ?? 0) >= 10).length, levelsOf(l).length]
         )
       ];
     }),
-    count('days-3', 'つづけた ひ', '📅', '3にち れんしゅう', '3にち れんしゅうした', (s) => [s.days, 3]),
-    count('days-7', 'つづけた ひ', '🗓️', '7にち れんしゅう', '7にち れんしゅうした', (s) => [s.days, 7]),
-    count('days-30', 'つづけた ひ', '🎂', '30にち れんしゅう', '30にち れんしゅうした', (s) => [s.days, 30]),
+    count('days-3', 'つづけた ひ', '📅', '3{日|にち} {練習|れんしゅう}', '3{日|にち} {練習|れんしゅう}した', (s) => [
+      s.days,
+      3
+    ]),
+    count('days-7', 'つづけた ひ', '🗓️', '7{日|にち} {練習|れんしゅう}', '7{日|にち} {練習|れんしゅう}した', (s) => [
+      s.days,
+      7
+    ]),
+    count('days-30', 'つづけた ひ', '🎂', '30{日|にち} {練習|れんしゅう}', '30{日|にち} {練習|れんしゅう}した', (s) => [
+      s.days,
+      30
+    ]),
     ...[
-      count('streak-3', 'つづけた ひ', '🔥', '3にち つづけた', '3にち つづけて れんしゅうした', (s) => [s.streak, 3]),
-      count('streak-7', 'つづけた ひ', '🏅', '7にち つづけた', '7にち つづけて れんしゅうした', (s) => [s.streak, 7])
+      count(
+        'streak-3',
+        'つづけた ひ',
+        '🔥',
+        '3{日|にち} {続|つづ}けた',
+        '3{日|にち} {続|つづ}けて {練習|れんしゅう}した',
+        (s) => [s.streak, 3]
+      ),
+      count(
+        'streak-7',
+        'つづけた ひ',
+        '🏅',
+        '7{日|にち} {続|つづ}けた',
+        '7{日|にち} {続|つづ}けて {練習|れんしゅう}した',
+        (s) => [s.streak, 7]
+      )
     ].map((b) => ({ ...b, shared: true })),
     ...[
       count(
         'balloon-found',
         'かくし',
         '🔍',
-        'かくしゲームを みつけた',
-        'かくれた ふうせんを みつけて あそんだ',
+        'かくしゲームを {見|み}つけた',
+        'かくれた ふうせんを {見|み}つけて {遊|あそ}んだ',
         (s) => [Math.min(1, s.balloons), 1]
       ),
       ...[500, 1000, 2000, 3000, 5000].map((n, k) =>
@@ -248,22 +338,26 @@ export function badgesOf(l: Lang): Badge[] {
           `balloon-${n}`,
           'かくし',
           '🎈🎉🎆🎇🏆'.match(/./gu)![k],
-          `ふうせん ${n}てん`,
-          `ふうせん ぽんで ${n}てん`,
+          `ふうせん ${n}{点|てん}`,
+          `ふうせん ぽんで ${n}{点|てん}`,
           (s) => [Math.min(n, s.balloon), n]
         )
       ),
-      count('egg-jump', 'かくし', '🖼️', 'とびだした！', 'たんごカードの えを 10かい タップして とびださせた', (s) => [
-        Math.min(1, s.eggs),
-        1
-      ]),
+      count(
+        'egg-jump',
+        'かくし',
+        '🖼️',
+        '{飛|と}び{出|だ}した！',
+        '{単語|たんご}カードの {絵|え}を 10{回|かい} タップして {飛|と}び{出|だ}させた',
+        (s) => [Math.min(1, s.eggs), 1]
+      ),
       ...[100, 200, 300, 500, 1000].map((n, k) =>
         count(
           `pinball-${n}`,
           'かくし',
           '🏓🎯🥉🥈🥇'.match(/./gu)![k],
-          `ピンボール ${n}かい`,
-          `とびだした えを はじいて かべに ${n}かい あてた`,
+          `ピンボール ${n}{回|かい}`,
+          `{飛|と}び{出|だ}した {絵|え}を はじいて かべに ${n}{回|かい} {当|あ}てた`,
           (s) => [Math.min(n, s.pinball), n]
         )
       )

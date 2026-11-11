@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Avatar from '../Avatar.svelte';
   import Icon from '../Icon.svelte';
   import AvatarCrop from './AvatarCrop.svelte';
@@ -21,7 +22,7 @@
     try {
       cropping = await loadImage(f);
     } catch {
-      error = 'この画像は読み込めませんでした';
+      error = 'この{画像|がぞう}は {読|よ}みこめませんでした';
     }
   }
   // 切り抜きが終わったら元画像の object URL を返す（表示中は revoke できない）
@@ -32,7 +33,7 @@
   function picked(url: string) {
     closeCrop();
     value = url;
-    if (!addPhoto(url)) error = 'しゃしんの いちらんが いっぱいです（この人には つかえます）';
+    if (!addPhoto(url)) error = '{写真|しゃしん}の {一覧|いちらん}が いっぱいです（この{人|ひと}には {使|つか}えます）';
   }
   // 600ms 押し続けたら削除モード。タップ（短い押下）は選択。削除モードの写真をもう一度タップすると抜ける
   function press(url: string) {
@@ -65,7 +66,7 @@
         <span class={['pick', 'photo', { on: value === p, hold: holding === p }]}>
           <button
             class="face"
-            aria-label="しゃしん"
+            aria-label={t('{写真|しゃしん}')}
             onpointerdown={() => press(p)}
             onpointerup={() => release(p)}
             onpointercancel={() => hold.cancel()}
@@ -73,19 +74,21 @@
             oncontextmenu={(e) => e.preventDefault()}><Avatar avatar={p} size={56} /></button
           >
           {#if holding === p}
-            <button class="del" onclick={() => remove(p)}><Icon name="trash" size={16} /> けす</button>
+            <button class="del" onclick={() => remove(p)}><Icon name="trash" size={16} /> {t('{消|け}す')}</button>
           {/if}
         </span>
       {/each}
       <label class="pick file">
         <Icon name="upload" size={26} />
-        <small>しゃしん</small>
+        <small>{t('{写真|しゃしん}')}</small>
         <input type="file" accept="image/*" onchange={upload} />
       </label>
     </div>
-    {#if error}<p class="err">{error}</p>{/if}
+    {#if error}<p class="err">{t(error)}</p>{/if}
     <p class="note">
-      しゃしんは ながおしで けせます（もういちど タップで もどる）。ほかの人も おなじ しゃしんを えらべます
+      {t(
+        '{写真|しゃしん}は {長|なが}おしで {消|け}せます（もう{一度|いちど} タップで もどる）。ほかの{人|ひと}も {同|おな}じ {写真|しゃしん}を {選|えら}べます'
+      )}
     </p>
   </div>
 {/if}

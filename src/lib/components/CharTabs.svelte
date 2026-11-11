@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from './Icon.svelte';
   import Stars from './Stars.svelte';
   import { get, charCleared } from '$lib/progress.svelte';
@@ -29,8 +30,8 @@
 </div>
 <div class="charstars card">
   <div class="row"><span>なぞる</span><Stars n={2} k={get(s.c).trace} size={20} /></div>
-  <div class="row"><span>じぶんで かく</span><Stars n={1} k={get(s.c).free} size={20} /></div>
-  <div class="row gold"><span>おてほんなし</span><Stars n={1} k={get(s.c).test} size={20} /></div>
+  <div class="row"><span>{t('{自分|じぶん}で {書|か}く')}</span><Stars n={1} k={get(s.c).free} size={20} /></div>
+  <div class="row gold"><span>{t('お{手本|てほん}なし')}</span><Stars n={1} k={get(s.c).test} size={20} /></div>
 </div>
 
 <style>

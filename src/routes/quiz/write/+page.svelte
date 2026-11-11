@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hiding, t } from '$lib/yomi.svelte';
   import { page } from '$app/state';
   import { untrack } from 'svelte';
   import { fly } from 'svelte/transition';
@@ -38,6 +39,7 @@
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const hear = speaker((on) => (speaking = on));
+  hiding(() => w.hidden);
 </script>
 
 <svelte:head>
@@ -46,7 +48,7 @@
 </svelte:head>
 
 <main in:fly={{ x: 40, duration: 250 }}>
-  <QuizHeader title="かきクイズ" {level} i={w.i} total={w.qs.length} done={w.done} />
+  <QuizHeader title={'{書|か}きクイズ'} {level} i={w.i} total={w.qs.length} done={w.done} />
   {#if w.word}
     <div class="left">
       <div class="card pic">
@@ -54,13 +56,13 @@
           >{/if}
         {#if w.kind === 'kanji' || w.kind === 'listen'}
           <button class={['hear', { big: w.kind === 'listen', speaking }]} onclick={() => hear(say, info().speech)}
-            ><Icon name="speaker" size={w.kind === 'listen' ? 40 : 22} /> きく</button
+            ><Icon name="speaker" size={w.kind === 'listen' ? 40 : 22} /> {t('{聞|き}く')}</button
           >
-          <small>きこえた ことばを かこう</small>
+          <small>{t('{聞|き}こえた {言葉|ことば}を {書|か}こう')}</small>
         {:else}
           <img src={imageUrl(w.word)} alt="" width="210" height="150" loading="eager" />
           <button class={['hear', { speaking }]} onclick={() => hear(nameOf(w.word), info().speech)}
-            ><Icon name="speaker" size={22} /> きく</button
+            ><Icon name="speaker" size={22} /> {t('{聞|き}く')}</button
           >
         {/if}
       </div>
@@ -84,20 +86,13 @@
         {/if}
       </div>
       <p class="hint">
-        {w.msg ||
-          (w.mode === 'test'
-            ? w.kind === 'blank'
-              ? '？ の もじを かこう'
-              : w.kind === 'kanji'
-                ? 'よみを みて かんじを かこう'
-                : `${w.k + 1} もじめを かいてみよう`
-            : 'まるから せんに そって なぞろう')}
+        {t(w.hint)}
       </p>
     </section>
 
     <div class="right">
-      <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
-      <ActionButton icon="refresh" label="やりなおす" onclick={() => w.nextLetter(w.k)} />
+      <ActionButton icon="undo" label={'{一|ひと}つ もどる'} onclick={() => canvas?.undo()} />
+      <ActionButton icon="refresh" label={'やり{直|なお}す'} onclick={() => w.nextLetter(w.k)} />
       {#if w.mode === 'test'}
         <ActionButton icon="check" label="できた" ready={w.drawn} onclick={() => canvas?.judge()} />
       {/if}

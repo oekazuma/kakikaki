@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { practiceUrl } from '$lib/nav';
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
@@ -11,7 +12,7 @@
   import { kanjiByReading } from '$lib/kanji';
   import { keepScroll } from '$lib/scroll';
   keepScroll(() => `chars:${lang.v}`);
-  const title = $derived(lang.v === 'kanji' ? 'よみから さがす' : 'もじから えらぶ');
+  const title = $derived(lang.v === 'kanji' ? '{読|よ}みから {探|さが}す' : '{文字|もじ}から {選|えら}ぶ');
 </script>
 
 <svelte:head>
@@ -43,7 +44,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1>{title}</h1>
+    <h1>{t(title)}</h1>
   </header>
   {#if lang.v === 'kanji'}
     <KanjiGrid groups={kanjiByReading()} jump />
@@ -54,7 +55,7 @@
       <div class="groups">
         {#each GROUPS as g (g.name)}
           <section class="card group">
-            <h2>{g.name}</h2>
+            <h2>{t(g.name)}</h2>
             {@render table(g.cols.map((col) => col.map(k)))}
           </section>
         {/each}
@@ -62,9 +63,9 @@
     </div>
   {:else}
     <div class="en">
-      {#each [['おおもじ', ALPHABET.slice(0, 2)], ['こもじ', ALPHABET.slice(2)], ['すうじ', [DIGITS]]] as const as [name, rows] (name)}
+      {#each [['{大|おお}{文字|もじ}', ALPHABET.slice(0, 2)], ['{小|こ}{文字|もじ}', ALPHABET.slice(2)], ['{数字|すうじ}', [DIGITS]]] as const as [name, rows] (name)}
         <section class="card group">
-          <h2 class="ltr">{name}</h2>
+          <h2 class="ltr">{t(name)}</h2>
           {#each rows as row (row.join(''))}
             <div class="row">
               {#each row as c (c)}{@render cell(c)}{/each}

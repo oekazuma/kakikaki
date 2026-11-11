@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { goto } from '$app/navigation';
   import WordCard from './WordCard.svelte';
   import KanjiCell from './KanjiCell.svelte';
@@ -11,7 +12,7 @@
 </script>
 
 {#if words.length}
-  <h2>つづきから</h2>
+  <h2>{t('{続|つづ}きから')}</h2>
   {#if lang.v === 'kanji'}
     <div class="grid">
       {#each words as w (w.id)}<KanjiCell c={w.name} />{/each}

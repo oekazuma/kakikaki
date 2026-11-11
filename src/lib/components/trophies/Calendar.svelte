@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from '../Icon.svelte';
   import { today } from '$lib/today';
   // 今月のカレンダー。全ことば をまたいで練習した日に印。連続した日数を上に出す（切れたことは言わない）
   let { days, streak }: { days: string[]; streak: number } = $props();
-  const t = today();
-  const [y, m] = t.split('-').map(Number);
+  const day = today();
+  const [y, m] = day.split('-').map(Number);
   const first = new Date(y, m - 1, 1).getDay();
   const count = new Date(y, m, 0).getDate();
   // 月初までの空きマスは負の番号で区別する（各マスに固有のキーを持たせる）
@@ -15,14 +16,18 @@
 
 <section class="card cal">
   <div class="head">
-    <b>{m} がつ</b>
-    {#if streak > 0}<span class="streak"><Icon name="star" size={16} fill /> つづけて {streak} にち</span>{/if}
+    <b>{t(`${m} {月|がつ}`)}</b>
+    {#if streak > 0}<span class="streak"
+        ><Icon name="star" size={16} fill /> {t(`{続|つづ}けて ${streak} {日|にち}`)}</span
+      >{/if}
   </div>
   <div class="grid">
-    {#each ['にち', 'げつ', 'か', 'すい', 'もく', 'きん', 'ど'] as w (w)}<span class="w">{w}</span>{/each}
+    {#each ['{日|にち}', '{月|げつ}', '{火|か}', '{水|すい}', '{木|もく}', '{金|きん}', '{土|ど}'] as w (w)}<span
+        class="w">{t(w)}</span
+      >{/each}
     {#each cells as d (d)}
       {#if d < 0}<span></span>{:else}
-        <span class="cell"><span class={['d', { on: set.has(key(d)), today: key(d) === t }]}>{d}</span></span>
+        <span class="cell"><span class={['d', { on: set.has(key(d)), today: key(d) === day }]}>{d}</span></span>
       {/if}
     {/each}
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { resolve } from '$app/paths';
   import { fade, scale } from 'svelte/transition';
   import BackButton from './BackButton.svelte';
@@ -13,16 +14,16 @@
 
 <header>
   <BackButton onclick={guard ? () => (asking = true) : undefined} />
-  <h1>{title} <span class="sub">{levelName(level, lang.v)}</span></h1>
+  <h1>{t(title)} <span class="sub">{t(levelName(level, lang.v))}</span></h1>
   <span class="prog">{Math.min(i + 1, total)} / {total}</span>
 </header>
 
 {#if asking}
   <div class="dim" transition:fade={{ duration: 150 }} role="presentation" onclick={() => (asking = false)}></div>
   <section class="card leave" transition:scale={{ duration: 200, start: 0.9 }}>
-    <p>クイズの とちゅうだよ。<br />やめて もどる？</p>
+    <p>{t('クイズの とちゅうだよ。')}<br />{t('やめて もどる？')}</p>
     <div class="btns">
-      <button class="stay" onclick={() => (asking = false)}>つづける</button>
+      <button class="stay" onclick={() => (asking = false)}>{t('{続|つづ}ける')}</button>
       <a class="go" href={resolve('/')}>もどる</a>
     </div>
   </section>

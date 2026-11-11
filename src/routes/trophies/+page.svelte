@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from '$lib/components/Icon.svelte';
   import BackButton from '$lib/components/BackButton.svelte';
   import StatTiles from '$lib/components/trophies/StatTiles.svelte';
@@ -30,7 +31,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1><Icon name="trophy" /> めだる と きろく</h1>
+    <h1><Icon name="trophy" /> {t('めだる と {記録|きろく}')}</h1>
   </header>
   <Hero {s} {badges} {got} />
   <StatTiles {s} />

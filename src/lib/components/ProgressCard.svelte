@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { resolve } from '$app/paths';
   import Bar from './Bar.svelte';
   import Icon from './Icon.svelte';
@@ -9,9 +10,11 @@
 
 <a class="card prog" href={resolve('/trophies')}>
   <span class="tr"><Icon name="trophy" size={22} /> {Object.keys(earned()).length} / {badgeCount}</span>
-  <span class="pl">もじ {s.chars}/{total.chars}<Bar have={s.chars} need={total.chars} /></span>
+  <span class="pl">{t('{文字|もじ}')} {s.chars}/{total.chars}<Bar have={s.chars} need={total.chars} /></span>
   {#if total.words}
-    <span class="pl">たんご {s.words}/{total.words}<Bar have={s.words} need={total.words} color="var(--teal)" /></span>
+    <span class="pl"
+      >{t('{単語|たんご}')} {s.words}/{total.words}<Bar have={s.words} need={total.words} color="var(--teal)" /></span
+    >
   {/if}
 </a>
 

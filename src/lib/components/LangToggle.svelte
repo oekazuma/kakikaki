@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { lang, setLang, info, LANGS } from '$lib/lang.svelte';
 </script>
 
-<div class="toggle card" role="tablist" aria-label="ことばを えらぶ">
+<div class="toggle card" role="tablist" aria-label={t('{言葉|ことば}を {選|えら}ぶ')}>
   <span class="knob" style:--i={LANGS.indexOf(lang.v)}></span>
   {#each LANGS as l (l)}
     <button role="tab" aria-selected={lang.v === l} class={{ on: lang.v === l }} onclick={() => setLang(l)}>

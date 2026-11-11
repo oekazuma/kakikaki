@@ -9,9 +9,9 @@ import { KANJI } from './kanji';
 export type Level = 1 | 2 | 3 | 4 | 5 | 6;
 export const levelsOf = (l: Lang): Level[] => (l === 'kanji' ? KANJI.map((k) => k.grade) : [1, 2, 3]);
 export type Kind = 'read' | 'write';
-const LEVEL_NAME: Record<number, string> = { 1: 'かんたん', 2: 'ふつう', 3: 'むずかしい' };
+const LEVEL_NAME: Record<number, string> = { 1: '{簡単|かんたん}', 2: 'ふつう', 3: '{難|むずか}しい' };
 // 級の表示名。かんじ は文字数の級ではなく学年で出題範囲を絞るので、名前も学年
-export const levelName = (lv: Level, l: Lang) => (l === 'kanji' ? `${lv}ねんせい` : LEVEL_NAME[lv]);
+export const levelName = (lv: Level, l: Lang) => (l === 'kanji' ? `${lv}{年生|ねんせい}` : LEVEL_NAME[lv]);
 export const QUESTIONS: Record<Kind, number> = { read: 10, write: 5 };
 
 // 文字数で級を決める。分布が各級 60 語前後になる境目

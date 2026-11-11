@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from '../Icon.svelte';
   import Bar from '../Bar.svelte';
   import { CAT_TOTAL, TOTAL, type Stats } from '$lib/badges';
-  import { CATEGORIES } from '$lib/words';
+  import { CAT_LABEL, CATEGORIES } from '$lib/words';
   import { quiz } from '$lib/progress.svelte';
   import { levelName, levelsOf } from '$lib/quiz';
   import { lang } from '$lib/lang.svelte';
@@ -12,9 +13,9 @@
   const tiles = $derived(
     (
       [
-        { label: 'もじ', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },
-        { label: 'きんのほし', icon: 'star', have: s.gold, need: total.chars, color: 'var(--star)' },
-        { label: 'たんご', icon: 'book', have: s.words, need: total.words, color: 'var(--teal)' },
+        { label: '{文字|もじ}', icon: 'pencil', have: s.chars, need: total.chars, color: 'var(--blue)' },
+        { label: '{金|きん}の{星|ほし}', icon: 'star', have: s.gold, need: total.chars, color: 'var(--star)' },
+        { label: '{単語|たんご}', icon: 'book', have: s.words, need: total.words, color: 'var(--teal)' },
         { label: 'おうかん', icon: 'crown', have: s.crowns, need: total.words, color: 'var(--warn)' }
       ] as const
     ).filter((t) => t.need > 0)
@@ -23,15 +24,15 @@
 </script>
 
 <section class="tiles">
-  {#each tiles as t (t.label)}
-    <div class="card tile" style:--c={t.color}>
-      <span class="ic"><Icon name={t.icon} size={22} /></span>
+  {#each tiles as tile (tile.label)}
+    <div class="card tile" style:--c={tile.color}>
+      <span class="ic"><Icon name={tile.icon} size={22} /></span>
       <div class="tl">
-        <span class="lb">{t.label}</span>
-        <b>{t.have}<small>/ {t.need}</small></b>
+        <span class="lb">{t(tile.label)}</span>
+        <b>{tile.have}<small>/ {tile.need}</small></b>
       </div>
-      <Bar have={t.have} need={t.need} color={t.color} />
-      <span class="pct">{pct(t.have, t.need)}%</span>
+      <Bar have={tile.have} need={tile.need} color={tile.color} />
+      <span class="pct">{pct(tile.have, tile.need)}%</span>
     </div>
   {/each}
 </section>
@@ -40,7 +41,7 @@
   <section class="card cats">
     {#each CATEGORIES as c (c)}
       <div class="cat">
-        <span class="cn">{c}</span>
+        <span class="cn">{t(CAT_LABEL[c])}</span>
         <Bar have={s.cats[c]} need={CAT_TOTAL[c]} color="var(--teal)" />
         <small>{s.cats[c]} / {CAT_TOTAL[c]}</small>
       </div>
@@ -49,11 +50,13 @@
 {/if}
 
 <section class="card quiz" class:one={levelsOf(lang.v).length > 3}>
-  {#each [['read', 'よみクイズ'], ['write', 'かきクイズ']] as [k, name] (k)}
+  {#each [['read', '{読|よ}みクイズ'], ['write', '{書|か}きクイズ']] as [k, name] (k)}
     <div class="qrow">
-      <b>{name}</b>
+      <b>{t(name)}</b>
       {#each levelsOf(lang.v) as lv (lv)}
-        <span class="qc"><small>{levelName(lv, lang.v)}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> もん</span>
+        <span class="qc"
+          ><small>{t(levelName(lv, lang.v))}</small><b>{quiz()[`${k}${lv}`] ?? 0}</b> {t('{問|もん}')}</span
+        >
       {/each}
     </div>
   {/each}

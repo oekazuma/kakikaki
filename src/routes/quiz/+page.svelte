@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
   import BackButton from '$lib/components/BackButton.svelte';
@@ -14,23 +15,25 @@
     {
       id: 'read',
       icon: 'eye',
-      name: 'よみクイズ',
-      desc: kanji ? 'かんじの よみを こたえよう' : 'もじを よんで えを えらぼう'
+      name: '{読|よ}みクイズ',
+      desc: kanji ? '{漢字|かんじ}の {読|よ}みを {答|こた}えよう' : '{文字|もじ}を {読|よ}んで {絵|え}を {選|えら}ぼう'
     },
     {
       id: 'write',
       icon: 'pencil',
-      name: 'かきクイズ',
-      desc: kanji ? 'よみを みて かんじを かこう' : 'えを みて もじを かこう'
+      name: '{書|か}きクイズ',
+      desc: kanji
+        ? '{読|よ}みを {見|み}て {漢字|かんじ}を {書|か}こう'
+        : '{絵|え}を {見|み}て {文字|もじ}を {書|か}こう'
     }
   ]);
   const LEVELS = $derived<{ lv: Level; hint: string }[]>(
     kanji
-      ? KANJI.map((k) => ({ lv: k.grade, hint: `${k.chars.length} じ` }))
+      ? KANJI.map((k) => ({ lv: k.grade, hint: `${k.chars.length} {字|じ}` }))
       : [
-          { lv: 1, hint: 'みじかい ことば' },
-          { lv: 2, hint: 'ふつうの ことば' },
-          { lv: 3, hint: 'ながい ことば' }
+          { lv: 1, hint: '{短|みじか}い {言葉|ことば}' },
+          { lv: 2, hint: 'ふつうの {言葉|ことば}' },
+          { lv: 3, hint: '{長|なが}い {言葉|ことば}' }
         ]
   );
 </script>
@@ -51,16 +54,16 @@
         <div class="kh">
           <span class="ki"><Icon name={k.icon} size={34} /></span>
           <div>
-            <h2>{k.name}</h2>
-            <p>{k.desc}（{QUESTIONS[k.id]} もん）</p>
+            <h2>{t(k.name)}</h2>
+            <p>{t(`${k.desc}（${QUESTIONS[k.id]} {問|もん}）`)}</p>
           </div>
         </div>
         <div class="levels" style:--n={LEVELS.length}>
           {#each LEVELS as { lv, hint } (lv)}
             <a class="lv" style:--c={COLORS[lv - 1]} href="{resolve(`/quiz/${k.id}`)}?level={lv}">
               <span class={['stars', { many: LEVELS.length > 3 }]}>{'★'.repeat(lv)}</span>
-              <span class="name">{levelName(lv, lang.v)}<small>{hint}</small></span>
-              <span class="n">せいかい<b>{quiz()[`${k.id}${lv}`] ?? 0}</b></span>
+              <span class="name">{t(levelName(lv, lang.v))}<small>{t(hint)}</small></span>
+              <span class="n">{t('{正解|せいかい}')}<b>{quiz()[`${k.id}${lv}`] ?? 0}</b></span>
             </a>
           {/each}
         </div>

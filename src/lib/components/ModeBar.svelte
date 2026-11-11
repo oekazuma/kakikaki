@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import Icon from './Icon.svelte';
   import { MODES } from '$lib/practice.svelte';
   import type { Mode } from '$lib/progress.svelte';
@@ -8,7 +9,7 @@
 <div class="modes card">
   {#each MODES as m (m.id)}
     <button class={{ on: mode === m.id }} onclick={() => onselect(m.id)}
-      ><Icon name={m.icon} size={20} /> {m.label}</button
+      ><Icon name={m.icon} size={20} /> {t(m.label)}</button
     >
   {/each}
 </div>

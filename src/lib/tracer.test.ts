@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { display } from './grade';
 import { Tracer, missMsg } from './tracer.svelte';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
@@ -203,8 +204,8 @@ describe('Tracer おてほんなし', () => {
     for (let i = 0; i < 6; i++) drag(t, strokePts('ぶ', i));
     const r = t.judge()!;
     expect(r.ok).toBe(false);
-    expect(missMsg(r)).not.toContain('ぶ');
-    expect(missMsg({ mode: 'test', score: 0, ok: false, top: 'ほ' })).toContain('「ほ」に みえるよ');
+    expect(display(missMsg(r), 1)).not.toContain('ぶ');
+    expect(display(missMsg({ mode: 'test', score: 0, ok: false, top: 'ほ' }), 1)).toContain('「ほ」に みえるよ');
   });
   it('画数が違うと、似た字の名前ではなく正しい本数を伝える（水 の右の 2 画を続けて書くと 3 画で 小 に近くなる）', () => {
     const t = new Tracer('水', STROKES_KANJI, 'test');
@@ -215,7 +216,7 @@ describe('Tracer おてほんなし', () => {
     const r = t.judge()!;
     expect(r.ok).toBe(false);
     expect(r.want).toBe(4);
-    expect(missMsg(r)).toBe('おしい！ せんの かずは 4 ほんだよ。もういちど！');
+    expect(display(missMsg(r), 1)).toBe('おしい！ せんの かずは 4 ほんだよ。もういちど！');
   });
   it('画数が合っていて形が違うときは、本数ではなく見えた字を伝える', () => {
     const t = new Tracer('あ', STROKES, 'test');
@@ -223,6 +224,6 @@ describe('Tracer おてほんなし', () => {
     const r = t.judge()!;
     expect(r.ok).toBe(false);
     expect(r.want).toBeUndefined();
-    expect(missMsg(r)).toContain('に みえるよ');
+    expect(display(missMsg(r), 1)).toContain('に みえるよ');
   });
 });

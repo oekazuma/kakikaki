@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { fly } from 'svelte/transition';
@@ -29,8 +30,8 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1><Icon name="user" /> だれが つかう？</h1>
-    <span class="count">{profiles.list.length} / {MAX_PROFILES} にん</span>
+    <h1><Icon name="user" /> {t('だれが {使|つか}う？')}</h1>
+    <span class="count">{profiles.list.length} / {MAX_PROFILES} {t('{人|にん}')}</span>
   </header>
   <div class="grid">
     {#each profiles.list as p (p.id)}
@@ -40,7 +41,7 @@
           <b>{p.name}</b>
           <small>{info(p.lang).short}</small>
         </button>
-        <button class="edit" onclick={() => (editing = p.id)} aria-label="へんしゅう"
+        <button class="edit" onclick={() => (editing = p.id)} aria-label={t('{編集|へんしゅう}')}
           ><Icon name="pencil" size={20} /></button
         >
       </div>
@@ -48,7 +49,7 @@
     {#if profiles.list.length < MAX_PROFILES}
       <button class="card person add" onclick={() => (editing = '')}>
         <span class="plus"><Icon name="plus" size={44} /></span>
-        <b>ついか する</b>
+        <b>{t('{追加|ついか} する')}</b>
       </button>
     {/if}
   </div>

@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { resolve } from '$app/paths';
   import Avatar from './Avatar.svelte';
   import { current } from '$lib/profiles.svelte';
 </script>
 
-<a class="card who" href={resolve('/profiles')} aria-label="だれが つかう？">
+<a class="card who" href={resolve('/profiles')} aria-label={t('だれが {使|つか}う？')}>
   <Avatar avatar={current().avatar} size={44} />
   <b>{current().name}</b>
 </a>

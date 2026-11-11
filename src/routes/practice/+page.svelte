@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hiding, t } from '$lib/yomi.svelte';
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
@@ -38,9 +39,12 @@
   let canvas = $state<Canvas>();
   let speaking = $state(false);
   const total = $derived(ready ? strokes[s.c].length : 0);
+  // おてほんなし では書く字を画面の文に出さない（「お手本なし」の 手 など）
+  hiding(() => (s.mode === 'test' ? [s.c] : []));
 
   // 右の きく はいまの 1 文字だけ（単語全体は左の単語カードのスピーカー）
   const hear = speaker((on) => (speaking = on));
+  const say = () => hear(speechOf(s.c), info().speech);
   function goNext() {
     s.complete = false;
     const id = s.nextId();
@@ -59,7 +63,7 @@
 <main in:fly={{ x: 40, duration: 250 }}>
   <header>
     <BackButton />
-    <h1>{s.cur.title}</h1>
+    <h1>{t(s.cur.title)}</h1>
   </header>
 
   <div class="left">
@@ -92,24 +96,20 @@
 
   <div class="right">
     <!-- どのモードでも同じ並び。途中のボタンは薄く残して位置を保つ（おてほんなし の みる はお手本を見せない）。一番下の できた は おてほんなし だけ -->
-    <ActionButton icon="speaker" label="きく" active={speaking} onclick={() => hear(speechOf(s.c), info().speech)} />
-    <ActionButton icon="eye" label="みる" disabled={s.mode === 'test'} onclick={() => canvas?.playDemo()} />
-    <ActionButton icon="undo" label="ひとつ もどる" onclick={() => canvas?.undo()} />
-    <ActionButton icon="refresh" label="やりなおす" onclick={() => s.select(s.i, s.mode)} />
+    <ActionButton icon="speaker" label={'{聞|き}く'} active={speaking} onclick={say} />
+    <ActionButton icon="eye" label={'{見|み}る'} disabled={s.mode === 'test'} onclick={() => canvas?.playDemo()} />
+    <ActionButton icon="undo" label={'{一|ひと}つ もどる'} onclick={() => canvas?.undo()} />
+    <ActionButton icon="refresh" label={'やり{直|なお}す'} onclick={() => s.select(s.i, s.mode)} />
     {#if s.mode === 'test'}
       <ActionButton icon="check" label="できた" ready={s.drawn} onclick={() => canvas?.judge()} />
     {/if}
   </div>
 
-  {#if s.drive}
-    <DriveBy {word} onend={() => (s.drive = false)} />
-  {/if}
+  {#if s.drive}<DriveBy {word} onend={() => (s.drive = false)} />{/if}
   {#if s.complete}
     <CompleteModal {word} onnext={goNext} onreplay={() => s.replay()} onchallenge={() => s.challenge()} />
   {/if}
-  {#if s.toast}
-    <BadgeToast badge={s.toast} />
-  {/if}
+  {#if s.toast}<BadgeToast badge={s.toast} />{/if}
 </main>
 
 <style>

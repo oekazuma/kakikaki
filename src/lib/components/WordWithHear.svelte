@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { scale } from 'svelte/transition';
   import { backOut } from 'svelte/easing';
   import WordCard from './WordCard.svelte';
@@ -59,7 +60,7 @@
     <button
       class={['wordhear', { speaking }]}
       onclick={() => hear(isCharWord(word) ? speechOf(word.name) : nameOf(word), info().speech)}
-      aria-label="たんごを きく"><Icon name="speaker" size={22} /></button
+      aria-label={t('{単語|たんご}を {聞|き}く')}><Icon name="speaker" size={22} /></button
     >
   {/if}
 </div>

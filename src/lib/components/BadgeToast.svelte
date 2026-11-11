@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/yomi.svelte';
   import { fly } from 'svelte/transition';
   import type { Badge } from '$lib/badges';
   let { badge }: { badge: Badge } = $props();
@@ -6,7 +7,7 @@
 
 <div class="toast card" transition:fly={{ y: -80, duration: 400 }}>
   <span class="tem">{badge.emoji}</span>
-  <div><small>めだる ゲット！</small><b>{badge.name}</b></div>
+  <div><small>{t('めだる ゲット！')}</small><b>{t(badge.name)}</b></div>
 </div>
 
 <style>
