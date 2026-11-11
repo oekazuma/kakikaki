@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { display } from '$lib/grade';
   import { levelName, levelsOf } from '$lib/quiz';
   import type { Lang } from '$lib/lang.svelte';
   // クイズの正解数（累計）を横棒で。長さはいちばん多い項目を 100% にする
@@ -12,7 +13,8 @@
       levelsOf(l).map((lv) => ({
         key: `${k}${lv}`,
         kind: k,
-        label: `${name} ${levelName(lv, l)}`,
+        // 保護者向けの画面は学年で変えず、級の名前は書き方を付ける前と同じ かな で出す
+        label: `${name} ${display(levelName(lv, l), null)}`,
         n: quiz[`${k}${lv}`] ?? 0
       }))
     )
