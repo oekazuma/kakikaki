@@ -6,7 +6,7 @@ import { badgesOf } from './badges';
 import { missMsg } from './tracer.svelte';
 
 // 保護者向けの画面は漢字で書き、学年での変換をしない
-const PARENT = /\/about\/|DeleteConfirm|DangerModal|DangerZone|Shredder|LangPicker|BirthGate/;
+const PARENT = /\/about\/|DeleteConfirm|DangerModal|DangerZone|Shredder|LangPicker|BirthGate|AppStorePopup/;
 const files = (dir: string): string[] =>
   readdirSync(dir).flatMap((f) => {
     const p = join(dir, f);

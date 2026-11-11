@@ -31,7 +31,7 @@
 
   <div class="cols">
     <div class="left">
-      <section class="card">
+      <section class="card ios">
         <h2>iPad アプリを公開しました</h2>
         <p>
           App Store で「かきかき -
@@ -45,7 +45,7 @@
           この Web 版は 2026 年 11 月 30
           日で公開を終えます。ホーム画面に追加してあれば、そのあともこの端末で使い続けられます。ただし更新は届かなくなり、ホーム画面から消すと入れ直せません。念のため、右の「バックアップ」で記録を書き出しておいてください。
         </p>
-        <a class="go" href="https://apps.apple.com/jp/app/id6832798120"
+        <a class="store" href="https://apps.apple.com/jp/app/id6832798120"
           >App Store で見る <Icon name="back" size={18} /></a
         >
       </section>
@@ -126,6 +126,27 @@
   ol {
     margin: 0;
     padding-left: 22px;
+  }
+  .ios {
+    border: 3px solid var(--blue);
+  }
+  .ios h2 {
+    font-size: 21px;
+  }
+  .store {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 10px 20px;
+    border-radius: 14px;
+    background: var(--blue);
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  .store :global(svg) {
+    transform: scaleX(-1);
   }
   .close {
     margin: 12px 0 0;
