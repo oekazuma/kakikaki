@@ -118,7 +118,6 @@ export class WriteQuiz {
   get c() {
     return this.letters[this.targets[this.k]];
   }
-  // 盤面の下のひとこと（書き方つき）
   get hint() {
     if (this.msg) return this.msg;
     if (this.mode !== 'test') return '{丸|まる}から {線|せん}に そって なぞろう';

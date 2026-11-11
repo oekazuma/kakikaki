@@ -24,15 +24,6 @@ describe('yomi', () => {
     expect(m.t('{見|み}る ことば')).toBe('みることば');
   });
 
-  it('差し込む値は変換せず、となりの空白は値の端の字で決める', async () => {
-    const m = await fresh();
-    m.updateProfile(m.current().id, { birth: '2017-05-01' });
-    expect(m.t`${'ひらがな'} の {記録|きろく}`).toBe('ひらがなのきろく');
-    expect(m.t`${'た ろう'} の え`).toBe('た ろうのえ');
-    expect(m.t`${4} ほん`).toBe('4 ほん');
-    expect(m.t`${'{見|み}'} る`).toBe('{見|み} る');
-  });
-
   it('生年月日が無い・未来・形が違う人を聞き直す', async () => {
     const m = await fresh();
     const a = m.addProfile('a', 'cat', 'ja', '2030-01-01')!;

@@ -35,7 +35,7 @@
     {#each details as { l, d } (l)}
       <LangOverview {l} {d} on={l === sel} onselect={() => (sel = l)} />
     {/each}
-    <Calendar {days} {streak} />
+    <Calendar {days} {streak} parent />
   </div>
 
   <div class="detail">

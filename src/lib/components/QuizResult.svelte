@@ -27,7 +27,7 @@
 <div class="result card" in:fly={{ y: 40, duration: 350 }}>
   <div class="score">{total} {t('{問中|もんちゅう}')} <b>{correct}</b> {t('{問|もん} {正解|せいかい}')}</div>
   <Stars n={3} k={stars} size={56} />
-  <p>{msg}</p>
+  <p>{t(msg)}</p>
   <div class="btns">
     {#if next}
       <a class="main" href="{resolve(`/quiz/${kind}`)}?level={next}">{t(`{次|つぎ}は ${levelName(next, lang.v)}`)}</a>

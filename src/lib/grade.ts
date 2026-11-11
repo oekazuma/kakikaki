@@ -12,7 +12,6 @@ export function isBirth(s: unknown, today: string): s is string {
   return s <= r.max && s >= r.min;
 }
 
-// 入力の欄の min / max（isBirth と同じ範囲）
 export const birthRange = (today: string) => ({
   min: `${Number(today.slice(0, 4)) - 100}${today.slice(4)}`,
   max: today

@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { display } from '$lib/grade';
   import { t } from '$lib/yomi.svelte';
   import Icon from '../Icon.svelte';
   import { today } from '$lib/today';
   // 今月のカレンダー。全ことば をまたいで練習した日に印。連続した日数を上に出す（切れたことは言わない）
-  let { days, streak }: { days: string[]; streak: number } = $props();
+  // 保護者向けの画面（parent）では学年で変えず、書き方を付ける前の かな で出す
+  let { days, streak, parent = false }: { days: string[]; streak: number; parent?: boolean } = $props();
+  const tr = (s: string) => (parent ? display(s, null) : t(s));
   const day = today();
   const [y, m] = day.split('-').map(Number);
   const first = new Date(y, m - 1, 1).getDay();
@@ -16,14 +19,14 @@
 
 <section class="card cal">
   <div class="head">
-    <b>{t(`${m} {月|がつ}`)}</b>
+    <b>{tr(`${m} {月|がつ}`)}</b>
     {#if streak > 0}<span class="streak"
-        ><Icon name="star" size={16} fill /> {t(`{続|つづ}けて ${streak} {日|にち}`)}</span
+        ><Icon name="star" size={16} fill /> {tr(`{続|つづ}けて ${streak} {日|にち}`)}</span
       >{/if}
   </div>
   <div class="grid">
     {#each ['{日|にち}', '{月|げつ}', '{火|か}', '{水|すい}', '{木|もく}', '{金|きん}', '{土|ど}'] as w (w)}<span
-        class="w">{t(w)}</span
+        class="w">{tr(w)}</span
       >{/each}
     {#each cells as d (d)}
       {#if d < 0}<span></span>{:else}

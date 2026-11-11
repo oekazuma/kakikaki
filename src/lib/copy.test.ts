@@ -57,6 +57,26 @@ describe('子ども向けの文の書き方', () => {
     expect(bad).toEqual([]);
   });
 
+  it('書き方つきの値を持つ変数と、書き方つきの名前を返す関数は、t() を通して出す', () => {
+    const bad: string[] = [];
+    for (const { f, s } of sources.filter(({ f }) => f.endsWith('.svelte'))) {
+      const script = s.match(/<script[\s\S]*?<\/script>/)?.[0] ?? '';
+      const markup = s.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, '');
+      const vars = script
+        .split(/;\n/)
+        .flatMap((st) => (MARK.test(st) ? [...st.matchAll(/(?:const|let)\s+(\w+)\s*=/g)].map((m) => m[1]) : []));
+      MARK.lastIndex = 0;
+      for (const v of vars) if (new RegExp(`\\{\\s*${v}\\s*\\}`).test(markup)) bad.push(`${f}: {${v}}`);
+      for (const m of markup.matchAll(/(?<!\$)\{\s*(levelName|gradeLabel|rowLabel)\(/g)) bad.push(`${f}: ${m[0]}`);
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('保護者向けの画面で使うカレンダーは、学年で変えない', () => {
+    const progress = readFileSync('src/routes/about/progress/+page.svelte', 'utf8');
+    expect(progress).toMatch(/<Calendar[^>]*\bparent\b/);
+  });
+
   it('1 年生の見た目は書き方を付ける前の文と同じ', () => {
     const ja = Object.fromEntries(badgesOf('ja').map((b) => [b.id, [display(b.name, 1), display(b.desc, 1)]]));
     expect(ja['first-gold']).toEqual(['はじめての きんのほし', 'おてほんなしで はじめて ごうかく']);

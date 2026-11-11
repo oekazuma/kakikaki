@@ -43,7 +43,7 @@
 </script>
 
 <svelte:head>
-  <title>かきクイズ {levelName(level, lang.v)} | {info().title}</title>
+  <title>かきクイズ {t(levelName(level, lang.v))} | {info().title}</title>
   <meta name="description" content="えを みて もじを かく クイズ。" />
 </svelte:head>
 

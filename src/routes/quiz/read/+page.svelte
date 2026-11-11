@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { hiding } from '$lib/yomi.svelte';
+  import { hiding, t } from '$lib/yomi.svelte';
   import { page } from '$app/state';
   import { untrack } from 'svelte';
   import { fly, scale } from 'svelte/transition';
@@ -39,7 +39,7 @@
 </script>
 
 <svelte:head>
-  <title>よみクイズ {levelName(level, lang.v)} | {info().title}</title>
+  <title>よみクイズ {t(levelName(level, lang.v))} | {info().title}</title>
   <meta name="description" content="もじを よんで えを えらぶ クイズ。" />
 </svelte:head>
 

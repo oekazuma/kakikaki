@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>{title} | {info().title}</title>
+  <title>{t(title)} | {info().title}</title>
   <meta name="description" content="練習したい文字をえらぶページ。" />
 </svelte:head>
 
