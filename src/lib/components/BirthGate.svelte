@@ -29,7 +29,7 @@
 </script>
 
 <div class="gate">
-  <section class="card">
+  <section class="card" role="dialog" aria-modal="true" aria-label="使う人の名前と生年月日">
     <h2>使う人の名前と生年月日を入れてください</h2>
     <p>
       画面の説明やボタンの文字を、その人の学年までに習った漢字で表示するために使います。練習する文字は変わりません。

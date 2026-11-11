@@ -37,7 +37,8 @@
 <svelte:document onvisibilitychange={onVisible} />
 
 <canvas class="fx" {@attach (c) => fx.mount(c)}></canvas>
-{@render children()}
+<!-- 生年月日の入力画面が出ている間は、下の画面に Tab や読み上げで移れないようにする -->
+<div class="app" inert={missingBirth().length > 0}>{@render children()}</div>
 {#if missingBirth().length}<BirthGate />{/if}
 <Splash />
 {#if tooSmall}
@@ -92,6 +93,9 @@
 {/if}
 
 <style>
+  .app {
+    display: contents;
+  }
   .fx {
     position: fixed;
     inset: 0;
