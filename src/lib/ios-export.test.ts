@@ -244,6 +244,16 @@ const pts2 = (lang: L, c: string) => SETS[lang][c].map((d) => pathToPoints(d, 2)
       mode: 'trace',
       events: drag(a[0].filter((_, i) => i % 9 === 0 || i === a[0].length - 1))
     },
+    // 水 の右の 2 画を続けて書くと 3 画になり 小 が 1 位になる。案内は似た字ではなく画数（want）
+    {
+      lang: 'kanji',
+      char: '水',
+      mode: 'test',
+      events: [
+        ...(([s1, s2, s3, s4]) => [s1, s2, [...s3, ...s4]])(pts2('kanji', '水')).flatMap((s) => drag(s)),
+        { t: 'judge' }
+      ]
+    },
     // 1 画目を 2 本に分けて書くと、書いた字が 1 位のまま画数違いで落ちる（top は空）
     {
       lang: 'ja',

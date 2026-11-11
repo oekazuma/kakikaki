@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { Tracer, missMsg } from './tracer.svelte';
 import { STROKES } from './strokes';
 import { STROKES_EN } from './strokes-en';
+import { STROKES_KANJI } from './strokes-kanji';
 import { pathToPoints, translate, type Pt } from './geometry';
 
 const strokePts = (c: string, i: number) => pathToPoints(STROKES[c][i], 2);
@@ -204,5 +205,24 @@ describe('Tracer おてほんなし', () => {
     expect(r.ok).toBe(false);
     expect(missMsg(r)).not.toContain('ぶ');
     expect(missMsg({ mode: 'test', score: 0, ok: false, top: 'ほ' })).toContain('「ほ」に みえるよ');
+  });
+  it('画数が違うと、似た字の名前ではなく正しい本数を伝える（水 の右の 2 画を続けて書くと 3 画で 小 に近くなる）', () => {
+    const t = new Tracer('水', STROKES_KANJI, 'test');
+    const [s1, s2, s3, s4] = STROKES_KANJI['水'].map((d) => pathToPoints(d, 2));
+    drag(t, s1);
+    drag(t, s2);
+    drag(t, [...s3, ...s4]);
+    const r = t.judge()!;
+    expect(r.ok).toBe(false);
+    expect(r.want).toBe(4);
+    expect(missMsg(r)).toBe('おしい！ せんの かずは 4 ほんだよ。もういちど！');
+  });
+  it('画数が合っていて形が違うときは、本数ではなく見えた字を伝える', () => {
+    const t = new Tracer('あ', STROKES, 'test');
+    for (let i = 0; i < 3; i++) drag(t, strokePts('お', i));
+    const r = t.judge()!;
+    expect(r.ok).toBe(false);
+    expect(r.want).toBeUndefined();
+    expect(missMsg(r)).toContain('に みえるよ');
   });
 });

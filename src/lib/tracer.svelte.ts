@@ -5,13 +5,19 @@ import { strokeScore } from './score';
 import { recognize, passes, testScore, templatesFor, RECOG } from './recognize';
 import type { Mode } from './progress.svelte';
 
-export type Result = { mode: Mode; score: number; ok: boolean; top: string };
+// want は おてほんなし で画数が違って落ちたときの、お手本の画数
+export type Result = { mode: Mode; score: number; ok: boolean; top: string; want?: number };
 // up() の結果: 画が完成 / 文字が完成 / 逸脱でやり直し / まだ途中（じぶんでかく）/ 1 画ぶん描いた（おてほんなし）
 type UpEvent = 'stroke' | 'done' | 'fail' | 'pending' | 'drawn' | 'idle';
 
-// おてほんなし で落ちたときの一言。top が空なのは書いた字そのものが 1 位なのに落ちたとき（画数の罰点で距離が伸びた）
+// おてほんなし で落ちたときの一言。画数が違うと形が近くても罰点で落ち、似た字の名前を出すと
+// 別の字を書いたと受け取って直す所が分からないので、本数を先に伝える
 export const missMsg = (r: Result) =>
-  r.top ? `おしい！ 「${r.top}」に みえるよ。もういちど！` : 'おしい！ せんの かずを たしかめて もういちど！';
+  r.want
+    ? `おしい！ せんの かずは ${r.want} ほんだよ。もういちど！`
+    : r.top
+      ? `おしい！ 「${r.top}」に みえるよ。もういちど！`
+      : 'おしい！ かたちを たしかめて もういちど！';
 
 // 1 文字ぶんの書き取りの状態機械。座標は 109 マスの viewBox 単位。描画・演出・タイマーは Canvas.svelte が持つ
 export class Tracer {
@@ -163,6 +169,10 @@ export class Tracer {
     }
     const mine = r.find((x) => this.accept.includes(x.char))!;
     const top = !ok && this.accept.includes(r[0].char) ? '' : r[0].char;
-    return { mode: 'test', score: testScore(mine.dist), ok, top };
+    // タップは画数に数えない。かきクイズで同じ読みの字（画数が違う）のどれかと合えば、画数の間違いではない
+    const n = (lines.length > 0 ? lines : this.trails).length;
+    const want =
+      ok || this.accept.some((c) => this.strokes[c].length === n) ? undefined : this.strokes[this.char].length;
+    return { mode: 'test', score: testScore(mine.dist), ok, top, ...(want ? { want } : {}) };
   }
 }
