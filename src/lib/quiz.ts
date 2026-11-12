@@ -60,10 +60,17 @@ export function pickChoices(
 
 // ？ に入る文字の選択肢: 正解と同じ文字セット（英語は同じ大文字小文字）から 2 つ
 // 数字は単語に出てこないので候補にしない（英語の 1 文字練習には数字があるが、クイズの出題対象は単語のみ）
-function blankLetters(correct: string, l: Lang, rnd: () => number): string[] {
+// 入れると別の単語になる字（いえ の い？ に す）は、どちらを選んでも正しく思えてしまうので外す
+function blankLetters(letters: string[], blank: number, l: Lang, rnd: () => number): string[] {
+  const correct = letters[blank];
   const lower = correct === correct.toLowerCase();
+  const words = new Set(WORDS.map((w) => lettersOf(w, l).join('|')));
   const pool = charsOf(l).filter(
-    (c) => c !== correct && !DIGITS.includes(c) && (l !== 'en' || (c === c.toLowerCase()) === lower)
+    (c) =>
+      c !== correct &&
+      !DIGITS.includes(c) &&
+      (l !== 'en' || (c === c.toLowerCase()) === lower) &&
+      !words.has(letters.with(blank, c).join('|'))
   );
   return shuffle([correct, ...shuffle(pool, rnd).slice(0, 2)], rnd);
 }
@@ -98,7 +105,7 @@ export function makeReadQuiz(l: Lang, level: Level, n = QUESTIONS.read, rnd = Ma
           key: letters[blank],
           choices: [answer],
           blank,
-          letters: blankLetters(letters[blank], l, rnd)
+          letters: blankLetters(letters, blank, l, rnd)
         };
       }
       return { kind, answer, key: answer.id, choices: pickChoices(answer, pool, l, level, rnd) };

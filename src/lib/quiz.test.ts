@@ -84,6 +84,19 @@ describe('quiz', () => {
       for (const q of makeReadQuiz('en', 2, 40, seeded(seed)))
         if (q.kind === 'blank') for (const c of q.letters!) expect(DIGITS).not.toContain(c);
   });
+  it('穴埋めの外れの字は、入れても別の単語にならない（いえ の い？ に す を出さない）', () => {
+    for (const l of ['ja', 'kana', 'en'] as const) {
+      const words = new Set(WORDS.map((w) => lettersOf(w, l).join('|')));
+      for (const level of [1, 2, 3] as const)
+        for (let seed = 1; seed <= 60; seed++)
+          for (const q of makeReadQuiz(l, level, 20, seeded(seed)))
+            if (q.kind === 'blank')
+              for (const c of q.letters!.filter((c) => c !== q.key)) {
+                const made = lettersOf(q.answer, l).with(q.blank!, c);
+                expect(words.has(made.join('|')), `${l} ${q.answer.id}: ${made.join('')}`).toBe(false);
+              }
+    }
+  });
   it('むずかしい の選択肢は同じカテゴリ・同じ文字数が優先される', () => {
     const answer = wordById('hamburger')!; // はんばーがー 6 文字。たべもの には同じ 6 文字の語が 4 つある
     for (const seed of [1, 2, 3]) {
