@@ -70,7 +70,7 @@ function blankLetters(letters: string[], blank: number, l: Lang, rnd: () => numb
       c !== correct &&
       !DIGITS.includes(c) &&
       (l !== 'en' || (c === c.toLowerCase()) === lower) &&
-      !words.has(letters.with(blank, c).join('|'))
+      !words.has(letters.map((x, i) => (i === blank ? c : x)).join('|'))
   );
   return shuffle([correct, ...shuffle(pool, rnd).slice(0, 2)], rnd);
 }
