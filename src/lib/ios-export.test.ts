@@ -456,7 +456,7 @@ describe('ios-data', () => {
     expect(toList(STROKES_KANA)).toHaveLength(81);
     expect(toList(STROKES_EN)).toHaveLength(62);
     expect(toList(STROKES_KANJI)).toHaveLength(1026);
-    expect(WORDS).toHaveLength(224);
+    expect(WORDS).toHaveLength(230);
   });
 
   it('いまのコードから作ったものと同じ（違えば pnpm ios:export）', () => {

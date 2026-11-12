@@ -152,6 +152,12 @@ export const WORDS: Word[] = [
   ]),
   ...W('ひと', [
     ['baby', 'あかちゃん', '👶', 'baby'],
+    ['father', 'おとうさん', '👨', 'father'],
+    ['mother', 'おかあさん', '👩', 'mother'],
+    ['dad', 'ぱぱ', '👨‍🍼', 'dad'],
+    ['mom', 'まま', '👩‍🍼', 'mom'],
+    ['grandpa', 'おじいちゃん', '👴', 'grandpa'],
+    ['grandma', 'おばあちゃん', '👵', 'grandma'],
     ['teacher', 'せんせい', '🧑‍🏫', 'teacher'],
     ['doctor', 'おいしゃさん', '🧑‍⚕️', 'doctor'],
     ['police', 'おまわりさん', '👮', 'police'],
